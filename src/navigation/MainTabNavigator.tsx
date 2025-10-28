@@ -64,7 +64,7 @@ export const MainTabNavigator = () => {
                 name="Favorites"
                 component={FavoritesScreen}
                 options={{
-                    tabBarLabel: 'Favorites',
+                    tabBarLabel: 'My Feed',
                     tabBarIcon: ({color}) => <Heart size={tabBarIconSize} color={color} />
                 }}
             />

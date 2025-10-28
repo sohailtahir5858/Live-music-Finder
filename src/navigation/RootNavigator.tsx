@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import magically from 'magically-sdk';
 import { Skeleton } from '../components/ui';
 import LoginScreen from '../screens/LoginScreen';
-import CitySelectionScreen from '../screens/CitySelectionScreen';
 import FeedbackScreen from '../screens/FeedbackScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { ShowDetailScreen } from '../screens/ShowDetailScreen';
@@ -16,7 +15,6 @@ import { useUserPreferences } from '../stores/userPreferencesStore';
 
 export type RootStackParamList = {
   Login: undefined;
-  CitySelection: undefined;
   MainTabs: undefined;
   Feedback: undefined;
   Profile: undefined;
@@ -32,21 +30,64 @@ export const RootNavigator = () => {
   const isAuthenticated = useAppStateStore((state) => state.isAuthenticated);
   const updateState = useAppStateStore((state) => state.updateState);
   const { loadPreferences, hasLoadedPreferences, hasSelectedCity } = useUserPreferences();
+  const [isAuthInitialized, setIsAuthInitialized] = React.useState(false);
 
-  useEffect(() => {
-    // Initialize auth state from SDK
-    updateState({ isAuthenticated: magically.auth.isAuthenticated });
+  // First effect: Initialize and restore session on app start
+  React.useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        // Check if there's a valid session already
+        const isAuth = magically.auth.isAuthenticated;
+        console.log('[Auth] Session check:', isAuth);
+        updateState({ isAuthenticated: isAuth });
+        
+        // If authenticated, load preferences
+        if (isAuth) {
+          console.log('[Auth] Loading preferences for authenticated user');
+          await loadPreferences();
+        }
+      } catch (error) {
+        console.error('[Auth] Error restoring session:', error);
+      } finally {
+        setIsAuthInitialized(true);
+      }
+    };
 
-    // Listen for auth state changes and update store
+    restoreSession();
+  }, []);
+
+  // Second effect: Set up auth state listener after initialization
+  React.useEffect(() => {
+    if (!isAuthInitialized) return;
+
+    console.log('[Auth] Setting up auth listener');
     const unsubscribe = magically.auth.onAuthStateChanged((authState) => {
+      console.log('[Auth] Auth state changed:', authState.isAuthenticated);
       updateState({ isAuthenticated: authState.isAuthenticated });
-      if (authState.isAuthenticated && !hasLoadedPreferences) {
+      
+      // When user logs in, load preferences
+      if (authState.isAuthenticated) {
+        console.log('[Auth] User logged in, loading preferences');
         loadPreferences();
+      } else {
+        console.log('[Auth] User logged out');
       }
     });
 
-    return unsubscribe;
-  }, [updateState, loadPreferences, hasLoadedPreferences]);
+    return () => {
+      console.log('[Auth] Cleaning up auth listener');
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isAuthInitialized]);
+
+  // Show loading screen while auth is initializing
+  if (!isAuthInitialized) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center' }}>
+        <Skeleton width={100} height={100} style={{ borderRadius: 50 }} />
+      </View>
+    );
+  }
 
   // IMPORTANT: Add more conditions here as needed for your app
   // Example: const needsOnboarding = useAppStateStore(state => state.needsOnboarding);
@@ -54,15 +95,10 @@ export const RootNavigator = () => {
   
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isAuthenticated ? (
-        // Auth flow: Login
+      {!isAuthenticated || !hasSelectedCity ? (
+        // Auth flow: Login (includes city selection for authenticated users)
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
-        </>
-      ) : !hasSelectedCity ? (
-        // First time: City selection
-        <>
-          <Stack.Screen name="CitySelection" component={CitySelectionScreen} />
         </>
       ) : (
         // Authenticated with city selected: Show main app

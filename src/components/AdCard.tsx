@@ -22,6 +22,7 @@ export const AdCard: React.FC<AdCardProps> = ({ ad, onImpression }) => {
   // Track impressions server-side or with a different strategy
 
   const handleAdClick = async () => {
+
     try {
       // Track click
       await Ads.update(ad._id, {

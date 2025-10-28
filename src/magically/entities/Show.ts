@@ -22,6 +22,7 @@
  *   price?: string
  *   capacity?: number
  *   popularity?: number
+ *   sourceUrl?: string
  *   isPublic: boolean
  *   // Standard fields (always present after save)
  *   _id: string
@@ -81,17 +82,9 @@ export interface Show {
   capacity?: number;
   /** Popularity rating (0-5) */
   popularity?: number;
+  /** Source URL for the event */
+  sourceUrl?: string;
   /** Public data visible to all users */
-  isPublic: boolean;
-  /** MongoDB document ID - automatically generated */
-  _id: string;
-  /** User who created this document - automatically set from auth */
-  creator: string;
-  /** When document was created - automatically set */
-  createdAt: Date;
-  /** When document was last updated - automatically managed */
-  updatedAt: Date;
-  /** Whether document is publicly visible - defaults to false */
   isPublic?: boolean;
 }
 

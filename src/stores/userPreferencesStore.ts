@@ -154,6 +154,7 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
       
       // Check if user is authenticated
       if (!magically.auth.currentUser) {
+        console.log('[Prefs] No auth user, using defaults');
         set({ 
           ...DEFAULT_PREFERENCES,
           hasLoadedPreferences: true,
@@ -162,12 +163,15 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
         return;
       }
 
+      console.log('[Prefs] Loading preferences for user:', magically.auth.currentUser);
       const result = await magically.data.query('user_preferences', {});
       
       if (result.data && result.data.length > 0) {
         const prefs = result.data[0] as any;
+        console.log('[Prefs] Found saved preferences:', prefs);
         set({
           selectedCity: prefs.selectedCity || DEFAULT_PREFERENCES.selectedCity,
+          hasSelectedCity: !!prefs.selectedCity, // Set to true if city was previously selected
           favoriteGenres: prefs.favoriteGenres || [],
           favoriteVenues: prefs.favoriteVenues || [],
           favoriteArtists: prefs.favoriteArtists || [],
@@ -176,22 +180,24 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
           isPremium: prefs.isPremium || false,
           viewMode: prefs.viewMode || 'card',
           hasLoadedPreferences: true,
+          isLoading: false,
         });
       } else {
         // No preferences found, use defaults
+        console.log('[Prefs] No saved preferences, using defaults');
         set({ 
           ...DEFAULT_PREFERENCES,
-          hasLoadedPreferences: true 
+          hasLoadedPreferences: true,
+          isLoading: false 
         });
       }
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      console.error('[Prefs] Error loading preferences:', error);
       set({ 
         ...DEFAULT_PREFERENCES,
-        hasLoadedPreferences: true 
+        hasLoadedPreferences: true,
+        isLoading: false 
       });
-    } finally {
-      set({ isLoading: false });
     }
   },
 
@@ -199,6 +205,7 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
     try {
       // Only save if user is authenticated
       if (!magically.auth.currentUser) {
+        console.log('[Prefs] Cannot save - no authenticated user');
         return;
       }
 
@@ -214,18 +221,23 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
         viewMode: state.viewMode,
       };
 
+      console.log('[Prefs] Saving preferences:', prefsData);
+
       // Check if preferences exist
       const existing = await magically.data.query('user_preferences', {});
       
       if (existing.data && existing.data.length > 0) {
         // Update existing
+        console.log('[Prefs] Updating existing preferences');
         await magically.data.update('user_preferences', { _id: existing.data[0]._id }, prefsData);
       } else {
         // Create new
+        console.log('[Prefs] Creating new preferences');
         await magically.data.insert('user_preferences', prefsData);
       }
+      console.log('[Prefs] Preferences saved successfully');
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error('[Prefs] Error saving preferences:', error);
     }
   },
 

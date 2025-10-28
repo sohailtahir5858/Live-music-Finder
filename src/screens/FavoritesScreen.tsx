@@ -144,7 +144,7 @@ export const FavoritesScreen = () => {
         {/* Header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
           <Text style={{ fontSize: 28, fontWeight: '900', color: text, marginBottom: 4 }}>
-            Your Favorites
+            My Feed
           </Text>
           <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600' }}>
             Shows matching your favorite {favoriteGenres.length > 0 && 'genres'}{favoriteGenres.length > 0 && favoriteVenues.length > 0 && ' and '}{favoriteVenues.length > 0 && 'venues'}

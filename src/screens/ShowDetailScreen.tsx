@@ -67,6 +67,7 @@ export const ShowDetailScreen = () => {
         { active: true, isPublic: true },
         { limit: 20 }
       );
+      console.log('Fetched ads:', allAds);
       const cityFilteredAds = allAds.data.filter(ad => 
         ad.city === selectedCity || ad.city === 'Both'
       );
@@ -301,7 +302,7 @@ export const ShowDetailScreen = () => {
 
               {/* Price */}
               {show.price && (
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: show.capacity ? 16 : 0 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: show.sourceUrl ? 16 : 0 }}>
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#10b981' + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                     <DollarSign size={20} color="#10b981" strokeWidth={2.5} />
                   </View>
@@ -316,21 +317,24 @@ export const ShowDetailScreen = () => {
                 </View>
               )}
 
-              {/* Capacity */}
-              {show.capacity && (
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f59e0b' + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-                    <Users size={20} color="#f59e0b" strokeWidth={2.5} />
+              {/* Event Link */}
+              {show.sourceUrl && (
+                <Pressable
+                  onPress={() => Linking.openURL(show.sourceUrl!)}
+                  style={{ flexDirection: 'row', alignItems: 'flex-start' }}
+                >
+                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: primary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                    <MapPin size={20} color={primary} strokeWidth={2.5} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4 }}>
-                      Capacity
+                      Event Link
                     </Text>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: text }}>
-                      {show.capacity} people
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: primary, textDecorationLine: 'underline' }}>
+                      View on Website
                     </Text>
                   </View>
-                </View>
+                </Pressable>
               )}
             </View>
 

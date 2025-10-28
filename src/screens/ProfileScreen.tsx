@@ -8,7 +8,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
-import { User, Bell, MessageSquare, Crown, LogOut, Trash2, ChevronRight } from 'lucide-react-native';
+import { User, Bell, MessageSquare, Crown, LogOut, Trash2, ChevronRight, MapPin } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserPreferences } from '../stores/userPreferencesStore';
 import { AnimatedSpinner } from '../components/ui';
@@ -17,13 +17,16 @@ import { MagicallyAlert } from '../components/ui';
 import { NotificationSettings } from '../components/NotificationSettings';
 import { GenreSelector } from '../components/GenreSelector';
 import { VenueSelector } from '../components/VenueSelector';
+import { CityCard } from '../components/CityCard';
 
 export default function ProfileScreen() {
   const { background, text, textMuted, primary, secondary, cardBackground, border, destructive } = useTheme();
   const navigation = useNavigation();
-  const { isPremium, setIsPremium } = useUserPreferences();
+  const { isPremium, setIsPremium, selectedCity, setSelectedCity } = useUserPreferences();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showCitySelection, setShowCitySelection] = useState(false);
+  const [tempSelectedCity, setTempSelectedCity] = useState<'Kelowna' | 'Nelson' | null>(selectedCity);
   const user = magically.auth.getCurrentUser();
 
   const handleSignOut = async () => {
@@ -138,6 +141,23 @@ export default function ProfileScreen() {
     );
   };
 
+  const handleCitySelect = (city: 'Kelowna' | 'Nelson') => {
+    setTempSelectedCity(city);
+  };
+
+  const handleConfirmCityChange = () => {
+    if (tempSelectedCity) {
+      setSelectedCity(tempSelectedCity);
+      setShowCitySelection(false);
+      MagicallyAlert.alert('City Updated', `Your location has been changed to ${tempSelectedCity}.`);
+    }
+  };
+
+  const handleCancelCityChange = () => {
+    setTempSelectedCity(selectedCity);
+    setShowCitySelection(false);
+  };
+
   if (!user) {
     return (
       <View style={{ flex: 1, backgroundColor: background }}>
@@ -205,6 +225,32 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
+        </View>
+
+        {/* City Selection Section */}
+        <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
+          <Pressable
+            onPress={() => {
+              setTempSelectedCity(selectedCity);
+              setShowCitySelection(true);
+            }}
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+                <MapPin size={18} color={primary} strokeWidth={2.5} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: text, marginBottom: 2 }}>
+                  Location
+                </Text>
+                <Text style={{ fontSize: 14, color: textMuted, fontWeight: '500' }}>
+                  {selectedCity || 'Select your city'}
+                </Text>
+              </View>
+            </View>
+            <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
+          </Pressable>
         </View>
 
         {/* Favorite Genres Section */}
@@ -328,6 +374,73 @@ export default function ProfileScreen() {
           </Text>
         </Pressable>
       </ScrollView>
+
+      {/* City Selection Modal */}
+      {showCitySelection && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: background, borderRadius: 20, padding: 20, margin: 20, width: '90%', maxWidth: 400 }}>
+            <Text style={{ fontSize: 24, fontWeight: '700', color: text, textAlign: 'center', marginBottom: 20 }}>
+              Change Location
+            </Text>
+            
+            <View style={{ gap: 16, marginBottom: 24 }}>
+              <CityCard
+                city="Kelowna"
+                imageUrl="https://trymagically.com/api/media/image?query=kelowna%20bc%20canada%20city%20beautiful%20okanagan%20lake%20sunset"
+                description="Okanagan's vibrant music scene"
+                isSelected={tempSelectedCity === 'Kelowna'}
+                onSelect={() => handleCitySelect('Kelowna')}
+                primary={primary}
+                text={text}
+                textMuted={textMuted}
+                cardBackground={cardBackground}
+                isDark={false}
+              />
+
+              <CityCard
+                city="Nelson"
+                imageUrl="https://trymagically.com/api/media/image?query=nelson%20bc%20canada%20city%20mountains%20kootenay%20lake"
+                description="Kootenay's eclectic music hub"
+                isSelected={tempSelectedCity === 'Nelson'}
+                onSelect={() => handleCitySelect('Nelson')}
+                primary={primary}
+                text={text}
+                textMuted={textMuted}
+                cardBackground={cardBackground}
+                isDark={false}
+              />
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Pressable
+                onPress={handleCancelCityChange}
+                style={{ flex: 1, paddingVertical: 14, paddingHorizontal: 20, backgroundColor: cardBackground, borderRadius: 12, alignItems: 'center' }}
+              >
+                <Text style={{ color: text, fontSize: 16, fontWeight: '600' }}>
+                  Cancel
+                </Text>
+              </Pressable>
+              
+              <Pressable
+                onPress={handleConfirmCityChange}
+                disabled={!tempSelectedCity}
+                style={{ 
+                  flex: 1, 
+                  paddingVertical: 14, 
+                  paddingHorizontal: 20, 
+                  backgroundColor: tempSelectedCity ? primary : textMuted + '40', 
+                  borderRadius: 12, 
+                  alignItems: 'center' 
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>
+                  Confirm
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

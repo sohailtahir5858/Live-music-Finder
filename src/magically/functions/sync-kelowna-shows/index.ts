@@ -388,7 +388,7 @@ function extractShowData(eventHtml: string, fullHtml?: string): Show | null {
       }
     }
 
-    // Extract venue - try multiple patterns
+    // Extract venue - try multiple patterns with better HTML stripping
     let venue = '';
     const venuePatterns = [
       /class="[^"]*tribe-events-calendar-list__event-venue-title[^"]*"[^>]*>([^<]+)</i,
@@ -399,8 +399,12 @@ function extractShowData(eventHtml: string, fullHtml?: string): Show | null {
     for (const pattern of venuePatterns) {
       const match = eventHtml.match(pattern);
       if (match) {
-        venue = stripHtml(match[1]);
-        break;
+        venue = stripHtml(match[1]).trim();
+        // Filter out venues that are URLs or too long/short
+        if (venue && !venue.includes('http') && venue.length > 1 && venue.length < 100) {
+          break;
+        }
+        venue = ''; // Reset if invalid
       }
     }
 
@@ -437,11 +441,22 @@ function extractShowData(eventHtml: string, fullHtml?: string): Show | null {
       }
     }
     
-    // Filter out non-genre terms
-    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming'];
-    const filteredGenres = genres.filter(g => 
-      !filterTerms.some(term => g.toLowerCase().includes(term))
-    );
+    // Filter out non-genre terms and invalid content
+    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming', 'http', 'www', '.com', '.ca', '.org', 'aesthetic', 'lab', 'cafe', 'bar', 'pub', 'restaurant', 'theatre', 'theater', 'club', 'lounge', 'brewery', 'winery', 'music', 'live', 'show', 'concert', 'performance', 'band', 'artist', 'performer'];
+    const validGenres = ['rock', 'pop', 'jazz', 'blues', 'country', 'folk', 'indie', 'alternative', 'punk', 'metal', 'hip-hop', 'rap', 'electronic', 'dance', 'house', 'techno', 'classical', 'orchestral', 'chamber', 'opera', 'world', 'reggae', 'ska', 'bluegrass', 'gospel', 'christian', 'r&b', 'soul', 'funk', 'disco', 'latin', 'salsa', 'tango', 'swing', 'big band', 'experimental', 'ambient', 'acoustic', 'unplugged', 'covers', 'tribute', 'original', 'local', 'canadian', 'international'];
+
+    const filteredGenres = genres.filter(g => {
+      const genre = g.trim().toLowerCase();
+      // Must be reasonable length, not contain URLs, and not match filter terms
+      const isValidLength = genre.length > 1 && genre.length < 50;
+      const noUrls = !genre.includes('http') && !genre.includes('www') && !genre.includes('.com') && !genre.includes('.ca') && !genre.includes('.org');
+      const noFilterTerms = !filterTerms.some(term => genre.includes(term));
+      const noSpecialChars = !genre.includes('/') && !genre.includes('\\') && !genre.includes('@') && !genre.includes('#');
+      const noNumbersOnly = !genre.match(/^\d+$/);
+      const isValidGenre = validGenres.some(valid => genre.includes(valid)) || genre.length <= 3; // Allow short genres like "pop", "jazz"
+
+      return isValidLength && noUrls && noFilterTerms && noSpecialChars && noNumbersOnly && (isValidGenre || genre.length <= 3);
+    });
 
     // Extract image
     const imageMatch = eventHtml.match(/<img[^>]*src="([^"]+)"/i);
@@ -529,10 +544,20 @@ function extractGenresFromEventPage(html: string): string[] {
     }
     
     // Filter out non-genre terms
-    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming'];
-    const filteredGenres = genres.filter(g => 
-      !filterTerms.some(term => g.toLowerCase().includes(term))
-    );
+    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming', 'http', 'www', '.com', '.ca', '.org', 'aesthetic', 'lab', 'cafe', 'bar', 'pub', 'restaurant', 'theatre', 'theater', 'club', 'lounge', 'brewery', 'winery', 'music', 'live', 'show', 'concert', 'performance', 'band', 'artist', 'performer'];
+    const validGenres = ['rock', 'pop', 'jazz', 'blues', 'country', 'folk', 'indie', 'alternative', 'punk', 'metal', 'hip-hop', 'rap', 'electronic', 'dance', 'house', 'techno', 'classical', 'orchestral', 'chamber', 'opera', 'world', 'reggae', 'ska', 'bluegrass', 'gospel', 'christian', 'r&b', 'soul', 'funk', 'disco', 'latin', 'salsa', 'tango', 'swing', 'big band', 'experimental', 'ambient', 'acoustic', 'unplugged', 'covers', 'tribute', 'original', 'local', 'canadian', 'international'];
+
+    const filteredGenres = genres.filter(g => {
+      const genre = g.trim().toLowerCase();
+      const isValidLength = genre.length > 1 && genre.length < 50;
+      const noUrls = !genre.includes('http') && !genre.includes('www') && !genre.includes('.com') && !genre.includes('.ca') && !genre.includes('.org');
+      const noFilterTerms = !filterTerms.some(term => genre.includes(term));
+      const noSpecialChars = !genre.includes('/') && !genre.includes('\\') && !genre.includes('@') && !genre.includes('#');
+      const noNumbersOnly = !genre.match(/^\d+$/);
+      const isValidGenre = validGenres.some(valid => genre.includes(valid)) || genre.length <= 3;
+
+      return isValidLength && noUrls && noFilterTerms && noSpecialChars && noNumbersOnly && (isValidGenre || genre.length <= 3);
+    });
     
     return filteredGenres.length > 0 ? filteredGenres.slice(0, 3) : ['General'];
   } catch (error) {
@@ -601,10 +626,20 @@ function extractShowDataFromEventPage(html: string): Show | null {
     }
     
     // Filter out non-genre terms
-    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming'];
-    const filteredGenres = genres.filter(g => 
-      !filterTerms.some(term => g.toLowerCase().includes(term))
-    );
+    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming', 'http', 'www', '.com', '.ca', '.org', 'aesthetic', 'lab', 'cafe', 'bar', 'pub', 'restaurant', 'theatre', 'theater', 'club', 'lounge', 'brewery', 'winery', 'music', 'live', 'show', 'concert', 'performance', 'band', 'artist', 'performer'];
+    const validGenres = ['rock', 'pop', 'jazz', 'blues', 'country', 'folk', 'indie', 'alternative', 'punk', 'metal', 'hip-hop', 'rap', 'electronic', 'dance', 'house', 'techno', 'classical', 'orchestral', 'chamber', 'opera', 'world', 'reggae', 'ska', 'bluegrass', 'gospel', 'christian', 'r&b', 'soul', 'funk', 'disco', 'latin', 'salsa', 'tango', 'swing', 'big band', 'experimental', 'ambient', 'acoustic', 'unplugged', 'covers', 'tribute', 'original', 'local', 'canadian', 'international'];
+
+    const filteredGenres = genres.filter(g => {
+      const genre = g.trim().toLowerCase();
+      const isValidLength = genre.length > 1 && genre.length < 50;
+      const noUrls = !genre.includes('http') && !genre.includes('www') && !genre.includes('.com') && !genre.includes('.ca') && !genre.includes('.org');
+      const noFilterTerms = !filterTerms.some(term => genre.includes(term));
+      const noSpecialChars = !genre.includes('/') && !genre.includes('\\') && !genre.includes('@') && !genre.includes('#');
+      const noNumbersOnly = !genre.match(/^\d+$/);
+      const isValidGenre = validGenres.some(valid => genre.includes(valid)) || genre.length <= 3;
+
+      return isValidLength && noUrls && noFilterTerms && noSpecialChars && noNumbersOnly && (isValidGenre || genre.length <= 3);
+    });
 
     // Extract description
     const descMatch = html.match(/class="[^"]*tribe-events-single-event-description[^"]*"[^>]*>([\s\S]*?)<\/div>/i);

@@ -526,11 +526,22 @@ function extractGenresFromEventPage(html: string): string[] {
       genres.push(...Array.from(genreMatches).map(m => stripHtml(m[1])));
     }
     
-    // Filter out non-genre terms
-    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming'];
-    const filteredGenres = genres.filter(g => 
-      !filterTerms.some(term => g.toLowerCase().includes(term))
-    );
+    // Filter out non-genre terms and invalid content
+    const filterTerms = ['event', 'events', 'calendar', 'venue', 'upcoming', 'http', 'www', '.com', '.ca', '.org', 'aesthetic', 'lab', 'cafe', 'bar', 'pub', 'restaurant', 'theatre', 'theater', 'club', 'lounge', 'brewery', 'winery', 'music', 'live', 'show', 'concert', 'performance', 'band', 'artist', 'performer'];
+    const validGenres = ['rock', 'pop', 'jazz', 'blues', 'country', 'folk', 'indie', 'alternative', 'punk', 'metal', 'hip-hop', 'rap', 'electronic', 'dance', 'house', 'techno', 'classical', 'orchestral', 'chamber', 'opera', 'world', 'reggae', 'ska', 'bluegrass', 'gospel', 'christian', 'r&b', 'soul', 'funk', 'disco', 'latin', 'salsa', 'tango', 'swing', 'big band', 'experimental', 'ambient', 'acoustic', 'unplugged', 'covers', 'tribute', 'original', 'local', 'canadian', 'international'];
+
+    const filteredGenres = genres.filter(g => {
+      const genre = g.trim().toLowerCase();
+      // Must be reasonable length, not contain URLs, and not match filter terms
+      const isValidLength = genre.length > 1 && genre.length < 50;
+      const noUrls = !genre.includes('http') && !genre.includes('www') && !genre.includes('.com') && !genre.includes('.ca') && !genre.includes('.org');
+      const noFilterTerms = !filterTerms.some(term => genre.includes(term));
+      const noSpecialChars = !genre.includes('/') && !genre.includes('\\') && !genre.includes('@') && !genre.includes('#');
+      const noNumbersOnly = !genre.match(/^\d+$/);
+      const isValidGenre = validGenres.some(valid => genre.includes(valid)) || genre.length <= 3; // Allow short genres like "pop", "jazz"
+
+      return isValidLength && noUrls && noFilterTerms && noSpecialChars && noNumbersOnly && (isValidGenre || genre.length <= 3);
+    });
 
     return filteredGenres.length > 0 ? filteredGenres.slice(0, 3) : ['General'];
   } catch (error) {

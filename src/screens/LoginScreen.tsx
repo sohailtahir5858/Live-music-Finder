@@ -1,18 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, Animated, Dimensions, Platform, Image } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, Animated, Dimensions, Platform, Image, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../contexts/ThemeContext';
 import { Logo } from '../components/ui/Logo';
-import { Mail, Loader2 } from 'lucide-react-native';
+import { Mail, Loader2, MapPin, Check } from 'lucide-react-native';
 import magically from 'magically-sdk';
+import { useUserPreferences } from '../stores/userPreferencesStore';
+import { CityCard } from '../components/CityCard';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const theme = useTheme();
+  const { setSelectedCity } = useUserPreferences();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [showCitySelection, setShowCitySelection] = useState(false);
+  const [selectedCity, setLocalSelectedCity] = useState<'Kelowna' | 'Nelson' | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -76,11 +81,23 @@ export default function LoginScreen() {
     setLoadingProvider(provider);
     try {
       await magically.auth.triggerAuthenticationFlow(provider);
+      // After successful auth, show city selection
+      setShowCitySelection(true);
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
       setIsLoading(false);
       setLoadingProvider(null);
+    }
+  };
+
+  const handleCitySelect = (city: 'Kelowna' | 'Nelson') => {
+    setLocalSelectedCity(city);
+  };
+
+  const handleConfirmCity = () => {
+    if (selectedCity) {
+      setSelectedCity(selectedCity);
     }
   };
 
@@ -171,6 +188,126 @@ export default function LoginScreen() {
     inputRange: [0, 1],
     outputRange: [0.3, 0.7],
   });
+
+  // Show city selection after login
+  if (showCitySelection) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        <StatusBar style={theme.statusBarStyle === 'light' ? 'light' : 'dark'} />
+        <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingHorizontal: 24,
+              paddingBottom: 40,
+            }}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View style={{ flex: 1, justifyContent: 'center', paddingTop: 60 }}>
+              {/* Header */}
+              <View style={{ alignItems: 'center', marginBottom: 48 }}>
+                <View
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 36,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 24,
+                    backgroundColor: '#f2a41e',
+                  }}
+                >
+                  <MapPin size={36} color="#fff" strokeWidth={2} />
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 32,
+                    fontWeight: '700',
+                    color: theme.text,
+                    textAlign: 'center',
+                    marginBottom: 12,
+                  }}
+                >
+                  Choose Your City
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: theme.textMuted,
+                    textAlign: 'center',
+                    lineHeight: 24,
+                    paddingHorizontal: 20,
+                  }}
+                >
+                  Select your location to discover live music events in your area
+                </Text>
+              </View>
+
+              {/* City Cards */}
+              <View style={{ gap: 20, marginBottom: 40 }}>
+                {/* Kelowna Card */}
+                <CityCard
+                  city="Kelowna"
+                  imageUrl="https://trymagically.com/api/media/image?query=kelowna%20bc%20canada%20city%20beautiful%20okanagan%20lake%20sunset"
+                  description="Okanagan's vibrant music scene"
+                  isSelected={selectedCity === 'Kelowna'}
+                  onSelect={() => handleCitySelect('Kelowna')}
+                  primary={theme.primary}
+                  text={theme.text}
+                  textMuted={theme.textMuted}
+                  cardBackground={theme.cardBackground}
+                  isDark={theme.statusBarStyle === 'dark'}
+                />
+
+                {/* Nelson Card */}
+                <CityCard
+                  city="Nelson"
+                  imageUrl="https://trymagically.com/api/media/image?query=nelson%20bc%20canada%20city%20mountains%20kootenay%20lake"
+                  description="Kootenay's eclectic music hub"
+                  isSelected={selectedCity === 'Nelson'}
+                  onSelect={() => handleCitySelect('Nelson')}
+                  primary={theme.primary}
+                  text={theme.text}
+                  textMuted={theme.textMuted}
+                  cardBackground={theme.cardBackground}
+                  isDark={theme.statusBarStyle === 'dark'}
+                />
+              </View>
+
+              {/* Confirm Button */}
+              {selectedCity && (
+                <Pressable
+                  onPress={handleConfirmCity}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.7 : 1,
+                  })}
+                >
+                  <View
+                    style={{
+                      paddingVertical: 18,
+                      borderRadius: 16,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'row',
+                      gap: 8,
+                      backgroundColor: '#f2a41e',
+                    }}
+                  >
+                    <Check size={20} color="#fff" strokeWidth={3} />
+                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+                      Continue with {selectedCity}
+                    </Text>
+                  </View>
+                </Pressable>
+              )}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
