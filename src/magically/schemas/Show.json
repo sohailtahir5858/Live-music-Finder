@@ -1,0 +1,93 @@
+{
+  "name": "Show",
+  "collection": "shows",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "required": true,
+        "description": "Show title or artist name"
+      },
+      "artist": {
+        "type": "string",
+        "required": true,
+        "description": "Artist or band name"
+      },
+      "venue": {
+        "type": "string",
+        "required": true,
+        "description": "Venue name"
+      },
+      "venueAddress": {
+        "type": "string",
+        "description": "Full venue address"
+      },
+      "city": {
+        "type": "string",
+        "required": true,
+        "enum": [
+          "Kelowna",
+          "Nelson"
+        ],
+        "description": "City: Kelowna or Nelson"
+      },
+      "date": {
+        "type": "string",
+        "format": "date",
+        "required": true,
+        "description": "Show date in YYYY-MM-DD format"
+      },
+      "time": {
+        "type": "string",
+        "required": true,
+        "description": "Show time (e.g., 8:00 PM)"
+      },
+      "genre": {
+        "type": "array",
+        "required": true,
+        "description": "Array of genres (rock, jazz, blues, country, electronic, indie, folk, pop, metal)",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": {
+        "type": "string",
+        "description": "Show description or details"
+      },
+      "imageUrl": {
+        "type": "string",
+        "format": "uri",
+        "description": "Show or artist image URL"
+      },
+      "price": {
+        "type": "string",
+        "description": "Ticket price (e.g., $25, Free)"
+      },
+      "capacity": {
+        "type": "number",
+        "description": "Venue capacity"
+      },
+      "popularity": {
+        "type": "number",
+        "description": "Popularity rating (0-5)"
+      },
+      "isPublic": {
+        "type": "boolean",
+        "required": true,
+        "default": true,
+        "description": "Public data visible to all users"
+      }
+    },
+    "required": [
+      "title",
+      "artist",
+      "venue",
+      "city",
+      "date",
+      "time",
+      "genre",
+      "isPublic"
+    ]
+  }
+}

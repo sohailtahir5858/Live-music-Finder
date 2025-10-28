@@ -1,0 +1,68 @@
+{
+  "name": "Ad",
+  "collection": "ads",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "required": true,
+        "description": "Ad title/name for identification"
+      },
+      "imageUrl": {
+        "type": "string",
+        "format": "uri",
+        "required": true,
+        "description": "Image URL for the ad"
+      },
+      "clickUrl": {
+        "type": "string",
+        "format": "uri",
+        "required": true,
+        "description": "URL to open when ad is clicked"
+      },
+      "active": {
+        "type": "boolean",
+        "required": true,
+        "default": true,
+        "description": "Whether the ad is currently active"
+      },
+      "startDate": {
+        "type": "string",
+        "format": "date-time",
+        "description": "When the ad campaign starts"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "date-time",
+        "description": "When the ad campaign ends"
+      },
+      "impressions": {
+        "type": "number",
+        "default": 0,
+        "description": "Number of times ad was displayed"
+      },
+      "clicks": {
+        "type": "number",
+        "default": 0,
+        "description": "Number of times ad was clicked"
+      },
+      "city": {
+        "type": "string",
+        "enum": [
+          "Kelowna",
+          "Nelson",
+          "Both"
+        ],
+        "default": "Both",
+        "description": "Which city to show the ad in"
+      }
+    },
+    "required": [
+      "title",
+      "imageUrl",
+      "clickUrl",
+      "active"
+    ]
+  }
+}

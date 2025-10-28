@@ -1,0 +1,367 @@
+{
+  "version": "1.0.0",
+  "projectId": "087b0e74-d9f5-42d2-ad9b-a688cccade35",
+  "projectName": "Live Music Finder",
+  "fileManifest": [
+    {
+      "path": "App.tsx",
+      "language": "typescript",
+      "hash": "a2900726732a947f16237cfbf5e01234938a6a841f5ba05f7d60e0fdeb511b71"
+    },
+    {
+      "path": "components/ThemeSwitcher.tsx",
+      "language": "typescript",
+      "hash": "d8ad830af738f474778ff1072700ee1694f9d77b68368740102639a7e434148e"
+    },
+    {
+      "path": "components/feedback/CategoryFilter.tsx",
+      "language": "typescript",
+      "hash": "ad2084e49257db1ba14aa7dbd91f95123243b8a40cec049b33ab039099316fa9"
+    },
+    {
+      "path": "components/feedback/CreateFeedbackModal.tsx",
+      "language": "typescript",
+      "hash": "b4367f64ae8415aa357d4a0be9926cf897816474496c6694864cb74d7e42f415"
+    },
+    {
+      "path": "components/feedback/FeedbackDetailModal.tsx",
+      "language": "typescript",
+      "hash": "d9b1da93094316ed7b27a37676826a8e432b54218cbe5fb66905fdc39f10e7e8"
+    },
+    {
+      "path": "components/feedback/FeedbackItem.tsx",
+      "language": "typescript",
+      "hash": "884c576eeff9fd24180997afcf49bc623ad819b9b111838ed6826babfa33923e"
+    },
+    {
+      "path": "components/feedback/index.ts",
+      "language": "typescript",
+      "hash": "9ad0f3201a49ecdf308c849ff262d7e57804de76912e469338a5f9be789e45c6"
+    },
+    {
+      "path": "components/ui/AnimatedSpinner.tsx",
+      "language": "typescript",
+      "hash": "7522df240bea7e60e4f651a483e5628479cfed98194b0c9af1a50fa15300b958"
+    },
+    {
+      "path": "components/ui/BlurCard.tsx",
+      "language": "typescript",
+      "hash": "69eb8bbeeefc830c6583d3c38b6383837c351d0ad008a90778b0556d56f5c41c"
+    },
+    {
+      "path": "components/ui/Button.tsx",
+      "language": "typescript",
+      "hash": "567cafa41d37f25197a58c3b2948c5e92cd6599d3eec1c947bc80b3c2845ad11"
+    },
+    {
+      "path": "components/ui/DatePicker.tsx",
+      "language": "typescript",
+      "hash": "9a91a9447eebf633fb40896cda17f21df662b5bbce144a61228e7544f57e19d3"
+    },
+    {
+      "path": "components/ui/Header.tsx",
+      "language": "typescript",
+      "hash": "b1e571f0c2f70bc8d2bed91d07e0564493b4b96d76ae5208a95a62dc80f681d1"
+    },
+    {
+      "path": "components/ui/Logo.tsx",
+      "language": "typescript",
+      "hash": "f8da2d184dc47c88db700f9a58b5a1919eebcd10b6a05030145076f4b12c7f4c"
+    },
+    {
+      "path": "components/ui/MagicallyAlert.tsx",
+      "language": "typescript",
+      "hash": "d630f6fdcb316bceeddcb7c1c16d71f9f9a1298d0070c056e0a876a5c4de9c84"
+    },
+    {
+      "path": "components/ui/ModalWrapper.tsx",
+      "language": "typescript",
+      "hash": "5724ebe5980e597df7bb15edb315f884f37b5011b0d8ec9a0805f441b5cfcd6d"
+    },
+    {
+      "path": "components/ui/Skeleton.tsx",
+      "language": "typescript",
+      "hash": "0fbb4ed4b935ea21146fc8ba7e362cad134223b95f9e293ec4ee6c460ece34d7"
+    },
+    {
+      "path": "components/ui/index.tsx",
+      "language": "typescript",
+      "hash": "1909f2d910a55791b3ccaf23ff366be8cf322c17aafb1f645c30876876775436"
+    },
+    {
+      "path": "constants/theme.ts",
+      "language": "typescript",
+      "hash": "8ad2bd4d1b8b9a852e9ae4156a61feeccc26334cefc9b26a11da8f5a239edee6"
+    },
+    {
+      "path": "contexts/ThemeContext.tsx",
+      "language": "typescript",
+      "hash": "1ff882e576b227d18c48869d6afe43a7a80f8e6f5eb4d4810eb5b2ff161d6ca1"
+    },
+    {
+      "path": "magically/config.ts",
+      "language": "typescript",
+      "hash": "5822e445e3fc9d55ddd5bc074a0dff097a387ae50645bf336de57cec7ef2549c"
+    },
+    {
+      "path": "magically/entities/Feedback.ts",
+      "language": "typescript",
+      "hash": "6068e6407987c8c9c8613ac140c301ccad24ce182869766cdf642f927fa397c0"
+    },
+    {
+      "path": "magically/functions/cron-job/index.ts",
+      "language": "typescript",
+      "hash": "a6dfb2550598285cc08cd1532f1def0f5a652aebd9bbc150dbc3937ca24adf88"
+    },
+    {
+      "path": "magically/functions/cron-job/wrangler.toml",
+      "language": "text",
+      "hash": "0ff94053d12c07bdd88b4653992cab942c202b1e87da3ee2532eb64e264a5493"
+    },
+    {
+      "path": "magically/functions/health-check/index.ts",
+      "language": "typescript",
+      "hash": "46a3f33106f46ff8b36e32ca4a530f85344ce82d2a8b0e7b55988f942c684636"
+    },
+    {
+      "path": "magically/functions/health-check/wrangler.toml",
+      "language": "text",
+      "hash": "0c5de4e9911386a1fb77340dd761f7a018ac3d5730065e01d4b5bc5cb2611a88"
+    },
+    {
+      "path": "magically/functions/stripe-payment/index.ts",
+      "language": "typescript",
+      "hash": "7e86bcc254479e4fcd376c35fa84c68d3a04aabca75e3c0f862fdb4159ca6834"
+    },
+    {
+      "path": "magically/functions/stripe-payment/wrangler.toml",
+      "language": "text",
+      "hash": "0530460464c69b3dc519caafffe8b55c5ec57f9f34b74d4b312a96d5b79e7e3c"
+    },
+    {
+      "path": "magically/functions/stripe-webhook/index.ts",
+      "language": "typescript",
+      "hash": "b79db96880231a07080e04684395e6111e40368e76e8c6bc6fedd5dcf3fea2a4"
+    },
+    {
+      "path": "magically/functions/stripe-webhook/wrangler.toml",
+      "language": "text",
+      "hash": "3dc7fa155143fe15199922afcf12089f39a4f592eefce55aa923ef844b183be6"
+    },
+    {
+      "path": "magically/init.ts",
+      "language": "typescript",
+      "hash": "662dc8a14714144d2962ba316c832250a883064dd54a0cbac029dfb48e1d03f8"
+    },
+    {
+      "path": "magically/schemas/Feedback.json",
+      "language": "json",
+      "hash": "799e0b1c9960783eae03fc45bdd7ab27f50933670fd80f7045cd18fc4b7828d7"
+    },
+    {
+      "path": "magically/utils/NavigationLogger.ts",
+      "language": "typescript",
+      "hash": "11717b3be6a297a776ff89f0aec1d16ade9fc662a01329908aa398e7a47ccb95"
+    },
+    {
+      "path": "navigation/MainTabNavigator.tsx",
+      "language": "typescript",
+      "hash": "5024ba0b962c1f89a89762508d5535d10fd97e4d83ef3246ad4d2c2af9ef6599"
+    },
+    {
+      "path": "navigation/RootNavigator.tsx",
+      "language": "typescript",
+      "hash": "04d6b43755477284ef591af399981523e5a87a856de63af5880c7430bbd90899"
+    },
+    {
+      "path": "screens/FeedbackScreen.tsx",
+      "language": "typescript",
+      "hash": "c2091c3f16b0c7b7a911c780d1630edbc2ce7108d78d628b30865865f9321cd0"
+    },
+    {
+      "path": "screens/LoginScreen.tsx",
+      "language": "typescript",
+      "hash": "43df1c849528fcf6cf3fce1eb5081235b4abcabca56a364044533002c4d62bc6"
+    },
+    {
+      "path": "screens/ProfileScreen.tsx",
+      "language": "typescript",
+      "hash": "72ba0b5db69150593e95325573988ae51a354594e0ae53244426d1e7e418bea6"
+    },
+    {
+      "path": "services/BaseDownloadService.ts",
+      "language": "typescript",
+      "hash": "ecd0b40988ef5573022b36c7a0f50681d2e5a46ef2f87642bedccb08cc662095"
+    },
+    {
+      "path": "services/DownloadManager.ts",
+      "language": "typescript",
+      "hash": "fa5ed6712861cf28b1de159d07b3c6807849b9a32b63ca62c509cde73871c88d"
+    },
+    {
+      "path": "services/DownloadValidatorService.ts",
+      "language": "typescript",
+      "hash": "6a97ec64063568059db7b3dd4fe2fa9814e949e26958631d545b792991183b4a"
+    },
+    {
+      "path": "services/FileManagerService.ts",
+      "language": "typescript",
+      "hash": "9a1f0b187343577adb646bd7a5ab87c9375b936cbb9bfa630472a88690b2a1ad"
+    },
+    {
+      "path": "services/ProgressTrackingService.ts",
+      "language": "typescript",
+      "hash": "9e85766d29243dd047fd383341154b9930ecc143fec9b2450ca0d7a2c0e96e71"
+    },
+    {
+      "path": "services/accountService.ts",
+      "language": "typescript",
+      "hash": "e764a536411c5f67c664164df78a778e30acc70a2b0c3130838c61e3d55d6aa3"
+    },
+    {
+      "path": "stores/appStateStore.ts",
+      "language": "typescript",
+      "hash": "83ae3e99cb126e047ee51df361c061faf8e17673cffd3c0f0bea546ab33e5322"
+    },
+    {
+      "path": "types/downloadTypes.ts",
+      "language": "typescript",
+      "hash": "443fe196e5c1a2e368a9011b93e88e321431dc711cac1f54222dc58a2aed7139"
+    },
+    {
+      "path": "TODO.md",
+      "language": "markdown",
+      "hash": "add955bf2246933b69112bdfb4829323f7709166cc6caf32b35760e8441f7d1b"
+    },
+    {
+      "path": "components/showcase/Reference.tsx",
+      "language": "typescript",
+      "hash": "4e0816a86285d3f2ff764e95bf46afc24dc9cad6fe5f787f7471cd87e95dd8c4"
+    },
+    {
+      "path": "magically/schemas/Show.json",
+      "language": "json",
+      "hash": "261b61716b009f3d8c8b9d5b8fe76bd07af20c3685102eae86d3359e94057009"
+    },
+    {
+      "path": "magically/entities/Show.ts",
+      "language": "typescript",
+      "hash": "2439cb5e5271898e5e98c5b7c03df18436839da4a52cc33f255537cb8c6cbfe0"
+    },
+    {
+      "path": "magically/entities/index.ts",
+      "language": "typescript",
+      "hash": "ef7fe7b0ecf0d16cae005867fff66f1b8b8c4c70d31dd304ec29fdc95548ac46"
+    },
+    {
+      "path": "Desktop/Live Music BC/stores/userPreferencesStore.ts",
+      "language": "typescript",
+      "hash": "e62fa28855c44bff24d36cc23be889f6cf2b4ee27a41e2dd91874bfc41cfabb2"
+    },
+    {
+      "path": "services/showService.ts",
+      "language": "typescript",
+      "hash": "28b7daa077d970e62cbc9ee63f4bdc0d70f29e6e975e16b26333671d742ea0ed"
+    },
+    {
+      "path": "screens/ShowsScreen.tsx",
+      "language": "typescript",
+      "hash": "987320730d1cb1d4480c804844b55059955db78fcbee7077281cbba178344014"
+    },
+    {
+      "path": "screens/FavoritesScreen.tsx",
+      "language": "typescript",
+      "hash": "e026d4086b3eaacc9490198af137201c211f676d24154f329094e1536c4c7435"
+    },
+    {
+      "path": "screens/NotificationsScreen.tsx",
+      "language": "typescript",
+      "hash": "e71ada3368b76ecbb07442a29e14a57b5961532fcbd5f12bcacaea60e1817b5f"
+    },
+    {
+      "path": "screens/ShowDetailScreen.tsx",
+      "language": "typescript",
+      "hash": "22034fdbf958b7095bf2f1c5e867db1cce0e16790f6918c06c84ab3fb9065032"
+    },
+    {
+      "path": "screens/FilterScreen.tsx",
+      "language": "typescript",
+      "hash": "33feedc6d3dd0d441b2ee009ed9013af029c10b5a12345b21100c34f7431771e"
+    },
+    {
+      "path": "stores/userPreferencesStore.ts",
+      "language": "typescript",
+      "hash": "1293129cb4fe7993414aa48b6091f0a673e8b931bcec65984b5026ffad78e391"
+    },
+    {
+      "path": "magically/functions/sync-kelowna-shows/index.ts",
+      "language": "typescript",
+      "hash": "ce9139efc148a806f431049ac108fb1383c6f1430b49c2c98bbf8f830c8e859a"
+    },
+    {
+      "path": "magically/functions/sync-kelowna-shows/wrangler.toml",
+      "language": "text",
+      "hash": "7be70d89a40ed9dcc4a95c4340f840dec2288d524dab49b00cb4632d1927da57"
+    },
+    {
+      "path": "screens/CitySelectionScreen.tsx",
+      "language": "typescript",
+      "hash": "d6380db5d656a939e66a0dcd089c27d084d2c470f6cb1c985e32ee10a02425c0"
+    },
+    {
+      "path": "magically/schemas/Ad.json",
+      "language": "json",
+      "hash": "46d9dc6f6d28c7890d3770f13ceab5a70315e86d746f52f5b74ac33331be9237"
+    },
+    {
+      "path": "magically/entities/Ad.ts",
+      "language": "typescript",
+      "hash": "29c269f2ebaf4e5935eb27fbb9e474e776582ac433ab60c873429754e9f39722"
+    },
+    {
+      "path": "components/AdCard.tsx",
+      "language": "typescript",
+      "hash": "32603d15965ab723da29cb56d546a40291b756a0d0ce8ca4d75f318464432b07"
+    },
+    {
+      "path": "components/ShowListItem.tsx",
+      "language": "typescript",
+      "hash": "11147afa9f5920ddb0f0c796d7252a2eea4740df64340a3fe7b06673b5a38ab5"
+    },
+    {
+      "path": "PROJECT.md",
+      "language": "markdown",
+      "hash": "245249e98564252570d9975c8fba1fc34e75384c8dc236566bc746bd9c7755e8"
+    },
+    {
+      "path": "stores/filterStore.ts",
+      "language": "typescript",
+      "hash": "fb12ca92956d5e86ef287a13ff993824ddbfa326f2ac8ba0c9cbb51448707313"
+    },
+    {
+      "path": "magically/functions/sync-nelson-shows/index.ts",
+      "language": "typescript",
+      "hash": "31f7d8a02e2beb2aff648916ff4440d009c06b3491065dd97d370033bb2fe0ed"
+    },
+    {
+      "path": "magically/functions/sync-nelson-shows/wrangler.toml",
+      "language": "text",
+      "hash": "af9ca8cd863d3cf3fb00826f1a0614591a097963b93fe94ff7b0d1e6454f81e1"
+    },
+    {
+      "path": "components/NotificationSettings.tsx",
+      "language": "typescript",
+      "hash": "aa3cf6981a90bd75fe51be4a607a91b9fb247104938104e0cc3592c838044977"
+    },
+    {
+      "path": "components/GenreSelector.tsx",
+      "language": "typescript",
+      "hash": "79f6f94ef419edf963b67be54a4bccb47e3ab1771a7ceaf40ea59138d10a2ae1"
+    },
+    {
+      "path": "components/VenueSelector.tsx",
+      "language": "typescript",
+      "hash": "8c63ed6a9f6d6b72907868af095d9e20456274ffef01822ee5c0330eae65d56f"
+    }
+  ]
+}
