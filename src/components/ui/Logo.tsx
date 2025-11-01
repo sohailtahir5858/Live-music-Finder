@@ -69,18 +69,15 @@ import { useTheme } from '../../contexts/ThemeContext';
 interface LogoProps {
     size?: number;
     style?: ViewStyle;
-    source?: string;
     rounded?: boolean;
     withShadow?: boolean;
 }
 
 // Default app logo URL - cached permanently
-const DEFAULT_LOGO_URL = 'https://iyecjtddy3onkaf5.public.blob.vercel-storage.com/087b0e74-d9f5-42d2-ad9b-a688cccade35/icon-1761153390836-TS6vMBjmS7l4gkHUFPvqqrCAYprGw0.png'; // Can be generated using the generateAppIcon tool.
 
 export const Logo = ({
     size = 40,
     style,
-    source = DEFAULT_LOGO_URL,
     rounded = false,
     withShadow = false
 }: LogoProps) => {
@@ -110,16 +107,17 @@ export const Logo = ({
                 width: size,
                 height: size,
                 borderRadius,
-                overflow: 'hidden'
+                justifyContent:'center',
+                alignItems:'center'
             },
             shadowStyle,
             style
         ]}>
             <Image
-                source={{ uri: source }}
+                source={require('../../../assets/images/live-music-App-icon.png')}
                 style={{
                     width: size,
-                    height: size,
+                height: size,
                 }}
                 contentFit="contain"
                 transition={200}

@@ -86,6 +86,11 @@ export interface Show {
   sourceUrl?: string;
   /** Public data visible to all users */
   isPublic?: boolean;
+  /** Standard fields */
+  _id: string;
+  creator: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ShowCreateInput extends Omit<Show, '_id' | 'creator' | 'createdAt' | 'updatedAt'> {

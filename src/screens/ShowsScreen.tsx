@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Animated, Easing, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, Pressable, Animated, Easing, RefreshControl, FlatList, ActivityIndicator } from 'react-native';
 import { Music2, MapPin, Calendar, Heart, Sliders, Search, Grid3x3, List } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -15,18 +15,21 @@ import { Show, Shows } from '../magically/entities/Show';
 import { Skeleton } from '../components/ui/Skeleton';
 import magically from 'magically-sdk';
 import { ShowListItem } from '../components/ShowListItem';
-import { showService } from '../services/showService';
 import { Image } from 'expo-image';
+import { fetchEvents } from '../services/eventService';
 
 export const ShowsScreen = () => {
   const { background, text, textMuted, primary, secondary, cardBackground } = useTheme();
   const navigation = useNavigation<any>();
-  const { selectedCity, setSelectedCity, favoriteArtists, toggleFavoriteArtist, isPremium, viewMode, setViewMode } = useUserPreferences();
+  const { selectedCity, setSelectedCity, favoriteArtists, toggleFavoriteArtist, isPremium, viewMode, setViewMode, hasLoadedPreferences } = useUserPreferences();
   const { activeFilters, hasActiveFilters } = useFilterStore();
   
   const [shows, setShows] = useState<Show[]>([]);
   const [isLoadingShows, setIsLoadingShows] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(30)).current;
@@ -47,36 +50,62 @@ export const ShowsScreen = () => {
       }),
     ]).start();
 
-    loadShows();
-  }, [selectedCity, isPremium, activeFilters]);
+    // Only load shows after preferences (e.g., selected city) have been loaded to avoid duplicate fetches
+    if (hasLoadedPreferences) {
+      loadShows();
+    }
+  }, [selectedCity, activeFilters, hasLoadedPreferences]);
 
-  const loadShows = async () => {
+  const loadShows = async (page = 1) => {
     try {
-      setIsLoadingShows(true);
-      // Apply active filters from filter store
-      const result = await showService.getShows({
-        city: selectedCity,
-        genres: activeFilters.genres.length > 0 ? activeFilters.genres : undefined,
-        venues: activeFilters.venues.length > 0 ? activeFilters.venues : undefined,
+      if (page === 1) {
+        setIsLoadingShows(true);
+        setShows([]);
+        setCurrentPage(1);
+        setHasMore(true);
+      }
+      
+      // Build filter options from activeFilters
+      const filterOptions = {
+        categoryIds: activeFilters.genres && activeFilters.genres.length > 0 
+          ? activeFilters.genres 
+          : undefined,
+        timeFilter: activeFilters.timeFilter,
         dateFrom: activeFilters.dateFrom,
         dateTo: activeFilters.dateTo,
-      });
-      setShows(result);
+      };
+      
+      const result = await fetchEvents(selectedCity, page, filterOptions);
+      if (page === 1) {
+        setShows(result);
+      } else {
+        setShows(prev => [...prev, ...result]);
+      }
+      setCurrentPage(page);
+      setHasMore(result.length > 0);
     } catch (error) {
       console.error('Error loading shows:', error);
     } finally {
       setIsLoadingShows(false);
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (!isLoadingMore && hasMore) {
+      setIsLoadingMore(true);
+      loadShows(currentPage + 1);
     }
   };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadShows();
+    await loadShows(1);
     setIsRefreshing(false);
   };
 
   const handleShowPress = (show: Show) => {
-    navigation.navigate('ShowDetail', { showId: show._id });
+    navigation.navigate('ShowDetail', { show });
   };
 
   const handleFilterPress = () => {
@@ -170,21 +199,17 @@ export const ShowsScreen = () => {
                 </Text>
               </View>
             ) : (
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingTop: 16, paddingBottom: 100 }}
-                refreshControl={
-                  <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={primary} />
-                }
-              >
-                {shows.map((show, index) => (
-                  <React.Fragment key={show._id}>
+              <FlatList
+                data={shows}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item, index }) => (
+                  <React.Fragment key={item._id}>
                     {viewMode === 'card' ? (
                       <ShowCard
-                        show={show}
-                        onPress={() => handleShowPress(show)}
-                        onFavoritePress={() => handleFavoritePress(show.artist)}
-                        isFavorite={isFavorite(show.artist)}
+                        show={item}
+                        onPress={() => handleShowPress(item)}
+                        onFavoritePress={() => handleFavoritePress(item.artist)}
+                        isFavorite={isFavorite(item.artist)}
                         isPremium={isPremium}
                         index={index}
                         primary={primary}
@@ -195,16 +220,24 @@ export const ShowsScreen = () => {
                       />
                     ) : (
                       <ShowListItem
-                        show={show}
-                        onPress={() => handleShowPress(show)}
-                        onFavoritePress={() => handleFavoritePress(show.artist)}
-                        isFavorite={isFavorite(show.artist)}
+                        show={item}
+                        onPress={() => handleShowPress(item)}
+                        onFavoritePress={() => handleFavoritePress(item.artist)}
+                        isFavorite={isFavorite(item.artist)}
                         isPremium={isPremium}
                       />
                     )}
                   </React.Fragment>
-                ))}
-              </ScrollView>
+                )}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingTop: 16, paddingBottom: 100 }}
+                refreshControl={
+                  <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={primary} />
+                }
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={isLoadingMore ? <ActivityIndicator size="large" color={primary} style={{ marginVertical: 20 }} /> : null}
+              />
             )}
           </Animated.View>
         </SafeAreaView>
@@ -261,16 +294,6 @@ const ShowCard = ({ show, onPress, onFavoritePress, isFavorite, isPremium, index
             <Image
               source={show.imageUrl || `https://trymagically.com/api/media/image?query=${encodeURIComponent(show.artist + ' live music')}`}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-            <View
-              style={{ 
-                position: 'absolute', 
-                bottom: 0, 
-                left: 0, 
-                right: 0, 
-                height: 120,
-                background: 'linear-gradient(to top, rgba(10, 10, 10, 0.95), transparent)'
-              }}
             />
 
             {/* Favorite Button */}

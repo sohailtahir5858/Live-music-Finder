@@ -10,7 +10,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserPreferences } from '../stores/userPreferencesStore';
-import { showService } from '../services/showService';
 import { Show } from '../magically/entities/Show';
 import { Skeleton } from '../components/ui/Skeleton';
 import { MagicallyAlert } from '../components/ui';
@@ -23,42 +22,25 @@ export const ShowDetailScreen = () => {
   const { background, text, textMuted, primary, secondary, cardBackground } = useTheme();
   const navigation = useNavigation();
   const route = useRoute<any>();
-  const { showId } = route.params || {};
+  const { show } = route.params || {};
   const { favoriteArtists, toggleFavoriteArtist, isPremium, selectedCity } = useUserPreferences();
   
-  const [show, setShow] = useState<Show | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeAd, setActiveAd] = useState<Ad | null>(null);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const heartScale = React.useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    if (showId) {
-      loadShow();
-      if (!isPremium) {
-        loadAd();
-      }
-    }
-  }, [showId, isPremium]);
-
-  const loadShow = async () => {
-    try {
-      setIsLoading(true);
-      const data = await showService.getShowById(showId);
-      setShow(data);
-      
+    if (show) {
+      loadAd();
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 600,
         easing: Easing.bezier(0.4, 0, 0.2, 1),
         useNativeDriver: true,
       }).start();
-    } catch (error) {
-      console.error('Error loading show:', error);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [show, isPremium]);
 
   const loadAd = async () => {
     try {
@@ -197,7 +179,6 @@ export const ShowDetailScreen = () => {
                 source={show.imageUrl || `https://trymagically.com/api/media/image?query=${encodeURIComponent(show.artist + ' live music concert')}`}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
-              <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200, background: 'linear-gradient(to top, rgba(10, 10, 10, 0.98), transparent)' }} />
               
               {/* Header Overlay */}
               <View style={{ position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', padding: 20 }}>
@@ -239,7 +220,7 @@ export const ShowDetailScreen = () => {
               
               {/* Event Categories */}
               <View style={{ position: 'absolute', bottom: 24, left: 20, flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-                {show.genre.map((genre, i) => (
+                {show.genre.map((genre: string, i: number) => (
                   <View key={i} style={{ borderRadius: 12, overflow: 'hidden', backgroundColor: '#f2a41e', paddingHorizontal: 12, paddingVertical: 6 }}>
                     <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                       {genre}

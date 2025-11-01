@@ -8,9 +8,10 @@ import { create } from 'zustand';
 export interface ShowFilters {
   genres: string[];
   venues: string[];
-  datePreset: string;
-  dateFrom?: string;
-  dateTo?: string;
+  timeFilter: string; // 'all-day' | 'morning' | 'afternoon' | 'evening' | 'night'
+  datePreset: string; // 'today' | 'tomorrow' | 'next-7' | 'next-30' | 'this-month' | 'next-month' | 'custom'
+  dateFrom?: string; // ISO date string (YYYY-MM-DD)
+  dateTo?: string; // ISO date string (YYYY-MM-DD)
 }
 
 interface FilterStore {
@@ -30,6 +31,7 @@ interface FilterStore {
 const initialFilters: ShowFilters = {
   genres: [],
   venues: [],
+  timeFilter: '',
   datePreset: '',
 };
 
@@ -51,10 +53,14 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
   
   hasActiveFilters: () => {
     const { activeFilters } = get();
+    // Defensive checks: timeFilter/datePreset may be undefined or empty string -> use Boolean
     return (
-      activeFilters.genres.length > 0 ||
-      activeFilters.venues.length > 0 ||
-      activeFilters.datePreset !== ''
+      (activeFilters.genres && activeFilters.genres.length > 0) ||
+      (activeFilters.venues && activeFilters.venues.length > 0) ||
+      Boolean(activeFilters.timeFilter) ||
+      Boolean(activeFilters.datePreset) ||
+      Boolean(activeFilters.dateFrom) ||
+      Boolean(activeFilters.dateTo)
     );
   },
 }));

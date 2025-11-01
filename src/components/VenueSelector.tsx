@@ -8,12 +8,12 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserPreferences } from '../stores/userPreferencesStore';
-import magically from 'magically-sdk';
+import { fetchVenues } from '../services/eventService';
 
 export const VenueSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
   const { favoriteVenues, toggleFavoriteVenue, isPremium, selectedCity } = useUserPreferences();
-  const [venues, setVenues] = useState<string[]>([]);
+  const [venues, setVenues] = useState<{ id: number; venue: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -23,18 +23,10 @@ export const VenueSelector = () => {
   const loadVenues = async () => {
     try {
       setIsLoading(true);
-      // Get unique venues from shows for selected city
-      const result = await magically.data.aggregate('shows', [
-        { $match: { city: selectedCity } },
-        { $group: { _id: '$venue' } },
-        { $sort: { _id: 1 } }
-      ]);
-      
-      const uniqueVenues = result
-        .map((item: any) => item._id)
-        .filter((v: string) => v && v !== 'TBA'); // Filter out TBA venues
-      
-      setVenues(uniqueVenues);
+      // Fetch venues from WordPress API for selected city
+      const wpVenues = await fetchVenues(selectedCity);
+      console.log("🚀 ~ loadVenues ~ wpVenues:", wpVenues)
+      setVenues(wpVenues);
     } catch (error) {
       console.error('Error loading venues:', error);
     } finally {
@@ -42,8 +34,8 @@ export const VenueSelector = () => {
     }
   };
 
-  const handleVenuePress = (venue: string) => {
-    const isAlreadySelected = favoriteVenues.includes(venue);
+  const handleVenuePress = (venueName: string) => {
+    const isAlreadySelected = favoriteVenues.includes(venueName);
     const canSelect = isPremium || isAlreadySelected || favoriteVenues.length < 2;
     
     if (!canSelect) {
@@ -51,7 +43,7 @@ export const VenueSelector = () => {
       return;
     }
     
-    toggleFavoriteVenue(venue);
+    toggleFavoriteVenue(venueName);
   };
 
   if (isLoading) {
@@ -100,13 +92,13 @@ export const VenueSelector = () => {
         contentContainerStyle={{ gap: 8 }}
       >
         {venues.map((venue) => {
-          const isSelected = favoriteVenues.includes(venue);
+          const isSelected = favoriteVenues.includes(venue.venue);
           const canSelect = isPremium || isSelected || favoriteVenues.length < 2;
           
           return (
             <Pressable
-              key={venue}
-              onPress={() => handleVenuePress(venue)}
+              key={venue.id}
+              onPress={() => handleVenuePress(venue.venue)}
               disabled={!canSelect && !isSelected}
               style={{
                 paddingVertical: 10,
@@ -122,9 +114,8 @@ export const VenueSelector = () => {
                 fontSize: 14, 
                 fontWeight: '700', 
                 color: isSelected ? primary : text,
-                whiteSpace: 'nowrap',
               }}>
-                {venue}
+                {venue.venue}
               </Text>
             </Pressable>
           );

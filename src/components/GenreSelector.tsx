@@ -8,12 +8,12 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { Music } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserPreferences } from '../stores/userPreferencesStore';
-import magically from 'magically-sdk';
+import { fetchGenres } from '../services/eventService';
 
 export const GenreSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
   const { favoriteGenres, toggleFavoriteGenre, isPremium } = useUserPreferences();
-  const [genres, setGenres] = useState<string[]>([]);
+  const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -22,18 +22,9 @@ export const GenreSelector = () => {
 
   const loadGenres = async () => {
     try {
-      // Get unique genres from shows using aggregation
-      const result = await magically.data.aggregate('shows', [
-        { $unwind: '$genre' },
-        { $group: { _id: '$genre' } },
-        { $sort: { _id: 1 } }
-      ]);
-      
-      const uniqueGenres = result
-        .map((item: any) => item._id)
-        .filter((g: string) => g && !g.startsWith('http')); // Filter out URLs
-      
-      setGenres(uniqueGenres);
+      // Fetch genres from WordPress API (use Kelowna as default, or get from user preferences)
+      const wpGenres = await fetchGenres('Kelowna');
+      setGenres(wpGenres);
     } catch (error) {
       console.error('Error loading genres:', error);
     } finally {
@@ -41,8 +32,8 @@ export const GenreSelector = () => {
     }
   };
 
-  const handleGenrePress = (genre: string) => {
-    const isAlreadySelected = favoriteGenres.includes(genre);
+  const handleGenrePress = (genreName: string) => {
+    const isAlreadySelected = favoriteGenres.includes(genreName);
     const canSelect = isPremium || isAlreadySelected || favoriteGenres.length < 2;
     
     if (!canSelect) {
@@ -50,7 +41,7 @@ export const GenreSelector = () => {
       return;
     }
     
-    toggleFavoriteGenre(genre);
+    toggleFavoriteGenre(genreName);
   };
 
   if (isLoading) {
@@ -95,13 +86,13 @@ export const GenreSelector = () => {
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {genres.map((genre) => {
-          const isSelected = favoriteGenres.includes(genre);
+          const isSelected = favoriteGenres.includes(genre.name);
           const canSelect = isPremium || isSelected || favoriteGenres.length < 2;
           
           return (
             <Pressable
-              key={genre}
-              onPress={() => handleGenrePress(genre)}
+              key={genre.id}
+              onPress={() => handleGenrePress(genre.name)}
               disabled={!canSelect && !isSelected}
               style={{
                 paddingVertical: 10,
@@ -118,7 +109,7 @@ export const GenreSelector = () => {
                 fontWeight: '700', 
                 color: isSelected ? primary : text 
               }}>
-                {genre}
+                {genre.name}
               </Text>
             </Pressable>
           );

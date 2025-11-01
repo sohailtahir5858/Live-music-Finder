@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import magically from 'magically-sdk';
@@ -12,6 +12,7 @@ import { FilterScreen } from '../screens/FilterScreen';
 import MainTabNavigator from './MainTabNavigator';
 import { useAppStateStore } from '../stores/appStateStore';
 import { useUserPreferences } from '../stores/userPreferencesStore';
+import { Activity } from 'lucide-react-native';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -81,13 +82,13 @@ export const RootNavigator = () => {
   }, [isAuthInitialized]);
 
   // Show loading screen while auth is initializing
-  if (!isAuthInitialized) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center' }}>
-        <Skeleton width={100} height={100} style={{ borderRadius: 50 }} />
-      </View>
-    );
-  }
+  // if (!isAuthInitialized) {
+  //   return (
+  //     <View style={{ flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center' }}>
+  //      <ActivityIndicator size={"large"} color={"white"} />
+  //     </View>
+  //   );
+  // }
 
   // IMPORTANT: Add more conditions here as needed for your app
   // Example: const needsOnboarding = useAppStateStore(state => state.needsOnboarding);
@@ -95,7 +96,7 @@ export const RootNavigator = () => {
   
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isAuthenticated || !hasSelectedCity ? (
+      {!magically.auth?.isAuthenticated ? (
         // Auth flow: Login (includes city selection for authenticated users)
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
