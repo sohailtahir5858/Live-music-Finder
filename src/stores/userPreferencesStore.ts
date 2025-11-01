@@ -83,8 +83,8 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
   toggleFavoriteGenre: (genre) => {
     const { favoriteGenres, isPremium } = get();
     
-    // Free users limited to 2 favorite genres
-    if (!isPremium && !favoriteGenres.includes(genre) && favoriteGenres.length >= 2) {
+    // Free users limited to 3 favorite genres
+    if (!isPremium && !favoriteGenres.includes(genre) && favoriteGenres.length >= 3) {
       return; // Don't add if at limit
     }
     
@@ -99,8 +99,8 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
   toggleFavoriteVenue: (venue) => {
     const { favoriteVenues, isPremium } = get();
     
-    // Free users limited to 2 favorite venues
-    if (!isPremium && !favoriteVenues.includes(venue) && favoriteVenues.length >= 2) {
+    // Free users limited to 3 favorite venues
+    if (!isPremium && !favoriteVenues.includes(venue) && favoriteVenues.length >= 3) {
       return;
     }
     
@@ -115,8 +115,8 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
   toggleFavoriteArtist: (artist) => {
     const { favoriteArtists, isPremium } = get();
     
-    // Free users limited to 2 favorite artists
-    if (!isPremium && !favoriteArtists.includes(artist) && favoriteArtists.length >= 2) {
+    // Free users limited to 3 favorite artists
+    if (!isPremium && !favoriteArtists.includes(artist) && favoriteArtists.length >= 3) {
       return;
     }
     

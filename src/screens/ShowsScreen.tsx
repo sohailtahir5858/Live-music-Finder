@@ -3,37 +3,65 @@
  * @description Home screen displaying all live music shows with city toggle and filtering
  */
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Animated, Easing, RefreshControl, FlatList, ActivityIndicator } from 'react-native';
-import { Music2, MapPin, Calendar, Heart, Sliders, Search, Grid3x3, List } from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../contexts/ThemeContext';
-import { useUserPreferences } from '../stores/userPreferencesStore';
-import { useFilterStore } from '../stores/filterStore';
-import { Show, Shows } from '../magically/entities/Show';
-import { Skeleton } from '../components/ui/Skeleton';
-import magically from 'magically-sdk';
-import { ShowListItem } from '../components/ShowListItem';
-import { Image } from 'expo-image';
-import { fetchEvents } from '../services/eventService';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Animated,
+  Easing,
+  RefreshControl,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import {
+  MapPin,
+  Calendar,
+  Heart,
+  Search,
+  SlidersVertical,
+  LucideTableOfContents
+} from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext";
+import { useUserPreferences } from "../stores/userPreferencesStore";
+import { useFilterStore } from "../stores/filterStore";
+import { Show, Shows } from "../magically/entities/Show";
+import { Skeleton } from "../components/ui/Skeleton";
+import magically from "magically-sdk";
+import { ShowListItem } from "../components/ShowListItem";
+import { Image } from "expo-image";
+import { fetchEvents } from "../services/eventService";
 
 export const ShowsScreen = () => {
-  const { background, text, textMuted, primary, secondary, cardBackground } = useTheme();
+  const { background, text, textMuted, primary, secondary, cardBackground } =
+    useTheme();
   const navigation = useNavigation<any>();
-  const { selectedCity, setSelectedCity, favoriteArtists, toggleFavoriteArtist, isPremium, viewMode, setViewMode, hasLoadedPreferences } = useUserPreferences();
+  const {
+    selectedCity,
+    setSelectedCity,
+    favoriteArtists,
+    toggleFavoriteArtist,
+    isPremium,
+    viewMode,
+    setViewMode,
+    hasLoadedPreferences,
+  } = useUserPreferences();
   const { activeFilters, hasActiveFilters } = useFilterStore();
-  
+
   const [shows, setShows] = useState<Show[]>([]);
   const [isLoadingShows, setIsLoadingShows] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [totalShows, setTotalShows] = useState(0);
 
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(30)).current;
-    
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -64,27 +92,29 @@ export const ShowsScreen = () => {
         setCurrentPage(1);
         setHasMore(true);
       }
-      
+
       // Build filter options from activeFilters
       const filterOptions = {
-        categoryIds: activeFilters.genres && activeFilters.genres.length > 0 
-          ? activeFilters.genres 
-          : undefined,
+        categoryIds:
+          activeFilters.genres && activeFilters.genres.length > 0
+            ? activeFilters.genres
+            : undefined,
         timeFilter: activeFilters.timeFilter,
         dateFrom: activeFilters.dateFrom,
         dateTo: activeFilters.dateTo,
       };
-      
+
       const result = await fetchEvents(selectedCity, page, filterOptions);
+      setTotalShows(result.total);
       if (page === 1) {
-        setShows(result);
+        setShows(result.events);
       } else {
-        setShows(prev => [...prev, ...result]);
+        setShows((prev) => [...prev, ...result.events]);
       }
       setCurrentPage(page);
-      setHasMore(result.length > 0);
+      setHasMore(result.events.length > 0);
     } catch (error) {
-      console.error('Error loading shows:', error);
+      console.error("Error loading shows:", error);
     } finally {
       setIsLoadingShows(false);
       setIsLoadingMore(false);
@@ -105,16 +135,16 @@ export const ShowsScreen = () => {
   };
 
   const handleShowPress = (show: Show) => {
-    navigation.navigate('ShowDetail', { show });
+    navigation.navigate("ShowDetail", { show });
   };
 
   const handleFilterPress = () => {
-    navigation.navigate('Filter');
+    navigation.navigate("Filter");
   };
 
   const handleFavoritePress = (artist: string) => {
     if (!magically.auth.currentUser) {
-      navigation.navigate('Login');
+      navigation.navigate("Login");
       return;
     }
     toggleFavoriteArtist(artist);
@@ -125,63 +155,184 @@ export const ShowsScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
       <View style={{ flex: 1, backgroundColor: background }}>
-        <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-          <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          <Animated.View
+            style={{
+              flex: 1,
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            }}
+          >
             {/* Header */}
-            <View style={{ paddingHorizontal: 24, marginTop: 16, marginBottom: 24 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <View
-                    style={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2a41e' }}
-                  >
-                    <Music2 size={24} color="#FFFFFF" strokeWidth={2.5} />
-                  </View>
-                  <View>
-                    <Text style={{ fontSize: 28, fontWeight: '900', color: text, letterSpacing: -0.5 }}>
-                      Live Shows
+            <View style={{ paddingHorizontal: 2, marginTop: 12, marginBottom: 24 }}>
+              {/* Top row: Logo + Buttons */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 24,
+                }}
+              >
+                {/* Logo text with styling */}
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: "800",
+                        color: primary,
+                        letterSpacing: -0.5,
+                      }}
+                    >
+                      LIVE
                     </Text>
-                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600', marginTop: 2 }}>
-                      {shows.length} upcoming events
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: "800",
+                        color: text,
+                        letterSpacing: -0.5,
+                      }}
+                    >
+                      MUSIC
                     </Text>
                   </View>
-                </View>
-                
-                {/* View Mode Toggle + Filter */}
-                <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <Pressable
-                    onPress={() => setViewMode(viewMode === 'card' ? 'list' : 'card')}
+                  <Text
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      backgroundColor: cardBackground,
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      fontSize: 13,
+                      fontWeight: "600",
+                      color: text,
+                      marginTop: 2,
+                      letterSpacing: 0.5,
+                      fontStyle: "italic",
                     }}
                   >
-                    {viewMode === 'card' ? (
-                      <List size={20} color={primary} strokeWidth={2.5} />
-                    ) : (
-                      <Grid3x3 size={20} color={primary} strokeWidth={2.5} />
-                    )}
+                    {selectedCity}
+                  </Text>
+                </View>
+
+                {/* View Mode Toggle + Filter Buttons */}
+                <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+                  {/* VIEW Button */}
+                  <Pressable
+                    onPress={() =>
+                      setViewMode(viewMode === "card" ? "list" : "card")
+                    }
+                    style={{
+                      paddingHorizontal: 14,
+                      paddingVertical: 10,
+                      borderRadius: 20,
+                      backgroundColor: viewMode === "list"? secondary: cardBackground,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      gap: 6,
+                    }}
+                  >
+                    {/* Dots with lines icon */}
+                    <View style={{ gap: 2, alignItems: "center" }}>
+                     <LucideTableOfContents color={viewMode === "list"? 'white': secondary} style={{ transform: [{ rotate: "180deg" }] }} size={20} />
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "600",
+                        color: 'white',
+                        letterSpacing: 0.3,
+                      }}
+                    >
+                      VIEW
+                    </Text>
                   </Pressable>
+
+                  {/* FILTER Button */}
                   <Pressable
                     onPress={handleFilterPress}
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      backgroundColor: hasActiveFilters() ? primary : cardBackground,
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      paddingHorizontal: 14,
+                      paddingVertical: 10,
+                      borderRadius: 20,
+                      backgroundColor: hasActiveFilters()
+                        ? primary
+                        : cardBackground,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      gap: 6,
+                      borderColor: primary,
                     }}
                   >
-                    <Sliders size={20} color={hasActiveFilters() ? '#FFFFFF' : primary} strokeWidth={2.5} />
-                    {hasActiveFilters() && (
-                      <View style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: 4, backgroundColor: '#f2a41e' }} />
-                    )}
+                    {/* Vertical lines with dots icon */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        gap: 2,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      
+                      <SlidersVertical color={hasActiveFilters()?'white':secondary} size={20}/>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "600",
+                        color: 'white',
+                        letterSpacing: 0.3,
+                      }}
+                    >
+                      FILTER
+                    </Text>
                   </Pressable>
                 </View>
+              </View>
+
+              {/* Shows count with dividers */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 12,
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    backgroundColor: 'white',
+                    borderColor:'white'
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: text,
+                    letterSpacing: 0.2,
+                  }}
+                >
+                  {totalShows}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: textMuted,
+                    fontWeight: "500",
+                  }}
+                >
+                  Upcoming Shows
+                </Text>
+                <View
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    backgroundColor: 'white',
+                    borderColor:'white'
+                  }}
+                />
               </View>
             </View>
 
@@ -189,12 +340,26 @@ export const ShowsScreen = () => {
             {isLoadingShows ? (
               <View style={{ paddingHorizontal: 24 }}>
                 {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} width="100%" height={viewMode === 'card' ? 280 : 80} style={{ marginBottom: viewMode === 'card' ? 24 : 12, borderRadius: viewMode === 'card' ? 24 : 16 }} />
+                  <Skeleton
+                    key={i}
+                    width="100%"
+                    height={viewMode === "card" ? 280 : 80}
+                    style={{
+                      marginBottom: viewMode === "card" ? 24 : 12,
+                      borderRadius: viewMode === "card" ? 24 : 16,
+                    }}
+                  />
                 ))}
               </View>
             ) : shows.length === 0 ? (
-              <View style={{ padding: 32, alignItems: 'center' }}>
-                <Text style={{ color: textMuted, fontSize: 16, textAlign: 'center' }}>
+              <View style={{ padding: 32, alignItems: "center" }}>
+                <Text
+                  style={{
+                    color: textMuted,
+                    fontSize: 16,
+                    textAlign: "center",
+                  }}
+                >
                   No shows available
                 </Text>
               </View>
@@ -204,7 +369,7 @@ export const ShowsScreen = () => {
                 keyExtractor={(item) => item._id}
                 renderItem={({ item, index }) => (
                   <React.Fragment key={item._id}>
-                    {viewMode === 'card' ? (
+                    {viewMode === "card" ? (
                       <ShowCard
                         show={item}
                         onPress={() => handleShowPress(item)}
@@ -232,11 +397,23 @@ export const ShowsScreen = () => {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingTop: 16, paddingBottom: 100 }}
                 refreshControl={
-                  <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={primary} />
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={handleRefresh}
+                    tintColor={primary}
+                  />
                 }
                 onEndReached={loadMore}
                 onEndReachedThreshold={0.5}
-                ListFooterComponent={isLoadingMore ? <ActivityIndicator size="large" color={primary} style={{ marginVertical: 20 }} /> : null}
+                ListFooterComponent={
+                  isLoadingMore ? (
+                    <ActivityIndicator
+                      size="large"
+                      color={primary}
+                      style={{ marginVertical: 20 }}
+                    />
+                  ) : null
+                }
               />
             )}
           </Animated.View>
@@ -260,68 +437,141 @@ interface ShowCardProps {
   textMuted: string;
 }
 
-const ShowCard = ({ show, onPress, onFavoritePress, isFavorite, isPremium, index, primary, secondary, cardBackground, text, textMuted }: ShowCardProps) => {
+const ShowCard = ({
+  show,
+  onPress,
+  onFavoritePress,
+  isFavorite,
+  isPremium,
+  index,
+  primary,
+  secondary,
+  cardBackground,
+  text,
+  textMuted,
+}: ShowCardProps) => {
   const cardScale = React.useRef(new Animated.Value(1)).current;
   const heartScale = React.useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
-    Animated.spring(cardScale, { toValue: 0.97, useNativeDriver: true, friction: 7 }).start();
+    Animated.spring(cardScale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      friction: 7,
+    }).start();
   };
 
   const handlePressOut = () => {
-    Animated.spring(cardScale, { toValue: 1, useNativeDriver: true, friction: 7 }).start();
+    Animated.spring(cardScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      friction: 7,
+    }).start();
   };
 
   const handleFavorite = () => {
     Animated.sequence([
-      Animated.timing(heartScale, { toValue: 1.4, duration: 120, easing: Easing.bezier(0.4, 0, 0.2, 1), useNativeDriver: true }),
-      Animated.spring(heartScale, { toValue: 1, useNativeDriver: true, friction: 5 }),
+      Animated.timing(heartScale, {
+        toValue: 1.4,
+        duration: 120,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+        useNativeDriver: true,
+      }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        friction: 5,
+      }),
     ]).start();
     onFavoritePress();
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
   return (
-    <Animated.View style={{ marginBottom: 24, transform: [{ scale: cardScale }] }}>
-      <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
-        <View style={{ borderRadius: 24, overflow: 'hidden', backgroundColor: cardBackground }}>
+    <Animated.View
+      style={{ marginBottom: 24, transform: [{ scale: cardScale }] }}
+    >
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <View
+          style={{
+            borderRadius: 24,
+            overflow: "hidden",
+            backgroundColor: cardBackground,
+          }}
+        >
           {/* Show Image */}
-          <View style={{ height: 200, position: 'relative' }}>
+          <View style={{ height: 200, position: "relative" }}>
             <Image
-              source={show.imageUrl || `https://trymagically.com/api/media/image?query=${encodeURIComponent(show.artist + ' live music')}`}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              source={
+                show.imageUrl ||
+                `https://trymagically.com/api/media/image?query=${encodeURIComponent(
+                  show.artist + " live music"
+                )}`
+              }
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
 
             {/* Favorite Button */}
             <Pressable
               onPress={handleFavorite}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 16,
                 right: 16,
                 width: 44,
                 height: 44,
                 borderRadius: 22,
-                backgroundColor: '#0A0A0AE6',
-                alignItems: 'center',
-                justifyContent: 'center',
+                backgroundColor: "#0A0A0AE6",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                <Heart size={20} color={isFavorite ? '#EF4444' : '#FFFFFF'} fill={isFavorite ? '#EF4444' : 'transparent'} strokeWidth={2.5} />
+                <Heart
+                  size={20}
+                  color={isFavorite ? "#EF4444" : "#FFFFFF"}
+                  fill={isFavorite ? "#EF4444" : "transparent"}
+                  strokeWidth={2.5}
+                />
               </Animated.View>
             </Pressable>
 
             {/* Event Categories */}
-            <View style={{ position: 'absolute', top: 16, left: 16, flexDirection: 'row', gap: 8 }}>
+            <View
+              style={{
+                position: "absolute",
+                top: 16,
+                left: 16,
+                flexDirection: "row",
+                gap: 8,
+              }}
+            >
               {show.genre.slice(0, 2).map((genre, i) => (
-                <View key={i} style={{ borderRadius: 12, overflow: 'hidden' }}>
-                  <View style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#f2a41e' }}>
-                    <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                <View key={i} style={{ borderRadius: 12, overflow: "hidden" }}>
+                  <View
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      backgroundColor: "#f2a41e",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#FFFFFF",
+                        fontSize: 11,
+                        fontWeight: "800",
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                      }}
+                    >
                       {genre}
                     </Text>
                   </View>
@@ -332,18 +582,38 @@ const ShowCard = ({ show, onPress, onFavoritePress, isFavorite, isPremium, index
 
           {/* Show Info */}
           <View style={{ padding: 18 }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: text, marginBottom: 8 }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "800",
+                color: text,
+                marginBottom: 8,
+              }}
+            >
               {show.artist}
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                marginBottom: 6,
+              }}
+            >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
-              <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600' }}>
+              <Text
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+              >
                 {show.venue}
               </Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+            >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
-              <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600' }}>
+              <Text
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+              >
                 {formatDate(show.date)} • {show.time}
               </Text>
             </View>

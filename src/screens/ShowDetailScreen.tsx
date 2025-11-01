@@ -219,7 +219,7 @@ export const ShowDetailScreen = () => {
               </View>
               
               {/* Event Categories */}
-              <View style={{ position: 'absolute', bottom: 24, left: 20, flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              <View style={{ position: 'absolute', bottom: 24, left: 2, flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 {show.genre.map((genre: string, i: number) => (
                   <View key={i} style={{ borderRadius: 12, overflow: 'hidden', backgroundColor: '#f2a41e', paddingHorizontal: 12, paddingVertical: 6 }}>
                     <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -284,8 +284,8 @@ export const ShowDetailScreen = () => {
               {/* Price */}
               {show.price && (
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: show.sourceUrl ? 16 : 0 }}>
-                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#10b981' + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-                    <DollarSign size={20} color="#10b981" strokeWidth={2.5} />
+                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: secondary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                    <DollarSign size={20} color={secondary} strokeWidth={2.5} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4 }}>

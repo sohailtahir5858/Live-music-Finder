@@ -183,7 +183,13 @@ interface WordPressVenueResponse {
   next_rest_url?: string;
   [key: string]: any;
 }
-
+interface FinalEventsI{
+  events:Show[];
+  total:number;
+  totalPages:number;
+  rest_url:string;
+  next_rest_url?:string;
+}
 export const fetchEvents = async (
   city: string,
   page: number = 1,
@@ -193,7 +199,7 @@ export const fetchEvents = async (
     dateFrom?: string;
     dateTo?: string;
   }
-): Promise<Show[]> => {
+): Promise<FinalEventsI> => {
   const baseUrl = city.toLowerCase() === 'nelson'
     ? 'https://livemusicnelson.ca/wp-json/tribe/events/v1/events/'
     : 'https://livemusickelowna.ca/wp-json/tribe/events/v1/events/';
@@ -238,10 +244,21 @@ export const fetchEvents = async (
       events = filterEventsByTime(events, options.timeFilter);
     }
 
-    return events;
+    return {
+      events:events,
+      total: data.total,
+      totalPages: data.total_pages,
+      rest_url:data.rest_url,
+      next_rest_url:data.next_rest_url
+    };
   } catch (error) {
     console.error("Error fetching events:", error);
-    return [];
+    return {
+      events: [],
+      total: 0,
+      totalPages: 0,
+      rest_url:'',
+    };
   }
 };
 

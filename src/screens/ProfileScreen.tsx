@@ -8,7 +8,7 @@ import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
-import { User, Bell, MessageSquare, Crown, LogOut, Trash2, ChevronRight, MapPin } from 'lucide-react-native';
+import { User, Bell, MessageSquare, LogOut, Trash2, ChevronRight, MapPin } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserPreferences } from '../stores/userPreferencesStore';
 import { AnimatedSpinner } from '../components/ui';
@@ -105,42 +105,6 @@ export default function ProfileScreen() {
     );
   };
 
-  const handlePremiumUpgrade = () => {
-    // Mock premium upgrade - in production, integrate with Stripe or App Store
-    MagicallyAlert.alert(
-      'Upgrade to Premium',
-      'Get instant notifications, unlimited favorites, and ad-free experience for $3.99/month',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Subscribe',
-          onPress: () => {
-            setIsPremium(true);
-            MagicallyAlert.alert('Success', 'Welcome to Premium! 🎉');
-          },
-        },
-      ]
-    );
-  };
-
-  const handlePremiumCancel = () => {
-    MagicallyAlert.alert(
-      'Cancel Premium?',
-      'You will lose access to premium features at the end of your billing period.',
-      [
-        { text: 'Keep Premium', style: 'cancel' },
-        {
-          text: 'Cancel Subscription',
-          style: 'destructive',
-          onPress: () => {
-            setIsPremium(false);
-            MagicallyAlert.alert('Cancelled', 'Your premium subscription has been cancelled.');
-          },
-        },
-      ]
-    );
-  };
-
   const handleCitySelect = (city: 'Kelowna' | 'Nelson') => {
     setTempSelectedCity(city);
   };
@@ -209,21 +173,6 @@ export default function ProfileScreen() {
             <Text style={{ fontSize: 20, fontWeight: '900', color: text, marginBottom: 4 }}>
               {user?.name || user?.email || 'Music Lover'}
             </Text>
-            {isPremium && (
-              <View style={{ 
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                backgroundColor: primary, 
-                paddingHorizontal: 12, 
-                paddingVertical: 6, 
-                borderRadius: 12 
-              }}>
-                <Crown size={14} color="#FFFFFF" style={{ marginRight: 4 }} />
-                <Text style={{ fontSize: 12, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5 }}>
-                  PREMIUM
-                </Text>
-              </View>
-            )}
           </View>
         </View>
 
@@ -262,71 +211,8 @@ export default function ProfileScreen() {
         {/* Notification Settings Section */}
         <NotificationSettings />
 
-        {/* Subscription Section */}
-        {!isPremium ? (
-          <Pressable onPress={handlePremiumUpgrade} style={{ marginBottom: 20, borderRadius: 20, overflow: 'hidden' }}>
-            <View style={{ padding: 20, backgroundColor: '#f2a41e' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
-                  <Crown size={20} color="#FFFFFF" strokeWidth={2.5} />
-                </View>
-                <Text style={{ fontSize: 20, fontWeight: '900', color: '#FFFFFF', flex: 1 }}>
-                  Go Premium
-                </Text>
-              </View>
-              <Text style={{ fontSize: 14, color: '#FFFFFF', fontWeight: '600', marginBottom: 16, lineHeight: 20, opacity: 0.95 }}>
-                • Instant notifications{'\n'}
-                • Unlimited favorites{'\n'}
-                • Ad-free experience{'\n'}
-                • Priority support
-              </Text>
-              <View style={{ backgroundColor: '#FFFFFF', paddingVertical: 12, borderRadius: 12, alignItems: 'center' }}>
-                <Text style={{ color: primary, fontSize: 15, fontWeight: '800', letterSpacing: 0.5 }}>
-                  Subscribe for $3.99/month
-                </Text>
-              </View>
-            </View>
-          </Pressable>
-        ) : (
-          <View style={{ marginBottom: 20, backgroundColor: cardBackground, borderRadius: 20, padding: 20, borderWidth: 2, borderColor: primary }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: primary + '20', alignItems: 'center', justifyContent: 'center' }}>
-                <Crown size={20} color={primary} strokeWidth={2.5} fill={primary} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 18, fontWeight: '800', color: text }}>
-                  Premium Member
-                </Text>
-                <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 2 }}>
-                  Active subscription
-                </Text>
-              </View>
-            </View>
-            <Pressable
-              onPress={handlePremiumCancel}
-              style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 16, backgroundColor: background, borderRadius: 12 }}
-            >
-              <Text style={{ color: destructive, fontSize: 14, fontWeight: '700', textAlign: 'center' }}>
-                Manage Subscription
-              </Text>
-            </Pressable>
-          </View>
-        )}
-
         {/* Menu Items */}
         <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 20 }}>
-          <Pressable
-            onPress={() => navigation.navigate('Notifications' as never)}
-            style={{ flexDirection: 'row', alignItems: 'center', padding: 18, borderBottomWidth: 1, borderBottomColor: border }}
-          >
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
-              <Bell size={18} color={primary} strokeWidth={2.5} />
-            </View>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1 }}>
-              Notifications
-            </Text>
-            <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
-          </Pressable>
 
           <Pressable
             onPress={() => navigation.navigate('Feedback' as never)}
