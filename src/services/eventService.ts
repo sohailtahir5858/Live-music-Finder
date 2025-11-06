@@ -204,10 +204,24 @@ export const fetchEvents = async (
     ? 'https://livemusicnelson.ca/wp-json/tribe/events/v1/events/'
     : 'https://livemusickelowna.ca/wp-json/tribe/events/v1/events/';
 
-  // Format dates properly for WordPress API
-  let startDate = '2025-10-28 01:00:00';
-  let endDate = '2027-10-30 00:59:59';
+  // Format dates properly for WordPress API (using local time, not UTC)
+  const formatLocalDateTime = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
 
+  const now = new Date();
+  const twoMonthsFromNow = new Date(now);
+
+  twoMonthsFromNow.setMonth(twoMonthsFromNow.getMonth() + 2);
+  let startDate = formatLocalDateTime(now); // Current date and time in YYYY-MM-DD HH:MM:SS format (local time)
+  let endDate = formatLocalDateTime(twoMonthsFromNow); // 2 months from now in YYYY-MM-DD HH:MM:SS format (local time)
+  console.log(startDate, endDate);
   if (options?.dateFrom) {
     // If dateFrom is just YYYY-MM-DD, convert to YYYY-MM-DD 00:00:00
     startDate = options.dateFrom.includes(':') 
@@ -234,8 +248,7 @@ export const fetchEvents = async (
   try {
     const response = await fetch(url);
     const data: WordPressApiResponse = await response.json();
-    console.log("🚀 ~ fetchEvents ~ url:", url);
-    console.log("🚀 ~ fetchEvents ~ data:", data);
+ 
     
     let events = mapWordPressEventsToAppFormat(data);
 
@@ -386,8 +399,8 @@ export function mapWordPressEventsToAppFormat(response: WordPressApiResponse): S
 
     return {
       _id: event.id.toString(),
-      title: event.title,
-      artist: event.title, // WordPress doesn't provide separate artist name
+      title: decodeHtmlEntities(event.title),
+      artist: decodeHtmlEntities(event.title), // WordPress doesn't provide separate artist name
       venue: decodeHtmlEntities(event.venue?.venue || 'TBA'),
       venueAddress: venueAddressParts.join(", "),
       city: (event.venue?.city === 'Nelson' ? 'Nelson' : 'Kelowna') as "Kelowna" | "Nelson",
