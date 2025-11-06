@@ -4,70 +4,34 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView, Animated } from "react-native";
-import {
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-} from "lucide-react-native";
+import { View, Text, Pressable, ScrollView } from "react-native";
+import { MapPin, ChevronDown, ChevronRight } from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { fetchVenues } from "../services/eventService";
 
 export const VenueSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
-  const { favoriteVenues, toggleFavoriteVenue, selectedCity } =
+  const { favoriteVenues, toggleFavoriteVenue, selectedCity, allVenues, isPremium } =
     useUserPreferences();
-  const [venues, setVenues] = useState<{ id: number; venue: string }[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const rotateAnim = React.useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    loadVenues();
-  }, [selectedCity]);
-
-  useEffect(() => {
-    Animated.timing(rotateAnim, {
-      toValue: isExpanded ? 1 : 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  }, [isExpanded]);
-
-  const loadVenues = async () => {
-    try {
-      setIsLoading(true);
-      const wpVenues = await fetchVenues(selectedCity);
-      console.log("🚀 ~ loadVenues ~ wpVenues:", wpVenues);
-      setVenues(wpVenues);
-    } catch (error) {
-      console.error("Error loading venues:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const currentCityVenues = favoriteVenues?.[selectedCity] || [];
 
   const handleVenuePress = (venueName: string) => {
-    const isAlreadySelected = favoriteVenues.includes(venueName);
-    // Free users can select up to 3 venues
-    const canSelect = isAlreadySelected || favoriteVenues.length < 3;
-    console.log("🚀 ~ handleVenuePress ~ canSelect:", canSelect)
+    const isAlreadySelected = currentCityVenues.includes(venueName);
+    const canSelect =
+      isPremium || isAlreadySelected || currentCityVenues.length < 3;
 
     if (!canSelect) {
+      // User has reached limit - don't toggle
       return;
     }
 
     toggleFavoriteVenue(venueName);
   };
 
-  const rotateInterpolate = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "180deg"],
-  });
-
-  if (isLoading) {
+  if (allVenues.length === 0) {
     return (
       <View
         style={{
@@ -103,6 +67,7 @@ export const VenueSelector = () => {
         borderRadius: 20,
         marginBottom: 16,
         overflow: "hidden",
+        padding: 20,
       }}
     >
       {/* Accordion Header */}
@@ -112,11 +77,10 @@ export const VenueSelector = () => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: 20,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          <MapPin size={20} color={primary} style={{ marginRight: 12 }} />
+          <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 16, fontWeight: "800", color: text }}>
               Favorite Venues
@@ -131,7 +95,7 @@ export const VenueSelector = () => {
                 }}
               >
                 Select your favourite venues to see matching shows in the "My
-                Feed" tab
+                Feed" tab ({currentCityVenues.length}/3)
               </Text>
             )}
           </View>
@@ -145,56 +109,40 @@ export const VenueSelector = () => {
         </View>
       </Pressable>
 
-      {/* Accordion Content */}
       {isExpanded && (
-        <View
-          style={{
-            paddingHorizontal: 20,
-            paddingBottom: 20,
-            borderTopColor: border,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 10,
-              marginTop: 16,
-            }}
-          >
-            {venues.map((venue) => {
-              const isSelected = favoriteVenues.includes(venue.venue);
-              const canSelect = isSelected || favoriteVenues.length < 3;
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingTop: 30 }}>
+          {allVenues.map((venue) => {
+            const isSelected = currentCityVenues.includes(venue.venue);
+            const canSelect =
+              isPremium || isSelected || currentCityVenues.length < 3;
 
-              return (
-                <Pressable
-                  key={venue.id}
-                  onPress={() => handleVenuePress(venue.venue)}
-                  disabled={!canSelect && !isSelected}
-                  style={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 16,
-                    borderRadius: 20,
-                    borderWidth: 1.5,
-                     borderColor: isSelected ? primary : border,
+            return (
+              <Pressable
+                key={venue.id}
+                onPress={() => handleVenuePress(venue.venue)}
+                disabled={!canSelect && !isSelected}
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 16,
+                  borderRadius: 20,
+                  borderWidth: 2,
+                  borderColor: isSelected ? primary : border,
                   backgroundColor: isSelected ? primary + "20" : "transparent",
                   opacity: !canSelect && !isSelected ? 0.4 : 1,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "700",
+                    color: isSelected ? primary : text,
                   }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "700",
-                      color: isSelected ? primary : text,
-                    }}
-                  >
-                    {venue.venue}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
+                  {venue.venue}
+                </Text>
+              </Pressable>
+            );
+          })}
           <Text
             style={{
               fontSize: 12,

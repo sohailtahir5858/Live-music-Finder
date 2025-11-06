@@ -9,6 +9,7 @@ import FeedbackScreen from '../screens/FeedbackScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { ShowDetailScreen } from '../screens/ShowDetailScreen';
 import { FilterScreen } from '../screens/FilterScreen';
+import CitySelectionScreen from '../screens/CitySelectionScreen';
 import MainTabNavigator from './MainTabNavigator';
 import { useAppStateStore } from '../stores/appStateStore';
 import { useUserPreferences } from '../stores/userPreferencesStore';
@@ -16,6 +17,7 @@ import { Activity } from 'lucide-react-native';
 
 export type RootStackParamList = {
   Login: undefined;
+  CitySelection: undefined;
   MainTabs: undefined;
   Feedback: undefined;
   Profile: undefined;
@@ -81,14 +83,14 @@ export const RootNavigator = () => {
     };
   }, [isAuthInitialized]);
 
-  // Show loading screen while auth is initializing
-  // if (!isAuthInitialized) {
-  //   return (
-  //     <View style={{ flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center' }}>
-  //      <ActivityIndicator size={"large"} color={"white"} />
-  //     </View>
-  //   );
-  // }
+  // Show loading screen while auth is initializing or preferences are loading
+  if (!isAuthInitialized || (isAuthenticated && !hasLoadedPreferences)) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center' }}>
+       <ActivityIndicator size={"large"} color={"#f2a41e"} />
+      </View>
+    );
+  }
 
   // IMPORTANT: Add more conditions here as needed for your app
   // Example: const needsOnboarding = useAppStateStore(state => state.needsOnboarding);
@@ -96,16 +98,20 @@ export const RootNavigator = () => {
   
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!magically.auth?.isAuthenticated ? (
-        // Auth flow: Login (includes city selection for authenticated users)
+      {!isAuthenticated ? (
+        // Not authenticated: Show Login Screen
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
+        </>
+      ) : !hasLoadedPreferences || !hasSelectedCity ? (
+        // Authenticated but needs city selection
+        <>
+          <Stack.Screen name="CitySelection" component={CitySelectionScreen} />
         </>
       ) : (
         // Authenticated with city selected: Show main app
         <>
           {/* TABS SCREEN - Shows bottom tabs */}
-          {/* Please remove if tabs are not needed */}
           <Stack.Screen name="MainTabs" component={MainTabNavigator} />
           
           {/* DETAIL SCREENS - These hide the tabs automatically */}

@@ -34,27 +34,28 @@ class ShowService {
         query.city = filters.city;
       }
 
-      // Always filter out past events - only show tomorrow and future
+      // Always filter out past events - only show current date to next 30 days
       const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const thirtyDaysFromNow = new Date(today);
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+      const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const thirtyDaysStr = thirtyDaysFromNow.toISOString().split('T')[0]; // YYYY-MM-DD format
       
       // Date range filter
       if (filters.dateFrom || filters.dateTo) {
         query.date = {};
-        // Use the later of tomorrow or filters.dateFrom
+        // Use the later of today or filters.dateFrom
         if (filters.dateFrom) {
-          query.date.$gte = filters.dateFrom >= tomorrowStr ? filters.dateFrom : tomorrowStr;
+          query.date.$gte = filters.dateFrom >= todayStr ? filters.dateFrom : todayStr;
         } else {
-          query.date.$gte = tomorrowStr; // Default: show only tomorrow and future
+          query.date.$gte = todayStr; // Default: show only today and future
         }
         if (filters.dateTo) {
           query.date.$lte = filters.dateTo;
         }
       } else {
-        // No date filter provided, default to tomorrow and future
-        query.date = { $gte: tomorrowStr };
+        // No date filter provided, default to today to next 30 days
+        query.date = { $gte: todayStr, $lte: thirtyDaysStr };
       }
 
       const result = await magically.data.query<Show>('shows', query, {
@@ -104,18 +105,20 @@ class ShowService {
   }
 
   /**
-   * Get a single show by ID
+   * Get shows by IDs
    */
-  async getShowById(id: string): Promise<Show | null> {
+  async getShowsByIds(ids: string[]): Promise<Show[]> {
     try {
+      if (ids.length === 0) return [];
+      
       const result = await magically.data.query<Show>('shows', { 
-        _id: id,
+        _id: { $in: ids },
         isPublic: true 
       });
-      return result.data[0] || null;
+      return result.data;
     } catch (error) {
-      console.error('Error fetching show:', error);
-      return null;
+      console.error('Error fetching shows by IDs:', error);
+      return [];
     }
   }
 
@@ -195,10 +198,17 @@ class ShowService {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
+    const thirtyDaysFromNow = new Date(today);
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+    
     const endOfWeek = new Date(today);
     endOfWeek.setDate(endOfWeek.getDate() + (7 - today.getDay()));
     
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
     return {
       tonight: {
@@ -216,10 +226,20 @@ class ShowService {
         dateFrom: today.toISOString().split('T')[0],
         dateTo: endOfWeek.toISOString().split('T')[0],
       },
+      next30Days: {
+        label: 'Next 30 Days',
+        dateFrom: today.toISOString().split('T')[0],
+        dateTo: thirtyDaysFromNow.toISOString().split('T')[0],
+      },
       thisMonth: {
         label: 'This Month',
-        dateFrom: today.toISOString().split('T')[0],
+        dateFrom: startOfMonth.toISOString().split('T')[0],
         dateTo: endOfMonth.toISOString().split('T')[0],
+      },
+      nextMonth: {
+        label: 'Next Month',
+        dateFrom: nextMonth.toISOString().split('T')[0],
+        dateTo: endOfNextMonth.toISOString().split('T')[0],
       },
     };
   }

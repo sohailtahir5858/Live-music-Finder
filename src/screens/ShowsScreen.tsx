@@ -44,6 +44,8 @@ export const ShowsScreen = () => {
     setSelectedCity,
     favoriteArtists,
     toggleFavoriteArtist,
+    favoriteShows,
+    toggleFavoriteShow,
     isPremium,
     viewMode,
     setViewMode,
@@ -142,15 +144,15 @@ export const ShowsScreen = () => {
     navigation.navigate("Filter");
   };
 
-  const handleFavoritePress = (artist: string) => {
+  const handleFavoritePress = (show: Show) => {
     if (!magically.auth.currentUser) {
       navigation.navigate("Login");
       return;
     }
-    toggleFavoriteArtist(artist);
+    toggleFavoriteShow(show);
   };
 
-  const isFavorite = (artist: string) => favoriteArtists.includes(artist);
+  const isFavorite = (showId: string) => favoriteShows.some(s => s._id === showId);
 
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
@@ -176,40 +178,7 @@ export const ShowsScreen = () => {
               >
                 {/* Logo text with styling */}
                 <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-                    <Text
-                      style={{
-                        fontSize: 22,
-                        fontWeight: "800",
-                        color: primary,
-                        letterSpacing: -0.5,
-                      }}
-                    >
-                      LIVE
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 22,
-                        fontWeight: "800",
-                        color: text,
-                        letterSpacing: -0.5,
-                      }}
-                    >
-                      MUSIC
-                    </Text>
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontWeight: "600",
-                      color: text,
-                      marginTop: 2,
-                      letterSpacing: 0.5,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    {selectedCity}
-                  </Text>
+                  <Image source={selectedCity=='Kelowna'? require('./../../assets/images/Live-Music-Kelowna-White.png'):require('./../../assets/images/live-music-logo-white.png')} style={{width:150, height:50, resizeMode:'contain'}} />
                 </View>
 
                 {/* View Mode Toggle + Filter Buttons */}
@@ -373,8 +342,8 @@ export const ShowsScreen = () => {
                       <ShowCard
                         show={item}
                         onPress={() => handleShowPress(item)}
-                        onFavoritePress={() => handleFavoritePress(item.artist)}
-                        isFavorite={isFavorite(item.artist)}
+                        onFavoritePress={() => handleFavoritePress(item)}
+                        isFavorite={isFavorite(item._id)}
                         isPremium={isPremium}
                         index={index}
                         primary={primary}
@@ -387,8 +356,8 @@ export const ShowsScreen = () => {
                       <ShowListItem
                         show={item}
                         onPress={() => handleShowPress(item)}
-                        onFavoritePress={() => handleFavoritePress(item.artist)}
-                        isFavorite={isFavorite(item.artist)}
+                        onFavoritePress={() => handleFavoritePress(item)}
+                        isFavorite={isFavorite(item._id)}
                         isPremium={isPremium}
                       />
                     )}

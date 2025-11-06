@@ -293,11 +293,32 @@ export const fetchGenres = async (city: string): Promise<WordPressCategory[]> =>
     ? 'https://livemusicnelson.ca/wp-json/tribe/events/v1/categories/'
     : 'https://livemusickelowna.ca/wp-json/tribe/events/v1/categories/';
 
+  const allCategories: WordPressCategory[] = [];
+  let currentPage = 1;
+  let hasNextPage = true;
+
   try {
-    const response = await fetch(baseUrl);
-    const data: WordPressCategoryResponse = await response.json();
-    console.log("🚀 ~ fetchGenres ~ data:", data);
-    return data.categories || [];
+    while (hasNextPage) {
+      const url = `${baseUrl}?page=${currentPage}&per_page=50&status=publish`;
+      console.log(`🚀 ~ fetchGenres ~ Fetching page ${currentPage}:`, url);
+
+      const response = await fetch(url);
+      const data: WordPressCategoryResponse = await response.json();
+
+      if (data.categories && data.categories.length > 0) {
+        allCategories.push(...data.categories);
+        console.log(`🚀 ~ fetchGenres ~ Page ${currentPage}: ${data.categories.length} categories`);
+
+        // Check if there's a next page
+        hasNextPage = data.next_rest_url !== undefined && data.next_rest_url !== null;
+        currentPage++;
+      } else {
+        hasNextPage = false;
+      }
+    }
+
+    console.log(`🚀 ~ fetchGenres ~ Total categories fetched: ${allCategories.length}`);
+    return allCategories;
   } catch (error) {
     console.error("Error fetching genres:", error);
     return [];
@@ -309,11 +330,32 @@ export const fetchVenues = async (city: string): Promise<WordPressVenue[]> => {
     ? 'https://livemusicnelson.ca/wp-json/tribe/events/v1/venues/'
     : 'https://livemusickelowna.ca/wp-json/tribe/events/v1/venues/';
 
+  const allVenues: WordPressVenue[] = [];
+  let currentPage = 1;
+  let hasNextPage = true;
+
   try {
-    const response = await fetch(baseUrl);
-    const data: WordPressVenueResponse = await response.json();
-    console.log("🚀 ~ fetchVenues ~ data:", data);
-    return data.venues || [];
+    while (hasNextPage) {
+      const url = `${baseUrl}?page=${currentPage}&per_page=50&status=publish`;
+      console.log(`🚀 ~ fetchVenues ~ Fetching page ${currentPage}:`, url);
+
+      const response = await fetch(url);
+      const data: WordPressVenueResponse = await response.json();
+
+      if (data.venues && data.venues.length > 0) {
+        allVenues.push(...data.venues);
+        console.log(`🚀 ~ fetchVenues ~ Page ${currentPage}: ${data.venues.length} venues`);
+
+        // Check if there's a next page
+        hasNextPage = data.next_rest_url !== undefined && data.next_rest_url !== null;
+        currentPage++;
+      } else {
+        hasNextPage = false;
+      }
+    }
+
+    console.log(`🚀 ~ fetchVenues ~ Total venues fetched: ${allVenues.length}`);
+    return allVenues;
   } catch (error) {
     console.error("Error fetching venues:", error);
     return [];

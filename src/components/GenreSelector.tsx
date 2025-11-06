@@ -9,35 +9,21 @@ import { ChevronDown, ChevronRight, Music } from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { fetchGenres } from "../services/eventService";
+import { DataService } from "../services/dataService";
 
 export const GenreSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
-  const { favoriteGenres, toggleFavoriteGenre, isPremium } =
+  const { favoriteGenres, toggleFavoriteGenre, isPremium, allGenres, selectedCity } =
     useUserPreferences();
-  const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  useEffect(() => {
-    loadGenres();
-  }, []);
-
-  const loadGenres = async () => {
-    try {
-      // Fetch genres from WordPress API (use Kelowna as default, or get from user preferences)
-      const wpGenres = await fetchGenres("Kelowna");
-      setGenres(wpGenres);
-    } catch (error) {
-      console.error("Error loading genres:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const currentCityGenres = favoriteGenres?.[selectedCity] || [];
+  console.log("🚀 ~ GenreSelector ~ currentCityGenres:", currentCityGenres,selectedCity)
 
   const handleGenrePress = (genreName: string) => {
-    const isAlreadySelected = favoriteGenres.includes(genreName);
+    const isAlreadySelected = currentCityGenres.includes(genreName);
     const canSelect =
-      isPremium || isAlreadySelected || favoriteGenres.length < 3;
+      isPremium || isAlreadySelected || currentCityGenres.length < 3;
 
     if (!canSelect) {
       // User has reached limit - don't toggle
@@ -47,7 +33,7 @@ export const GenreSelector = () => {
     toggleFavoriteGenre(genreName);
   };
 
-  if (isLoading) {
+  if (allGenres.length === 0) {
     return (
       <View
         style={{
@@ -111,7 +97,7 @@ export const GenreSelector = () => {
                 }}
               >
                 Select your favourite music to see matching shows in the "My
-                Feed" tab
+                Feed" tab ({currentCityGenres.length}/3)
               </Text>
             )}
           </View>
@@ -126,11 +112,11 @@ export const GenreSelector = () => {
       </Pressable>
 
       {isExpanded && (
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8,paddingTop:30 }}>
-          {genres.map((genre) => {
-            const isSelected = favoriteGenres.includes(genre.name);
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingTop: 30 }}>
+          {allGenres.map((genre) => {
+            const isSelected = currentCityGenres.includes(genre.name);
             const canSelect =
-              isPremium || isSelected || favoriteGenres.length < 3;
+              isPremium || isSelected || currentCityGenres.length < 3;
 
             return (
               <Pressable

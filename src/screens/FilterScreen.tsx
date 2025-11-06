@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Pressable, Modal } from 'react-native';
-import { ArrowLeft, Sliders, X, Calendar } from 'lucide-react-native';
+import { ArrowLeft, Sliders, X, Calendar, Clock, Music2, MapPin, ChevronDown, ChevronRight } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
@@ -13,17 +13,17 @@ import { showService } from '../services/showService';
 import { useUserPreferences } from '../stores/userPreferencesStore';
 import { useFilterStore } from '../stores/filterStore';
 import { fetchGenres, fetchVenues, WordPressCategory, WordPressVenue, decodeHtmlEntities } from '../services/eventService';
+import { DataService } from '../services/dataService';
 import { TIME_FILTERS, getDatePresets, getTimeFilterStrings } from '../utils/filterHelpers';
 import { CustomDateRangePicker } from '../components/CustomDateRangePicker';
 
 export const FilterScreen = () => {
   const { background, text, textMuted, primary, secondary, cardBackground, border } = useTheme();
   const navigation = useNavigation();
-  const { selectedCity } = useUserPreferences();
+  const { selectedCity,setAllGenres,setAllVenues,allGenres,allVenues, loadAllGenres, loadAllVenues } = useUserPreferences();
   const { activeFilters, setFilters, clearFilters: clearStoreFilters } = useFilterStore();
   
-  const [availableGenres, setAvailableGenres] = useState<WordPressCategory[]>([]);
-  const [availableVenues, setAvailableVenues] = useState<WordPressVenue[]>([]);
+ 
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<string | null>(null);
@@ -31,6 +31,12 @@ export const FilterScreen = () => {
   const [customDateFrom, setCustomDateFrom] = useState<Date | null>(null);
   const [customDateTo, setCustomDateTo] = useState<Date | null>(null);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  
+  // Accordion states
+  const [expandedTimeFilter, setExpandedTimeFilter] = useState(false);
+  const [expandedDateFilter, setExpandedDateFilter] = useState(false);
+  const [expandedGenres, setExpandedGenres] = useState(false);
+  const [expandedVenues, setExpandedVenues] = useState(false);
 
   const datePresets = getDatePresets();
 
@@ -61,12 +67,18 @@ export const FilterScreen = () => {
 
   const loadFilterOptions = async () => {
     try {
-      const genres = await fetchGenres(selectedCity);
-      const venues = await fetchVenues(selectedCity);
-      setAvailableGenres(genres);
-      setAvailableVenues(venues);
+      // Load categories and venues from store (which calls API with pagination)
+      await Promise.all([
+        loadAllGenres(selectedCity),
+        loadAllVenues(selectedCity),
+      ]);
+
+      console.log("🚀 ~ loadFilterOptions ~ genres:", allGenres.length, "venues:", allVenues.length);
     } catch (error) {
       console.error('Error loading filter options:', error);
+      // Set empty arrays on error
+      setAllGenres([]);
+      setAllVenues([]);
     }
   };
 
@@ -152,124 +164,168 @@ export const FilterScreen = () => {
           </View>
 
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 120 }}>
-            {/* Time Filter */}
-            <View style={{ marginBottom: 32 }}>
-              <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 12 }}>
-                Time of Day
-              </Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                {TIME_FILTERS.map((timeFilter) => {
-                  const isSelected = selectedTimeFilter === timeFilter.value;
-                  return (
-                    <Pressable
-                      key={timeFilter.value}
-                      onPress={() => setSelectedTimeFilter(isSelected ? '' : timeFilter.value)}
-                      style={{
-                        paddingVertical: 10,
-                        paddingHorizontal: 18,
-                        borderRadius: 14,
-                        backgroundColor: isSelected ? 'transparent' : cardBackground,
-                        borderWidth: isSelected ? 2 : 0,
-                        borderColor: primary,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {isSelected && (
-                        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: primary, opacity: 0.1 }} />
-                      )}
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
-                        {timeFilter.label}
+            {/* Time Filter Accordion */}
+            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
+              <Pressable
+                onPress={() => setExpandedTimeFilter(!expandedTimeFilter)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <Clock size={20} color={primary} style={{ marginRight: 12 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
+                      Time of Day
+                    </Text>
+                    {!expandedTimeFilter && selectedTimeFilter && (
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                        {TIME_FILTERS.find(t => t.value === selectedTimeFilter)?.label}
                       </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+                    )}
+                  </View>
+                </View>
+                <View>
+                  {expandedTimeFilter ? (
+                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
+                  )}
+                </View>
+              </Pressable>
+
+              {expandedTimeFilter && (
+                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
+                    {TIME_FILTERS.map((timeFilter) => {
+                      const isSelected = selectedTimeFilter === timeFilter.value;
+                      return (
+                        <Pressable
+                          key={timeFilter.value}
+                          onPress={() => setSelectedTimeFilter(isSelected ? '' : timeFilter.value)}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 18,
+                            borderRadius: 14,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? primary : border,
+                            backgroundColor: isSelected ? primary + '20' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
+                            {timeFilter.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
             </View>
 
-            {/* Date Presets */}
-            <View style={{ marginBottom: 32 }}>
-              <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 12 }}>
-                Date Range
-              </Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                {datePresets.map((preset) => {
-                  const isSelected = selectedDatePreset === preset.value;
-                  return (
+            {/* Date Range Accordion */}
+            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
+              <Pressable
+                onPress={() => setExpandedDateFilter(!expandedDateFilter)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <Calendar size={20} color={primary} style={{ marginRight: 12 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
+                      Date Range
+                    </Text>
+                    {!expandedDateFilter && selectedDatePreset && (
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                        {selectedDatePreset === 'custom' && customDateFrom && customDateTo
+                          ? `${customDateFrom.toLocaleDateString()} - ${customDateTo.toLocaleDateString()}`
+                          : datePresets.find(p => p.value === selectedDatePreset)?.label}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+                <View>
+                  {expandedDateFilter ? (
+                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
+                  )}
+                </View>
+              </Pressable>
+
+              {expandedDateFilter && (
+                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
+                    {datePresets.map((preset) => {
+                      const isSelected = selectedDatePreset === preset.value;
+                      return (
+                        <Pressable
+                          key={preset.value}
+                          onPress={() => setSelectedDatePreset(isSelected ? '' : preset.value)}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 18,
+                            borderRadius: 14,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? primary : border,
+                            backgroundColor: isSelected ? primary + '20' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
+                            {preset.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                    {/* Custom Date Option */}
                     <Pressable
-                      key={preset.value}
-                      onPress={() => setSelectedDatePreset(isSelected ? '' : preset.value)}
+                      onPress={() => {
+                        setSelectedDatePreset('custom');
+                        setShowCustomDatePicker(true);
+                      }}
                       style={{
                         paddingVertical: 10,
                         paddingHorizontal: 18,
                         borderRadius: 14,
-                        backgroundColor: isSelected ? 'transparent' : cardBackground,
-                        borderWidth: isSelected ? 2 : 0,
-                        borderColor: primary,
-                        overflow: 'hidden',
+                        borderWidth: 1.5,
+                        borderColor: selectedDatePreset === 'custom' ? primary : border,
+                        backgroundColor: selectedDatePreset === 'custom' ? primary + '20' : 'transparent',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 6,
                       }}
                     >
-                      {isSelected && (
-                        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: primary, opacity: 0.1 }} />
-                      )}
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
-                        {preset.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                {/* Custom Date Option */}
-                <Pressable
-                  onPress={() => {
-                    setSelectedDatePreset('custom');
-                    setShowCustomDatePicker(true);
-                  }}
-                  style={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 18,
-                    borderRadius: 14,
-                    backgroundColor: selectedDatePreset === 'custom' ? 'transparent' : cardBackground,
-                    borderWidth: selectedDatePreset === 'custom' ? 2 : 0,
-                    borderColor: primary,
-                    overflow: 'hidden',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  {selectedDatePreset === 'custom' && (
-                    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: primary, opacity: 0.1 }} />
-                  )}
-                  <Calendar size={14} color={selectedDatePreset === 'custom' ? primary : text} />
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: selectedDatePreset === 'custom' ? primary : text }}>
-                    Custom
-                  </Text>
-                </Pressable>
-              </View>
-
-              {/* Custom Date Picker */}
-              {selectedDatePreset === 'custom' && (
-                <View style={{ marginTop: 16, padding: 16, backgroundColor: cardBackground, borderRadius: 12, borderWidth: 1, borderColor: border }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: text, marginBottom: 12 }}>
-                    Select date range
-                  </Text>
-                  <View style={{ gap: 12 }}>
-                    <Pressable
-                      onPress={() => setShowCustomDatePicker(true)}
-                      style={{ paddingVertical: 12, paddingHorizontal: 12, backgroundColor: background, borderRadius: 10, borderWidth: 1, borderColor: border }}
-                    >
-                      <Text style={{ color: customDateFrom ? text : textMuted, fontSize: 14, fontWeight: '600' }}>
-                        From: {customDateFrom ? customDateFrom.toLocaleDateString() : 'Select date'}
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => setShowCustomDatePicker(true)}
-                      style={{ paddingVertical: 12, paddingHorizontal: 12, backgroundColor: background, borderRadius: 10, borderWidth: 1, borderColor: border }}
-                    >
-                      <Text style={{ color: customDateTo ? text : textMuted, fontSize: 14, fontWeight: '600' }}>
-                        To: {customDateTo ? customDateTo.toLocaleDateString() : 'Select date'}
+                      <Calendar size={14} color={selectedDatePreset === 'custom' ? primary : text} />
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: selectedDatePreset === 'custom' ? primary : text }}>
+                        Custom
                       </Text>
                     </Pressable>
                   </View>
+
+                  {/* Custom Date Picker */}
+                  {selectedDatePreset === 'custom' && (
+                    <View style={{ marginTop: 16, padding: 16, backgroundColor: background, borderRadius: 12, borderWidth: 1, borderColor: border }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: text, marginBottom: 12 }}>
+                        Select date range
+                      </Text>
+                      <View style={{ gap: 12 }}>
+                        <Pressable
+                          onPress={() => setShowCustomDatePicker(true)}
+                          style={{ paddingVertical: 12, paddingHorizontal: 12, backgroundColor: cardBackground, borderRadius: 10, borderWidth: 1, borderColor: border }}
+                        >
+                          <Text style={{ color: customDateFrom ? text : textMuted, fontSize: 14, fontWeight: '600' }}>
+                            From: {customDateFrom ? customDateFrom.toLocaleDateString() : 'Select date'}
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          onPress={() => setShowCustomDatePicker(true)}
+                          style={{ paddingVertical: 12, paddingHorizontal: 12, backgroundColor: cardBackground, borderRadius: 10, borderWidth: 1, borderColor: border }}
+                        >
+                          <Text style={{ color: customDateTo ? text : textMuted, fontSize: 14, fontWeight: '600' }}>
+                            To: {customDateTo ? customDateTo.toLocaleDateString() : 'Select date'}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
                 </View>
               )}
 
@@ -288,105 +344,152 @@ export const FilterScreen = () => {
               />
             </View>
 
-            {/* Genres */}
-            <View style={{ marginBottom: 32 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
-                  Genres
-                </Text>
+            {/* Genres Accordion */}
+            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
+              <Pressable
+                onPress={() => setExpandedGenres(!expandedGenres)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <Music2 size={20} color={primary} style={{ marginRight: 12 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
+                      Genres
+                    </Text>
+                    {!expandedGenres && selectedGenres.length > 0 && (
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                        {selectedGenres.length} selected
+                      </Text>
+                    )}
+                  </View>
+                </View>
                 {selectedGenres.length > 0 && (
-                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10 }}>
+                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
                     <Text style={{ fontSize: 12, fontWeight: '800', color: primary }}>
-                      {selectedGenres.length} selected
+                      {selectedGenres.length}
                     </Text>
                   </View>
                 )}
-              </View>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                {availableGenres.map((genre) => {
-                  const decodedName = decodeHtmlEntities(genre.name);
-                  const isSelected = selectedGenres.includes(genre.name);
-                  return (
-                    <Pressable
-                      key={genre.id}
-                      onPress={() => toggleGenre(genre.name)}
-                      style={{
-                        paddingVertical: 10,
-                        paddingHorizontal: 18,
-                        borderRadius: 14,
-                        backgroundColor: isSelected ? 'transparent' : cardBackground,
-                        borderWidth: isSelected ? 2 : 0,
-                        borderColor: primary,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {isSelected && (
-                        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: primary, opacity: 0.1 }} />
-                      )}
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? '#FFFFFF' : text }}>
-                        {decodedName}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+                <View>
+                  {expandedGenres ? (
+                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
+                  )}
+                </View>
+              </Pressable>
+
+              {expandedGenres && (
+                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
+                    {allGenres.map((genre) => {
+                      const decodedName = decodeHtmlEntities(genre.name);
+                      const isSelected = selectedGenres.includes(genre.name);
+                      return (
+                        <Pressable
+                          key={genre.id}
+                          onPress={() => toggleGenre(genre.name)}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 18,
+                            borderRadius: 14,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? primary : border,
+                            backgroundColor: isSelected ? primary + '20' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
+                            {decodedName}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
             </View>
 
-            {/* Venues */}
-            <View style={{ marginBottom: 32 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
-                  Venues in {selectedCity}
-                </Text>
+            {/* Venues Accordion */}
+            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
+              <Pressable
+                onPress={() => setExpandedVenues(!expandedVenues)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <MapPin size={20} color={primary} style={{ marginRight: 12 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
+                      Venues in {selectedCity}
+                    </Text>
+                    {!expandedVenues && selectedVenues.length > 0 && (
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                        {selectedVenues.length} selected
+                      </Text>
+                    )}
+                  </View>
+                </View>
                 {selectedVenues.length > 0 && (
-                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10 }}>
+                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
                     <Text style={{ fontSize: 12, fontWeight: '800', color: primary }}>
-                      {selectedVenues.length} selected
+                      {selectedVenues.length}
                     </Text>
                   </View>
                 )}
-              </View>
-              {availableVenues.map((venue) => {
-                const decodedVenueName = decodeHtmlEntities(venue.venue);
-                const isSelected = selectedVenues.includes(venue.venue);
-                return (
-                  <Pressable
-                    key={venue.id}
-                    onPress={() => toggleVenue(venue.venue)}
-                    style={{
-                      paddingVertical: 14,
-                      paddingHorizontal: 16,
-                      borderRadius: 14,
-                      backgroundColor: isSelected ? primary + '20' : cardBackground,
-                      borderWidth: isSelected ? 2 : 1,
-                      borderColor: isSelected ? primary : border,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text, flex: 1 }}>
-                        {decodedVenueName}
-                      </Text>
-                      <View
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: 10,
-                          borderWidth: 2,
-                          borderColor: isSelected ? primary : border,
-                          backgroundColor: isSelected ? primary : 'transparent',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {isSelected && (
-                          <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FFFFFF' }} />
-                        )}
-                      </View>
-                    </View>
-                  </Pressable>
-                );
-              })}
+                <View>
+                  {expandedVenues ? (
+                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
+                  )}
+                </View>
+              </Pressable>
+
+              {expandedVenues && (
+                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
+                  <View style={{ gap: 10, marginTop: 16 }}>
+                    {allVenues.map((venue) => {
+                      const decodedVenueName = decodeHtmlEntities(venue.venue);
+                      const isSelected = selectedVenues.includes(venue.venue);
+                      return (
+                        <Pressable
+                          key={venue.id}
+                          onPress={() => toggleVenue(venue.venue)}
+                          style={{
+                            paddingVertical: 14,
+                            paddingHorizontal: 16,
+                            borderRadius: 14,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? primary : border,
+                            backgroundColor: isSelected ? primary + '20' : 'transparent',
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text, flex: 1 }}>
+                              {decodedVenueName}
+                            </Text>
+                            <View
+                              style={{
+                                width: 20,
+                                height: 20,
+                                borderRadius: 10,
+                                borderWidth: 2,
+                                borderColor: isSelected ? primary : border,
+                                backgroundColor: isSelected ? primary : 'transparent',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              {isSelected && (
+                                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FFFFFF' }} />
+                              )}
+                            </View>
+                          </View>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
             </View>
           </ScrollView>
 

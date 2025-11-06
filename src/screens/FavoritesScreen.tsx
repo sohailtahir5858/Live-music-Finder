@@ -3,56 +3,94 @@
  * @description Screen displaying shows matching user's favorite genres and venues selected in Profile
  */
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native';
-import { Heart, MapPin, Calendar, Lock, Music } from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../contexts/ThemeContext';
-import { useUserPreferences } from '../stores/userPreferencesStore';
-import { useAppStateStore } from '../stores/appStateStore';
-import { showService } from '../services/showService';
-import { Show } from '../magically/entities/Show';
-import { Skeleton } from '../components/ui/Skeleton';
-import magically from 'magically-sdk';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  RefreshControl,
+  FlatList,
+  Animated,
+  Easing,
+  ActivityIndicator,
+} from "react-native";
+import {
+  Heart,
+  MapPin,
+  Calendar,
+  Lock,
+  Music,
+  LucideTableOfContents,
+  SlidersVertical,
+} from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "../contexts/ThemeContext";
+import { useUserPreferences } from "../stores/userPreferencesStore";
+import { useAppStateStore } from "../stores/appStateStore";
+import { Show } from "../magically/entities/Show";
+import { Skeleton } from "../components/ui/Skeleton";
+import magically from "magically-sdk";
+import { ShowListItem } from "../components/ShowListItem";
+import { Image } from "expo-image";
 
 export const FavoritesScreen = () => {
-  const { background, text, textMuted, primary, cardBackground } = useTheme();
+  const { background, text, textMuted, primary, secondary, cardBackground } =
+    useTheme();
   const navigation = useNavigation<any>();
-  const { favoriteGenres, favoriteVenues, selectedCity, isPremium } = useUserPreferences();
+  const {
+    favoriteShows,
+    selectedCity,
+    isPremium,
+    viewMode,
+    setViewMode,
+    toggleFavoriteShow,
+  } = useUserPreferences();
   const { isAuthenticated } = useAppStateStore();
-  
+
   const [shows, setShows] = useState<Show[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const slideAnim = React.useRef(new Animated.Value(30)).current;
+
   useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     if (!isAuthenticated) {
       setIsLoading(false);
       return;
     }
     loadFavoriteShows();
-  }, [isAuthenticated, favoriteGenres, favoriteVenues, selectedCity]);
+  }, [isAuthenticated, favoriteShows, selectedCity]);
 
   const loadFavoriteShows = async () => {
     try {
       setIsLoading(true);
-      
-      // Only fetch if user has selected favorites
-      if (favoriteGenres.length === 0 && favoriteVenues.length === 0) {
-        setShows([]);
-        return;
-      }
-      
-      const data = await showService.getFavoriteShows(
-        favoriteGenres,
-        favoriteVenues,
-        [], // No artist filtering for now
-        selectedCity
+
+      // Filter favorite shows by selected city
+      const filteredShows = favoriteShows.filter(
+        (show) => show.city === selectedCity
       );
-      setShows(data);
+
+      setShows(filteredShows);
     } catch (error) {
-      console.error('Error loading favorite shows:', error);
+      console.error("Error loading favorite shows:", error);
     } finally {
       setIsLoading(false);
     }
@@ -65,148 +103,457 @@ export const FavoritesScreen = () => {
   };
 
   const handleShowPress = (show: Show) => {
-    navigation.navigate('ShowDetail', { showId: show._id });
+    navigation.navigate("ShowDetail", { show });
+  };
+
+  const handleFavoritePress = (show: Show) => {
+    toggleFavoriteShow(show);
   };
 
   const handleLoginPress = () => {
-    navigation.navigate('Login');
+    navigation.navigate("Login");
   };
 
   const handleGoToProfile = () => {
-    navigation.navigate('Profile');
+    navigation.navigate("Shows");
   };
 
-  // Sign In Required
-  if (!isAuthenticated) {
-    return (
-      <View style={{ flex: 1, backgroundColor: background }}>
-        <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 }}>
-            <View style={{ alignItems: 'center' }}>
-              <View style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 24, backgroundColor: primary }}>
-                <Lock size={36} color="#FFFFFF" strokeWidth={2.5} />
-              </View>
-              <Text style={{ fontSize: 24, fontWeight: '900', color: text, textAlign: 'center', marginBottom: 12 }}>
-                Sign In Required
-              </Text>
-              <Text style={{ fontSize: 15, color: textMuted, textAlign: 'center', marginBottom: 32, lineHeight: 22 }}>
-                Sign in to save your favorite genres and venues. Get personalized show recommendations!
-              </Text>
-              <Pressable onPress={handleLoginPress} style={{ borderRadius: 16, overflow: 'hidden', width: '100%' }}>
-                <View style={{ paddingVertical: 16, paddingHorizontal: 32, alignItems: 'center', backgroundColor: primary }}>
-                  <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 }}>
-                    Sign In
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  }
 
-  const hasFavorites = favoriteGenres.length > 0 || favoriteVenues.length > 0;
-
-  // Empty State - No favorites selected
-  if (!isLoading && !hasFavorites) {
-    return (
-      <View style={{ flex: 1, backgroundColor: background }}>
-        <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 }}>
-            <View style={{ alignItems: 'center' }}>
-              <View style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 24, backgroundColor: primary + '20' }}>
-                <Heart size={36} color={primary} strokeWidth={2.5} />
-              </View>
-              <Text style={{ fontSize: 24, fontWeight: '900', color: text, textAlign: 'center', marginBottom: 12 }}>
-                No Favorites Yet
-              </Text>
-              <Text style={{ fontSize: 15, color: textMuted, textAlign: 'center', marginBottom: 32, lineHeight: 22 }}>
-                Go to Profile and select your favorite genres and venues to see personalized show recommendations here!
-              </Text>
-              <Pressable onPress={handleGoToProfile} style={{ borderRadius: 16, overflow: 'hidden', width: '100%' }}>
-                <View style={{ paddingVertical: 16, paddingHorizontal: 32, alignItems: 'center', backgroundColor: primary }}>
-                  <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 }}>
-                    Set Favorites
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-        {/* Header */}
-        <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
-          <Text style={{ fontSize: 28, fontWeight: '900', color: text, marginBottom: 4 }}>
-            My Feed
-          </Text>
-          <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600' }}>
-            Shows matching your favorite {favoriteGenres.length > 0 && 'genres'}{favoriteGenres.length > 0 && favoriteVenues.length > 0 && ' and '}{favoriteVenues.length > 0 && 'venues'}
-          </Text>
-        </View>
-
-        {/* Shows List */}
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={primary} />}
-        >
-          {isLoading ? (
-            <>
-              <Skeleton width="100%" height={140} style={{ marginBottom: 16, borderRadius: 20 }} />
-              <Skeleton width="100%" height={140} style={{ marginBottom: 16, borderRadius: 20 }} />
-              <Skeleton width="100%" height={140} style={{ marginBottom: 16, borderRadius: 20 }} />
-            </>
-          ) : shows.length === 0 ? (
-            <View style={{ alignItems: 'center', paddingVertical: 60 }}>
-              <Music size={48} color={textMuted} strokeWidth={1.5} style={{ marginBottom: 16 }} />
-              <Text style={{ fontSize: 18, fontWeight: '800', color: text, textAlign: 'center', marginBottom: 8 }}>
-                No Matching Shows
-              </Text>
-              <Text style={{ fontSize: 14, color: textMuted, textAlign: 'center', lineHeight: 20 }}>
-                There are no upcoming shows in {selectedCity} matching your favorite genres or venues. Check back later!
-              </Text>
-            </View>
-          ) : (
-            shows.map((show) => (
-              <Pressable key={show._id} onPress={() => handleShowPress(show)}>
-                <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 16, marginBottom: 16 }}>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: text, marginBottom: 8 }}>
-                    {show.artist}
+      <View style={{ flex: 1, backgroundColor: background }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          <Animated.View
+            style={{
+              flex: 1,
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            }}
+          >
+            {/* Header */}
+            <View
+              style={{ paddingHorizontal: 2, marginTop: 12, marginBottom: 24 }}
+            >
+              {/* Top row: Logo + Buttons */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 24,
+                }}
+              >
+                {/* Logo text with styling */}
+                <View style={{ flex: 1 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "baseline",
+                      gap: 6,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: "800",
+                        color: primary,
+                        letterSpacing: -0.5,
+                      }}
+                    >
+                      MY
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: "800",
+                        color: text,
+                        letterSpacing: -0.5,
+                      }}
+                    >
+                      FAVORITES
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: text,
+                      marginTop: 2,
+                      letterSpacing: 0.5,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {selectedCity}
                   </Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <MapPin size={14} color={textMuted} style={{ marginRight: 6 }} />
-                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600' }}>
-                      {show.venue}
+                </View>
+
+                {/* View Mode Toggle */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  {/* VIEW Button */}
+                  <Pressable
+                    onPress={() =>
+                      setViewMode(viewMode === "card" ? "list" : "card")
+                    }
+                    style={{
+                      paddingHorizontal: 14,
+                      paddingVertical: 10,
+                      borderRadius: 20,
+                      backgroundColor:
+                        viewMode === "list" ? secondary : cardBackground,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      gap: 6,
+                    }}
+                  >
+                    {/* Dots with lines icon */}
+                    <View style={{ gap: 2, alignItems: "center" }}>
+                      <LucideTableOfContents
+                        color={viewMode === "list" ? "white" : secondary}
+                        style={{ transform: [{ rotate: "180deg" }] }}
+                        size={20}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "600",
+                        color: "white",
+                        letterSpacing: 0.3,
+                      }}
+                    >
+                      VIEW
                     </Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Calendar size={14} color={textMuted} style={{ marginRight: 6 }} />
-                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600' }}>
-                      {new Date(show.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • {show.time}
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Shows count with dividers */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 12,
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    backgroundColor: "white",
+                    borderColor: "white",
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: text,
+                    letterSpacing: 0.2,
+                  }}
+                >
+                  {shows.length}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: textMuted,
+                    fontWeight: "500",
+                  }}
+                >
+                  Favorite Shows
+                </Text>
+                <View
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    backgroundColor: "white",
+                    borderColor: "white",
+                  }}
+                />
+              </View>
+            </View>
+
+            {/* Shows List */}
+            {isLoading ? (
+              <View style={{ paddingHorizontal: 24 }}>
+                {[1, 2, 3].map((i) => (
+                  <Skeleton
+                    key={i}
+                    width="100%"
+                    height={viewMode === "card" ? 280 : 80}
+                    style={{
+                      marginBottom: viewMode === "card" ? 24 : 12,
+                      borderRadius: viewMode === "card" ? 24 : 16,
+                    }}
+                  />
+                ))}
+              </View>
+            ) : shows.length === 0 ? (
+              <View style={{ padding: 32, alignItems: "center" }}>
+                <Text
+                  style={{
+                    color: textMuted,
+                    fontSize: 16,
+                    textAlign: "center",
+                  }}
+                >
+                  No favorite shows in {selectedCity}
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={shows}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item, index }) => (
+                  <React.Fragment key={item._id}>
+                    {viewMode === "card" ? (
+                      <ShowCard
+                        show={item}
+                        onPress={() => handleShowPress(item)}
+                        onFavoritePress={() => handleFavoritePress(item)}
+                        isFavorite={true}
+                        isPremium={isPremium}
+                        index={index}
+                        primary={primary}
+                        secondary={secondary}
+                        cardBackground={cardBackground}
+                        text={text}
+                        textMuted={textMuted}
+                      />
+                    ) : (
+                      <ShowListItem
+                        show={item}
+                        onPress={() => handleShowPress(item)}
+                        onFavoritePress={() => handleFavoritePress(item)}
+                        isFavorite={true}
+                        isPremium={isPremium}
+                      />
+                    )}
+                  </React.Fragment>
+                )}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingTop: 16, paddingBottom: 100 }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    tintColor={primary}
+                  />
+                }
+              />
+            )}
+          </Animated.View>
+        </SafeAreaView>
+      </View>
+    </View>
+  );
+};
+
+interface ShowCardProps {
+  show: Show;
+  onPress: () => void;
+  onFavoritePress: () => void;
+  isFavorite: boolean;
+  isPremium: boolean;
+  index: number;
+  primary: string;
+  secondary: string;
+  cardBackground: string;
+  text: string;
+  textMuted: string;
+}
+
+const ShowCard = ({
+  show,
+  onPress,
+  onFavoritePress,
+  isFavorite,
+  isPremium,
+  index,
+  primary,
+  secondary,
+  cardBackground,
+  text,
+  textMuted,
+}: ShowCardProps) => {
+  const cardScale = React.useRef(new Animated.Value(1)).current;
+  const heartScale = React.useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(cardScale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      friction: 7,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(cardScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      friction: 7,
+    }).start();
+  };
+
+  const handleFavorite = () => {
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.4,
+        duration: 120,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+        useNativeDriver: true,
+      }),
+      Animated.spring(heartScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        friction: 5,
+      }),
+    ]).start();
+    onFavoritePress();
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
+  return (
+    <Animated.View
+      style={{ marginBottom: 24, transform: [{ scale: cardScale }] }}
+    >
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <View
+          style={{
+            borderRadius: 24,
+            overflow: "hidden",
+            backgroundColor: cardBackground,
+          }}
+        >
+          {/* Show Image */}
+          <View style={{ height: 200, position: "relative" }}>
+            <Image
+              source={
+                show.imageUrl ||
+                `https://trymagically.com/api/media/image?query=${encodeURIComponent(
+                  show.artist + " live music"
+                )}`
+              }
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+
+            {/* Favorite Button */}
+            <Pressable
+              onPress={handleFavorite}
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "#0A0A0AE6",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                <Heart
+                  size={20}
+                  color={isFavorite ? "#EF4444" : "#FFFFFF"}
+                  fill={isFavorite ? "#EF4444" : "transparent"}
+                  strokeWidth={2.5}
+                />
+              </Animated.View>
+            </Pressable>
+
+            {/* Event Categories */}
+            <View
+              style={{
+                position: "absolute",
+                top: 16,
+                left: 16,
+                flexDirection: "row",
+                gap: 8,
+              }}
+            >
+              {show.genre.slice(0, 2).map((genre, i) => (
+                <View key={i} style={{ borderRadius: 12, overflow: "hidden" }}>
+                  <View
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      backgroundColor: "#f2a41e",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#FFFFFF",
+                        fontSize: 11,
+                        fontWeight: "800",
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      {genre}
                     </Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                    {show.genre.slice(0, 3).map((genre) => (
-                      <View key={genre} style={{ paddingVertical: 4, paddingHorizontal: 10, backgroundColor: primary + '20', borderRadius: 8 }}>
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: primary }}>
-                          {genre}
-                        </Text>
-                      </View>
-                    ))}
                   </View>
                 </View>
-              </Pressable>
-            ))
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Show Info */}
+          <View style={{ padding: 18 }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "800",
+                color: text,
+                marginBottom: 8,
+              }}
+            >
+              {show.artist}
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                marginBottom: 6,
+              }}
+            >
+              <MapPin size={16} color={primary} strokeWidth={2.5} />
+              <Text
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+              >
+                {show.venue}
+              </Text>
+            </View>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+            >
+              <Calendar size={16} color={secondary} strokeWidth={2.5} />
+              <Text
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+              >
+                {formatDate(show.date)} • {show.time}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 };

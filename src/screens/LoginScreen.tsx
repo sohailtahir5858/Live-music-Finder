@@ -8,29 +8,22 @@ import {
   Dimensions,
   Platform,
   Image,
-  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useTheme } from "../contexts/ThemeContext";
 import { Logo } from "../components/ui/Logo";
-import { Mail, Loader2, MapPin, Check } from "lucide-react-native";
+import { Mail, Loader2 } from "lucide-react-native";
 import magically from "magically-sdk";
-import { useUserPreferences } from "../stores/userPreferencesStore";
-import { CityCard } from "../components/CityCard";
 import { ImageBackground } from "expo-image";
 
 const { width, height } = Dimensions.get("window");
 
 export default function LoginScreen() {
   const theme = useTheme();
-  const { setSelectedCity } = useUserPreferences();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
-  const [showCitySelection, setShowCitySelection] = useState(false);
-  const [selectedCity, setLocalSelectedCity] = useState<
-    "Kelowna" | "Nelson" | null
-  >(null);
+
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -58,31 +51,33 @@ export default function LoginScreen() {
       }),
     ]).start();
 
+    // Faster and more prominent pulse (1.5s cycle, scale to 1.15)
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
-          toValue: 1.05,
-          duration: 2000,
+          toValue: 1.15,
+          duration: 750,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 2000,
+          duration: 750,
           useNativeDriver: true,
         }),
       ])
     ).start();
 
+    // Faster glow animation for more prominent effect
     Animated.loop(
       Animated.sequence([
         Animated.timing(stageGlowAnim, {
           toValue: 1,
-          duration: 3000,
+          duration: 1500,
           useNativeDriver: true,
         }),
         Animated.timing(stageGlowAnim, {
           toValue: 0,
-          duration: 3000,
+          duration: 1500,
           useNativeDriver: true,
         }),
       ])
@@ -94,23 +89,12 @@ export default function LoginScreen() {
     setLoadingProvider(provider);
     try {
       await magically.auth.triggerAuthenticationFlow(provider);
-      // After successful auth, show city selection
-      setShowCitySelection(true);
+      // Authentication success will be handled by the auth state listener in RootNavigator
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
       setLoadingProvider(null);
-    }
-  };
-
-  const handleCitySelect = (city: "Kelowna" | "Nelson") => {
-    setLocalSelectedCity(city);
-  };
-
-  const handleConfirmCity = () => {
-    if (selectedCity) {
-      setSelectedCity(selectedCity);
     }
   };
 
@@ -197,133 +181,8 @@ export default function LoginScreen() {
 
   const glowOpacity = stageGlowAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.3, 0.7],
+    outputRange: [0.4, 0.9], // More prominent glow
   });
-
-  // Show city selection after login
-  if (showCitySelection) {
-    return (
-      <View style={{ flex: 1, backgroundColor: theme.background }}>
-        <StatusBar
-          style={theme.statusBarStyle === "light" ? "light" : "dark"}
-        />
-        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-          <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingHorizontal: 24,
-              paddingBottom: 40,
-            }}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-          >
-            <View style={{ flex: 1, justifyContent: "center", paddingTop: 60 }}>
-              {/* Header */}
-              <View style={{ alignItems: "center", marginBottom: 48 }}>
-                <View
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: 36,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 24,
-                    backgroundColor: "#f2a41e",
-                  }}
-                >
-                  <MapPin size={36} color="#fff" strokeWidth={2} />
-                </View>
-
-                <Text
-                  style={{
-                    fontSize: 32,
-                    fontWeight: "700",
-                    color: theme.text,
-                    textAlign: "center",
-                    marginBottom: 12,
-                  }}
-                >
-                  Choose Your City
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: theme.textMuted,
-                    textAlign: "center",
-                    lineHeight: 24,
-                    paddingHorizontal: 20,
-                  }}
-                >
-                  Select your location to discover live music events in your
-                  area
-                </Text>
-              </View>
-
-              {/* City Cards */}
-              <View style={{ gap: 20, marginBottom: 40 }}>
-                {/* Kelowna Card */}
-                <CityCard
-                  city="Kelowna"
-                  imageUrl="https://trymagically.com/api/media/image?query=kelowna%20bc%20canada%20city%20beautiful%20okanagan%20lake%20sunset"
-                  description="Okanagan's vibrant music scene"
-                  isSelected={selectedCity === "Kelowna"}
-                  onSelect={() => handleCitySelect("Kelowna")}
-                  primary={theme.primary}
-                  text={theme.text}
-                  textMuted={theme.textMuted}
-                  cardBackground={theme.cardBackground}
-                  isDark={theme.statusBarStyle === "dark"}
-                />
-
-                {/* Nelson Card */}
-                <CityCard
-                  city="Nelson"
-                  imageUrl="https://trymagically.com/api/media/image?query=nelson%20bc%20canada%20city%20mountains%20kootenay%20lake"
-                  description="Kootenay's eclectic music hub"
-                  isSelected={selectedCity === "Nelson"}
-                  onSelect={() => handleCitySelect("Nelson")}
-                  primary={theme.primary}
-                  text={theme.text}
-                  textMuted={theme.textMuted}
-                  cardBackground={theme.cardBackground}
-                  isDark={theme.statusBarStyle === "dark"}
-                />
-              </View>
-
-              {/* Confirm Button */}
-              {selectedCity && (
-                <Pressable
-                  onPress={handleConfirmCity}
-                  style={({ pressed }) => ({
-                    opacity: pressed ? 0.7 : 1,
-                  })}
-                >
-                  <View
-                    style={{
-                      paddingVertical: 18,
-                      borderRadius: 16,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexDirection: "row",
-                      gap: 8,
-                      backgroundColor: "#f2a41e",
-                    }}
-                  >
-                    <Check size={20} color="#fff" strokeWidth={3} />
-                    <Text
-                      style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}
-                    >
-                      Continue with {selectedCity}
-                    </Text>
-                  </View>
-                </Pressable>
-              )}
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
@@ -367,22 +226,54 @@ export default function LoginScreen() {
                       transform: [{ scale: scaleAnim }],
                       marginBottom: 32,
                       position: "relative",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
+                    {/* Pulsing shadow layer 1 */}
                     <Animated.View
                       style={{
                         position: "absolute",
-                        top: -10,
-                        left: -10,
-                        right: -10,
-                        bottom: -10,
-                        backgroundColor: theme.primary,
+                        width: 130,
+                        height: 130,
                         borderRadius: 30,
-                        opacity: glowOpacity,
-                        transform: [{ scale: pulseAnim }],
+                        backgroundColor: theme.primary,
+                        opacity: glowOpacity.interpolate({
+                          inputRange: [0.4, 0.9],
+                          outputRange: [0.15, 0.35],
+                        }),
+                        transform: [{ 
+                          scale: pulseAnim.interpolate({
+                             inputRange: [1, 1.15],
+                            outputRange: [1, 1.1],
+                          })
+                        }],
                       }}
                     />
-                    <View
+
+                    {/* Pulsing shadow layer 2 */}
+                    <Animated.View
+                      style={{
+                        position: "absolute",
+                        width: 130,
+                        height: 130,
+                        borderRadius: 30,
+                        backgroundColor: theme.primary,
+                        opacity: stageGlowAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0.2, 0.5],
+                        }),
+                        transform: [{ 
+                          scale: pulseAnim.interpolate({
+                            inputRange: [1, 1.15],
+                            outputRange: [1, 1.1],
+                          })
+                        }],
+                      }}
+                    />
+
+                    {/* Logo container with strong shadow */}
+                    <Animated.View
                       style={{
                         width: 130,
                         height: 130,
@@ -393,14 +284,12 @@ export default function LoginScreen() {
                         borderWidth: 3,
                         borderColor: theme.primary,
                         shadowColor: theme.primary,
-                        shadowOffset: { width: 0, height: 8 },
-                        shadowOpacity: 0.4,
-                        shadowRadius: 16,
-                        elevation: 10,
+                        shadowOffset: { width: 0, height: 0 },
+                        
                       }}
                     >
                       <Logo size={100} />
-                    </View>
+                    </Animated.View>
                   </Animated.View>
 
                   <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
@@ -483,7 +372,7 @@ export default function LoginScreen() {
                     borderColor={theme.border}
                   />
 
-                  <AuthButton
+              {Platform.OS=='ios'&&<AuthButton
                     onPress={() => triggerAuth("apple")}
                     icon={
                       <Image
@@ -493,10 +382,8 @@ export default function LoginScreen() {
                         style={{
                           width: 24,
                           height: 24,
-                          tintColor:
-                            theme.statusBarStyle === "dark"
-                              ? theme.text
-                              : undefined,
+                          tintColor:'black'
+                         
                         }}
                         resizeMode="contain"
                       />
@@ -505,7 +392,7 @@ export default function LoginScreen() {
                     provider="apple"
                     bgColor={theme.text}
                     textColor={theme.background}
-                  />
+                  />}
 
                   <AuthButton
                     onPress={() => triggerAuth("email")}
