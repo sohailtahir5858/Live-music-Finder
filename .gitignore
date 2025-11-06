@@ -38,3 +38,7 @@ yarn-error.*
 *.tsbuildinfo
 
 .idea
+# APK build files
+*.apk
+*.aab
+build-*.apk
