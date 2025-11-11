@@ -8,6 +8,7 @@ import { View, Text, Pressable } from 'react-native';
 import { MapPin, Calendar, Clock, Heart } from 'lucide-react-native';
 import { Show } from '../magically/entities/Show';
 import { useTheme } from '../contexts/ThemeContext';
+import { FONT_FAMILY } from '../utils/fontConfig';
 
 interface ShowListItemProps {
   show: Show;
@@ -54,10 +55,10 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
           borderColor: '#f2a41e',
         }}
       >
-        <Text style={{ fontSize: 18, fontWeight: '800', color: '#f2a41e' }}>
+        <Text style={{ fontSize: 18, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: '#f2a41e' }}>
           {new Date(show.date).getDate()}
         </Text>
-        <Text style={{ fontSize: 10, fontWeight: '700', color: '#f2a41e', textTransform: 'uppercase' }}>
+        <Text style={{ fontSize: 10, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: '#f2a41e', textTransform: 'uppercase' }}>
           {new Date(show.date).toLocaleDateString('en-US', { month: 'short' })}
         </Text>
       </View>
@@ -68,6 +69,7 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
           style={{
             fontSize: 16,
             fontWeight: '800',
+            fontFamily: FONT_FAMILY.proximanovaBlack,
             color: text,
             marginBottom: 4,
           }}
@@ -79,14 +81,14 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 2 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <MapPin size={12} color={textMuted} strokeWidth={2.5} />
-            <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600' }} numberOfLines={1}>
+            <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold }} numberOfLines={1}>
               {show.venue}
             </Text>
           </View>
           
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <Clock size={12} color={textMuted} strokeWidth={2.5} />
-            <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600' }}>
+            <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
               {show.time}
             </Text>
           </View>
@@ -105,7 +107,7 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
                   borderRadius: 8,
                 }}
               >
-                <Text style={{ fontSize: 10, fontWeight: '700', color: '#f2a41e' }}>
+                <Text style={{ fontSize: 10, fontWeight: '700', color: '#f2a41e', fontFamily: FONT_FAMILY.proximaNovaBold }}>
                   {genre}
                 </Text>
               </View>

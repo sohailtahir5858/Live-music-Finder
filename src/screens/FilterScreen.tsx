@@ -9,6 +9,7 @@ import { ArrowLeft, Sliders, X, Calendar, Clock, Music2, MapPin, ChevronDown, Ch
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
+import { FONT_FAMILY } from '../utils/fontConfig';
 import { showService } from '../services/showService';
 import { useUserPreferences } from '../stores/userPreferencesStore';
 import { useFilterStore } from '../stores/filterStore';
@@ -150,13 +151,13 @@ export const FilterScreen = () => {
               >
                 <ArrowLeft size={20} color={text} strokeWidth={2.5} />
               </Pressable>
-              <Text style={{ fontSize: 24, fontWeight: '900', color: text, letterSpacing: -0.5 }}>
+              <Text style={{ fontSize: 24, fontWeight: '900', fontFamily: FONT_FAMILY.proximanovaBlack, color: text, letterSpacing: -0.5 }}>
                 Filters
               </Text>
             </View>
             {hasActiveFilters && (
               <Pressable onPress={handleClearFilters}>
-                <Text style={{ fontSize: 14, color: primary, fontWeight: '700' }}>
+                <Text style={{ fontSize: 14, color: primary, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold }}>
                   Clear All
                 </Text>
               </Pressable>
@@ -164,7 +165,155 @@ export const FilterScreen = () => {
           </View>
 
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 120 }}>
-            {/* Time Filter Accordion */}
+            {/* Genres Accordion - FIRST */}
+            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
+              <Pressable
+                onPress={() => setExpandedGenres(!expandedGenres)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <Music2 size={20} color={primary} style={{ marginRight: 12 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
+                      Genres
+                    </Text>
+                    {!expandedGenres && selectedGenres.length > 0 && (
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
+                        {selectedGenres.length} selected
+                      </Text>
+                    )}
+                  </View>
+                </View>
+                {selectedGenres.length > 0 && (
+                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: primary }}>
+                      {selectedGenres.length}
+                    </Text>
+                  </View>
+                )}
+                <View>
+                  {expandedGenres ? (
+                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
+                  )}
+                </View>
+              </Pressable>
+
+              {expandedGenres && (
+                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
+                    {allGenres.map((genre) => {
+                      const decodedName = decodeHtmlEntities(genre.name);
+                      const isSelected = selectedGenres.includes(genre.name);
+                      return (
+                        <Pressable
+                          key={genre.id}
+                          onPress={() => toggleGenre(genre.name)}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 18,
+                            borderRadius: 14,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? primary : border,
+                            backgroundColor: isSelected ? primary + '20' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text }}>
+                            {decodedName}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+            </View>
+
+            {/* Venues Accordion - SECOND */}
+            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
+              <Pressable
+                onPress={() => setExpandedVenues(!expandedVenues)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <MapPin size={20} color={primary} style={{ marginRight: 12 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
+                      Venues in {selectedCity}
+                    </Text>
+                    {!expandedVenues && selectedVenues.length > 0 && (
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
+                        {selectedVenues.length} selected
+                      </Text>
+                    )}
+                  </View>
+                </View>
+                {selectedVenues.length > 0 && (
+                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: primary }}>
+                      {selectedVenues.length}
+                    </Text>
+                  </View>
+                )}
+                <View>
+                  {expandedVenues ? (
+                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
+                  )}
+                </View>
+              </Pressable>
+
+              {expandedVenues && (
+                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
+                  <View style={{ gap: 10, marginTop: 16 }}>
+                    {allVenues.map((venue) => {
+                      const decodedVenueName = decodeHtmlEntities(venue.venue);
+                      const isSelected = selectedVenues.includes(venue.venue);
+                      return (
+                        <Pressable
+                          key={venue.id}
+                          onPress={() => toggleVenue(venue.venue)}
+                          style={{
+                            paddingVertical: 14,
+                            paddingHorizontal: 16,
+                            borderRadius: 14,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? primary : border,
+                            backgroundColor: isSelected ? primary + '20' : 'transparent',
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={{ fontSize: 15, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text, flex: 1 }}>
+                              {decodedVenueName}
+                            </Text>
+                            <View
+                              style={{
+                                width: 20,
+                                height: 20,
+                                borderRadius: 10,
+                                borderWidth: 2,
+                                borderColor: isSelected ? primary : border,
+                                backgroundColor: isSelected ? primary : 'transparent',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              {isSelected && (
+                                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FFFFFF' }} />
+                              )}
+                            </View>
+                          </View>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+            </View>
+
+            {/* Time Filter Accordion - THIRD */}
             <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
               <Pressable
                 onPress={() => setExpandedTimeFilter(!expandedTimeFilter)}
@@ -173,11 +322,11 @@ export const FilterScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Clock size={20} color={primary} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
                       Time of Day
                     </Text>
                     {!expandedTimeFilter && selectedTimeFilter && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
                         {TIME_FILTERS.find(t => t.value === selectedTimeFilter)?.label}
                       </Text>
                     )}
@@ -210,7 +359,7 @@ export const FilterScreen = () => {
                             backgroundColor: isSelected ? primary + '20' : 'transparent',
                           }}
                         >
-                          <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
+                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text }}>
                             {timeFilter.label}
                           </Text>
                         </Pressable>
@@ -221,7 +370,7 @@ export const FilterScreen = () => {
               )}
             </View>
 
-            {/* Date Range Accordion */}
+            {/* Date Range Accordion - FOURTH */}
             <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
               <Pressable
                 onPress={() => setExpandedDateFilter(!expandedDateFilter)}
@@ -230,11 +379,11 @@ export const FilterScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Calendar size={20} color={primary} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
                       Date Range
                     </Text>
                     {!expandedDateFilter && selectedDatePreset && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
                         {selectedDatePreset === 'custom' && customDateFrom && customDateTo
                           ? `${customDateFrom.toLocaleDateString()} - ${customDateTo.toLocaleDateString()}`
                           : datePresets.find(p => p.value === selectedDatePreset)?.label}
@@ -269,7 +418,7 @@ export const FilterScreen = () => {
                             backgroundColor: isSelected ? primary + '20' : 'transparent',
                           }}
                         >
-                          <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
+                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text }}>
                             {preset.label}
                           </Text>
                         </Pressable>
@@ -294,7 +443,7 @@ export const FilterScreen = () => {
                       }}
                     >
                       <Calendar size={14} color={selectedDatePreset === 'custom' ? primary : text} />
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: selectedDatePreset === 'custom' ? primary : text }}>
+                      <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: selectedDatePreset === 'custom' ? primary : text }}>
                         Custom
                       </Text>
                     </Pressable>
@@ -303,7 +452,7 @@ export const FilterScreen = () => {
                   {/* Custom Date Picker */}
                   {selectedDatePreset === 'custom' && (
                     <View style={{ marginTop: 16, padding: 16, backgroundColor: background, borderRadius: 12, borderWidth: 1, borderColor: border }}>
-                      <Text style={{ fontSize: 12, fontWeight: '700', color: text, marginBottom: 12 }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginBottom: 12 }}>
                         Select date range
                       </Text>
                       <View style={{ gap: 12 }}>
@@ -342,154 +491,6 @@ export const FilterScreen = () => {
                 initialEndDate={customDateTo}
                 theme={{ primary, background, text, cardBackground }}
               />
-            </View>
-
-            {/* Genres Accordion */}
-            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
-              <Pressable
-                onPress={() => setExpandedGenres(!expandedGenres)}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                  <Music2 size={20} color={primary} style={{ marginRight: 12 }} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
-                      Genres
-                    </Text>
-                    {!expandedGenres && selectedGenres.length > 0 && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
-                        {selectedGenres.length} selected
-                      </Text>
-                    )}
-                  </View>
-                </View>
-                {selectedGenres.length > 0 && (
-                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
-                    <Text style={{ fontSize: 12, fontWeight: '800', color: primary }}>
-                      {selectedGenres.length}
-                    </Text>
-                  </View>
-                )}
-                <View>
-                  {expandedGenres ? (
-                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
-                  ) : (
-                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
-                  )}
-                </View>
-              </Pressable>
-
-              {expandedGenres && (
-                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
-                    {allGenres.map((genre) => {
-                      const decodedName = decodeHtmlEntities(genre.name);
-                      const isSelected = selectedGenres.includes(genre.name);
-                      return (
-                        <Pressable
-                          key={genre.id}
-                          onPress={() => toggleGenre(genre.name)}
-                          style={{
-                            paddingVertical: 10,
-                            paddingHorizontal: 18,
-                            borderRadius: 14,
-                            borderWidth: 1.5,
-                            borderColor: isSelected ? primary : border,
-                            backgroundColor: isSelected ? primary + '20' : 'transparent',
-                          }}
-                        >
-                          <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? primary : text }}>
-                            {decodedName}
-                          </Text>
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-            </View>
-
-            {/* Venues Accordion */}
-            <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 16, overflow: 'hidden' }}>
-              <Pressable
-                onPress={() => setExpandedVenues(!expandedVenues)}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                  <MapPin size={20} color={primary} style={{ marginRight: 12 }} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', color: text }}>
-                      Venues in {selectedCity}
-                    </Text>
-                    {!expandedVenues && selectedVenues.length > 0 && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginTop: 4 }}>
-                        {selectedVenues.length} selected
-                      </Text>
-                    )}
-                  </View>
-                </View>
-                {selectedVenues.length > 0 && (
-                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
-                    <Text style={{ fontSize: 12, fontWeight: '800', color: primary }}>
-                      {selectedVenues.length}
-                    </Text>
-                  </View>
-                )}
-                <View>
-                  {expandedVenues ? (
-                    <ChevronDown size={24} color={primary} strokeWidth={2.5} />
-                  ) : (
-                    <ChevronRight size={24} color={primary} strokeWidth={2.5} />
-                  )}
-                </View>
-              </Pressable>
-
-              {expandedVenues && (
-                <View style={{ paddingHorizontal: 20, paddingBottom: 20, borderTopWidth: 1, borderTopColor: border }}>
-                  <View style={{ gap: 10, marginTop: 16 }}>
-                    {allVenues.map((venue) => {
-                      const decodedVenueName = decodeHtmlEntities(venue.venue);
-                      const isSelected = selectedVenues.includes(venue.venue);
-                      return (
-                        <Pressable
-                          key={venue.id}
-                          onPress={() => toggleVenue(venue.venue)}
-                          style={{
-                            paddingVertical: 14,
-                            paddingHorizontal: 16,
-                            borderRadius: 14,
-                            borderWidth: 1.5,
-                            borderColor: isSelected ? primary : border,
-                            backgroundColor: isSelected ? primary + '20' : 'transparent',
-                          }}
-                        >
-                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text, flex: 1 }}>
-                              {decodedVenueName}
-                            </Text>
-                            <View
-                              style={{
-                                width: 20,
-                                height: 20,
-                                borderRadius: 10,
-                                borderWidth: 2,
-                                borderColor: isSelected ? primary : border,
-                                backgroundColor: isSelected ? primary : 'transparent',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              {isSelected && (
-                                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FFFFFF' }} />
-                              )}
-                            </View>
-                          </View>
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
             </View>
           </ScrollView>
 

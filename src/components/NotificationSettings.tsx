@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, Pressable, Switch } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserPreferences } from '../stores/userPreferencesStore';
+import { FONT_FAMILY } from '../utils/fontConfig';
 
 export const NotificationSettings = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
@@ -24,10 +25,10 @@ export const NotificationSettings = () => {
       <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flex: 1, marginRight: 16 }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 6 }}>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 6, fontFamily: FONT_FAMILY.proximanovaBlack }}>
               Push Notifications
             </Text>
-            <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', lineHeight: 18 }}>
+            <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', lineHeight: 18, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
               {isPremium ? 'Get instant alerts when your favorite artist, genre, or venue is coming up' : 'Get general updates about new events'}
             </Text>
           </View>
@@ -43,10 +44,10 @@ export const NotificationSettings = () => {
       {/* Notification Frequency */}
       {notificationsEnabled && (
         <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
-          <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 12, fontFamily: FONT_FAMILY.proximanovaBlack }}>
             Notification Frequency
           </Text>
-          <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginBottom: 16, lineHeight: 18 }}>
+          <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginBottom: 16, lineHeight: 18, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
             Choose how often you want to receive notifications
           </Text>
           
@@ -75,18 +76,18 @@ export const NotificationSettings = () => {
               >
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text, fontFamily: FONT_FAMILY.proximaNovaBold }}>
                       {freq.charAt(0).toUpperCase() + freq.slice(1)}
                     </Text>
                     {isPremiumFeature && (
                       <View style={{ paddingHorizontal: 8, paddingVertical: 2, backgroundColor: primary, borderRadius: 6 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5, fontFamily: FONT_FAMILY.proximanovaBlack }}>
                           PREMIUM
                         </Text>
                       </View>
                     )}
                   </View>
-                  <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600', marginTop: 4 }}>
+                  <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600', marginTop: 4, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
                     {freq === 'instant' && (isPremium ? 'Instant alerts for your favorite artists, genres, and venues' : 'Upgrade to get instant personalized alerts')}
                     {freq === 'daily' && (isPremium ? 'Daily personalized digest matching your favorites' : 'Daily general updates about new events')}
                     {freq === 'weekly' && (isPremium ? 'Weekly curated summary of your favorite genres' : 'Weekly general event list')}

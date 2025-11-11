@@ -1,4 +1,6 @@
 // Keep the combined height of tabBarIconSize  + tabBarLabelFontSize <= 32 to avoid clipping
+import { FONT_FAMILY } from '../utils/fontConfig';
+
 export const themes = {
   light: {
     statusBarStyle: "light",
@@ -46,6 +48,14 @@ export const themes = {
     wellnessForeground: '#ffffff',
     nurturing: '#f4e4d6',
     nurturingForeground: '#1c1917',
+    // Font configuration
+    fontFamily: FONT_FAMILY.proximaNova,
+    fontFamilyLight: FONT_FAMILY.proximaNovaLight,
+    fontFamilyMedium: FONT_FAMILY.proximaNovaMedium,
+    fontFamilySemiBold: FONT_FAMILY.proximaNovaSemiBold,
+    fontFamilyBold: FONT_FAMILY.proximaNovaBold,
+    fontFamilyExtraBold: FONT_FAMILY.proximanovaExtraBold,
+    fontFamilyBlack: FONT_FAMILY.proximanovaBlack,
     feedback: {
       positive: '#10b981',
       neutral: '#f59e0b',
@@ -103,6 +113,14 @@ export const themes = {
     wellnessForeground: '#fafaf9',
     nurturing: '#44403c',
     nurturingForeground: '#fafaf9',
+    // Font configuration
+    fontFamily: FONT_FAMILY.proximaNova,
+    fontFamilyLight: FONT_FAMILY.proximaNovaLight,
+    fontFamilyMedium: FONT_FAMILY.proximaNovaMedium,
+    fontFamilySemiBold: FONT_FAMILY.proximaNovaSemiBold,
+    fontFamilyBold: FONT_FAMILY.proximaNovaBold,
+    fontFamilyExtraBold: FONT_FAMILY.proximanovaExtraBold,
+    fontFamilyBlack: FONT_FAMILY.proximanovaBlack,
     feedback: {
       positive: '#10b981',
       neutral: '#f59e0b',

@@ -67,7 +67,9 @@ export const Button: React.FC<ButtonProps> = ({
     text, 
     textMuted, 
     cardBackground,
-    borderRadius 
+    borderRadius,
+    fontFamilyBold,
+    fontFamily
   } = useTheme();
   
   const [isDebouncing, setIsDebouncing] = useState(false);
@@ -160,6 +162,7 @@ export const Button: React.FC<ButtonProps> = ({
   const textStyles: TextStyle = {
     fontSize: sizeStyles.fontSize,
     fontWeight: '500',
+    fontFamily: fontFamilyBold,
     ...textColor,
   };
 

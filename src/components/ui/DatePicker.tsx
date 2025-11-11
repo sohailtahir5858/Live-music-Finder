@@ -39,6 +39,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
+import { FONT_FAMILY } from '../../utils/fontConfig';
 
 // DatePicker interface matching @react-native-community/datetimepicker
 interface DatePickerProps {
@@ -251,15 +252,15 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               marginBottom: 16,
             }}>
               <TouchableOpacity onPress={handleCancel}>
-                <Text style={{ fontSize: 16, color: textMuted }}>Cancel</Text>
+                <Text style={{ fontSize: 16, color: textMuted, fontFamily: FONT_FAMILY.proximaNova }}>Cancel</Text>
               </TouchableOpacity>
               
-              <Text style={{ fontSize: 18, fontWeight: '600', color: text }}>
-                {mode === 'time' ? 'Select Time' : 'Select Date'}
+                            <Text style={{ fontSize: 18, fontWeight: '600', color: text, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                {formatDate(value)}
               </Text>
               
               <TouchableOpacity onPress={mode === 'time' ? handleTimeSelect : () => handleDateSelect(value)}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: primary }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: primary, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
                   Done
                 </Text>
               </TouchableOpacity>
@@ -371,13 +372,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                   {/* Hour Picker */}
                   <View style={{ alignItems: 'center', marginRight: 20 }}>
-                    <Text style={{ fontSize: 14, color: textMuted, marginBottom: 8 }}>Hour</Text>
+                    <Text style={{ fontSize: 14, color: textMuted, marginBottom: 8, fontFamily: FONT_FAMILY.proximaNova }}>Hour</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <TouchableOpacity
                         onPress={() => setSelectedHour(selectedHour > 1 ? selectedHour - 1 : 12)}
                         style={{ padding: 8 }}
                       >
-                        <Text style={{ fontSize: 20, color: primary }}>−</Text>
+                        <Text style={{ fontSize: 20, color: primary, fontFamily: FONT_FAMILY.proximaNovaBold }}>−</Text>
                       </TouchableOpacity>
                       <Text style={{
                         fontSize: 24,
@@ -393,22 +394,22 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         onPress={() => setSelectedHour(selectedHour < 12 ? selectedHour + 1 : 1)}
                         style={{ padding: 8 }}
                       >
-                        <Text style={{ fontSize: 20, color: primary }}>+</Text>
+                        <Text style={{ fontSize: 20, color: primary, fontFamily: FONT_FAMILY.proximaNovaBold }}>+</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
 
-                  <Text style={{ fontSize: 24, fontWeight: '600', marginHorizontal: 8, color: text }}>:</Text>
+                  <Text style={{ fontSize: 24, fontWeight: '600', marginHorizontal: 8, color: text, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>:</Text>
 
                   {/* Minute Picker */}
                   <View style={{ alignItems: 'center', marginLeft: 20 }}>
-                    <Text style={{ fontSize: 14, color: textMuted, marginBottom: 8 }}>Minute</Text>
+                    <Text style={{ fontSize: 14, color: textMuted, marginBottom: 8, fontFamily: FONT_FAMILY.proximaNova }}>Minute</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <TouchableOpacity
                         onPress={() => setSelectedMinute(selectedMinute > 0 ? selectedMinute - 1 : 59)}
                         style={{ padding: 8 }}
                       >
-                        <Text style={{ fontSize: 20, color: primary }}>−</Text>
+                        <Text style={{ fontSize: 20, color: primary, fontFamily: FONT_FAMILY.proximaNovaBold }}>−</Text>
                       </TouchableOpacity>
                       <Text style={{
                         fontSize: 24,
@@ -424,7 +425,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         onPress={() => setSelectedMinute(selectedMinute < 59 ? selectedMinute + 1 : 0)}
                         style={{ padding: 8 }}
                       >
-                        <Text style={{ fontSize: 20, color: primary }}>+</Text>
+                        <Text style={{ fontSize: 20, color: primary, fontFamily: FONT_FAMILY.proximaNovaBold }}>+</Text>
                       </TouchableOpacity>
                     </View>
                   </View>

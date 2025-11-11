@@ -44,7 +44,20 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-font"
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/proximanova-regular.otf",
+            "./assets/fonts/proximanova-light.otf",
+            "./assets/fonts/proximanova-bold.otf",
+            "./assets/fonts/proximanova-semibold.otf",
+            "./assets/fonts/proximanova-extrabold.otf",
+            "./assets/fonts/proximanova-black.otf",
+            "./assets/fonts/proximanova-mediumit.otf"
+          ]
+        }
+      ]
     ]
   }
 }

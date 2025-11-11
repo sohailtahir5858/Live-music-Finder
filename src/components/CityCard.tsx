@@ -64,7 +64,7 @@ export const CityCard: React.FC<CityCardProps> = ({
           borderColor: isSelected ? primary : 'transparent',
         }}
       >
-        <View style={{ height: 220, width: CARD_WIDTH, position: 'relative' }}>
+        <View style={{ height: 220, width: '100%', position: 'relative' }}>
           {/* Background Image */}
           <Image
             source={{ uri: imageUrl }}
@@ -87,7 +87,7 @@ export const CityCard: React.FC<CityCardProps> = ({
           />
 
           {/* Glassmorphic Content */}
-          <View style={{ flex: 1, justifyContent: 'flex-end', padding: 20 }}>
+          <View style={{ flex: 1, justifyContent: 'flex-end', padding: 10 }}>
             <BlurView
               intensity={isDark ? 40 : 60}
               tint={isDark ? 'dark' : 'light'}

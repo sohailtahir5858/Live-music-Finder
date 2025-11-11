@@ -8,17 +8,21 @@ import { View, Text, Pressable, ScrollView } from "react-native";
 import { ChevronDown, ChevronRight, Music } from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
-import { fetchGenres } from "../services/eventService";
-import { DataService } from "../services/dataService";
+import { decodeHtmlEntities, fetchGenres } from "../services/eventService";
+import { FONT_FAMILY } from "../utils/fontConfig";
 
 export const GenreSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
-  const { favoriteGenres, toggleFavoriteGenre, isPremium, allGenres, selectedCity } =
-    useUserPreferences();
+  const {
+    favoriteGenres,
+    toggleFavoriteGenre,
+    isPremium,
+    allGenres,
+    selectedCity,
+  } = useUserPreferences();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const currentCityGenres = favoriteGenres?.[selectedCity] || [];
-  console.log("🚀 ~ GenreSelector ~ currentCityGenres:", currentCityGenres,selectedCity)
 
   const handleGenrePress = (genreName: string) => {
     const isAlreadySelected = currentCityGenres.includes(genreName);
@@ -51,11 +55,11 @@ export const GenreSelector = () => {
           }}
         >
           <Music size={20} color={primary} style={{ marginRight: 8 }} />
-          <Text style={{ fontSize: 16, fontWeight: "800", color: text }}>
+          <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.proximanovaBlack }}>
             Favorite Genres
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600" }}>
+        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
           Loading genres...
         </Text>
       </View>
@@ -81,10 +85,10 @@ export const GenreSelector = () => {
           justifyContent: "space-between",
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1}}>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Music size={20} color={primary} style={{ marginRight: 8 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "800", color: text }}>
+            <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.proximanovaBlack }}>
               Favorite Genres
             </Text>
             {!isExpanded && (
@@ -94,6 +98,7 @@ export const GenreSelector = () => {
                   color: textMuted,
                   fontWeight: "600",
                   marginTop: 4,
+                  fontFamily: FONT_FAMILY.proximaNovaSemiBold,
                 }}
               >
                 Select your favourite music to see matching shows in the "My
@@ -112,8 +117,16 @@ export const GenreSelector = () => {
       </Pressable>
 
       {isExpanded && (
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingTop: 30 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 8,
+            paddingTop: 30,
+          }}
+        >
           {allGenres.map((genre) => {
+            const decodedName = decodeHtmlEntities(genre.name);
             const isSelected = currentCityGenres.includes(genre.name);
             const canSelect =
               isPremium || isSelected || currentCityGenres.length < 3;
@@ -138,9 +151,10 @@ export const GenreSelector = () => {
                     fontSize: 14,
                     fontWeight: "700",
                     color: isSelected ? primary : text,
+                    fontFamily: FONT_FAMILY.proximaNovaBold,
                   }}
                 >
-                  {genre.name}
+                  {decodedName}
                 </Text>
               </Pressable>
             );
@@ -152,6 +166,7 @@ export const GenreSelector = () => {
               fontWeight: "500",
               marginTop: 16,
               letterSpacing: 0.3,
+              fontFamily: FONT_FAMILY.proximaNova,
             }}
           >
             WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH

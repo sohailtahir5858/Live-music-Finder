@@ -27,6 +27,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../contexts/ThemeContext";
+import { FONT_FAMILY } from "../utils/fontConfig";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { useAppStateStore } from "../stores/appStateStore";
 import { Show } from "../magically/entities/Show";
@@ -122,7 +123,7 @@ export const FavoritesScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
-      <View style={{ flex: 1, backgroundColor: background }}>
+      <View style={{ flex: 1, backgroundColor: background,paddingHorizontal:10 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <Animated.View
             style={{
@@ -502,6 +503,7 @@ const ShowCard = ({
                         color: "#FFFFFF",
                         fontSize: 11,
                         fontWeight: "800",
+                        fontFamily: FONT_FAMILY.proximanovaExtraBold,
                         textTransform: "uppercase",
                         letterSpacing: 0.5,
                       }}
@@ -520,6 +522,7 @@ const ShowCard = ({
               style={{
                 fontSize: 20,
                 fontWeight: "800",
+                fontFamily: FONT_FAMILY.proximanovaExtraBold,
                 color: text,
                 marginBottom: 8,
               }}
@@ -536,7 +539,7 @@ const ShowCard = ({
             >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
               >
                 {show.venue}
               </Text>
@@ -546,7 +549,7 @@ const ShowCard = ({
             >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
               >
                 {formatDate(show.date)} • {show.time}
               </Text>

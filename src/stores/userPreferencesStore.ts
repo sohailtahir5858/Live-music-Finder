@@ -155,7 +155,6 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
   },
 
   toggleFavoriteVenue: (venue) => {
-    console.log("🚀 ~ venue:", venue)
     const { favoriteVenues, selectedCity, isPremium, allVenues } = get();
     const currentCityVenues = favoriteVenues[selectedCity];
     console.log("🚀 ~ currentCityVenues:", currentCityVenues)
@@ -302,7 +301,8 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
         }
       }
 
-      console.log(`[Venues] Loaded ${allVenues.length} venues for ${city}`);
+      // alphabetically sort venues by name
+      allVenues.sort((a, b) => a.venue.localeCompare(b.venue));
       get().setAllVenues(allVenues);
     } catch (error) {
       console.error('[Venues] Error loading venues:', error);

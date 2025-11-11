@@ -8,12 +8,18 @@ import { View, Text, Pressable, ScrollView } from "react-native";
 import { MapPin, ChevronDown, ChevronRight } from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
-import { fetchVenues } from "../services/eventService";
+import { decodeHtmlEntities, fetchVenues } from "../services/eventService";
+import { FONT_FAMILY } from "../utils/fontConfig";
 
 export const VenueSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
-  const { favoriteVenues, toggleFavoriteVenue, selectedCity, allVenues, isPremium } =
-    useUserPreferences();
+  const {
+    favoriteVenues,
+    toggleFavoriteVenue,
+    selectedCity,
+    allVenues,
+    isPremium,
+  } = useUserPreferences();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const currentCityVenues = favoriteVenues?.[selectedCity] || [];
@@ -49,11 +55,11 @@ export const VenueSelector = () => {
           }}
         >
           <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
-          <Text style={{ fontSize: 16, fontWeight: "800", color: text }}>
+          <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.proximanovaBlack }}>
             Favorite Venues
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600" }}>
+        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
           Loading venues...
         </Text>
       </View>
@@ -82,7 +88,7 @@ export const VenueSelector = () => {
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "800", color: text }}>
+            <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.proximanovaBlack }}>
               Favorite Venues
             </Text>
             {!isExpanded && (
@@ -92,6 +98,7 @@ export const VenueSelector = () => {
                   color: textMuted,
                   fontWeight: "600",
                   marginTop: 4,
+                  fontFamily: FONT_FAMILY.proximaNovaSemiBold,
                 }}
               >
                 Select your favourite venues to see matching shows in the "My
@@ -110,8 +117,17 @@ export const VenueSelector = () => {
       </Pressable>
 
       {isExpanded && (
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingTop: 30 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 8,
+            paddingTop: 30,
+          }}
+        >
           {allVenues.map((venue) => {
+            const decodedName = decodeHtmlEntities(venue.venue);
+
             const isSelected = currentCityVenues.includes(venue.venue);
             const canSelect =
               isPremium || isSelected || currentCityVenues.length < 3;
@@ -136,9 +152,10 @@ export const VenueSelector = () => {
                     fontSize: 14,
                     fontWeight: "700",
                     color: isSelected ? primary : text,
+                    fontFamily: FONT_FAMILY.proximaNovaBold,
                   }}
                 >
-                  {venue.venue}
+                  {decodedName}
                 </Text>
               </Pressable>
             );
@@ -150,6 +167,7 @@ export const VenueSelector = () => {
               fontWeight: "500",
               marginTop: 16,
               letterSpacing: 0.3,
+              fontFamily: FONT_FAMILY.proximaNova,
             }}
           >
             WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH

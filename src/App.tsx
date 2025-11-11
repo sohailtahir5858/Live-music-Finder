@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DarkTheme,
   DefaultTheme,
@@ -7,9 +7,11 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Toaster } from "sonner-native";
+import * as SplashScreen from "expo-splash-screen";
 
 import { initialize } from "./magically/init";
 import { createNavigationLogger } from "./magically/utils/NavigationLogger";
+import { loadCustomFonts } from "./utils/fontConfig";
 
 initialize();
 
@@ -76,6 +78,39 @@ function AppContent() {
 }
 
 export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Keep splash screen visible while loading fonts
+        await SplashScreen.preventAutoHideAsync();
+        
+        // Load custom fonts
+        const fontLoaded = await loadCustomFonts();
+        
+        if (fontLoaded) {
+          setFontsLoaded(true);
+        } else {
+          // Even if font loading fails, we continue with system fonts
+          setFontsLoaded(true);
+        }
+      } catch (e) {
+        console.warn('[App] Error preparing app:', e);
+        setFontsLoaded(true);
+      } finally {
+        // Hide splash screen after fonts are loaded
+        await SplashScreen.hideAsync();
+      }
+    }
+
+    prepare();
+  }, []);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>

@@ -4,12 +4,13 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
-import { User, Bell, MessageSquare, LogOut, Trash2, ChevronRight, MapPin } from 'lucide-react-native';
+import { User, Bell, MessageSquare, LogOut, Trash2, ChevronRight, MapPin, FileText, Lock } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
+import { FONT_FAMILY } from '../utils/fontConfig';
 import { useUserPreferences } from '../stores/userPreferencesStore';
 import { AnimatedSpinner } from '../components/ui';
 import magically from 'magically-sdk';
@@ -128,19 +129,19 @@ export default function ProfileScreen() {
         <View style={{ flex: 1, backgroundColor: background }}>
           <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 }} edges={['top']}>
             <User size={64} color={textMuted} strokeWidth={1.5} />
-            <Text style={{ fontSize: 20, fontWeight: '700', color: text, marginTop: 16, textAlign: 'center' }}>
+            <Text style={{ fontSize: 20, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginTop: 16, textAlign: 'center' }}>
               Sign In Required
             </Text>
-            <Pressable
+            <TouchableOpacity
               onPress={() => navigation.navigate('Login' as never)}
               style={{ marginTop: 24, borderRadius: 16, overflow: 'hidden', width: '100%' }}
             >
               <View style={{ paddingVertical: 16, paddingHorizontal: 32, alignItems: 'center', backgroundColor: '#f2a41e' }}>
-                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800', letterSpacing: 0.5 }}>
+                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, letterSpacing: 0.5 }}>
                   Sign In
                 </Text>
               </View>
-            </Pressable>
+            </TouchableOpacity>
           </SafeAreaView>
         </View>
       </View>
@@ -170,7 +171,7 @@ export default function ProfileScreen() {
             >
               <User size={36} color="#FFFFFF" strokeWidth={2.5} />
             </View>
-            <Text style={{ fontSize: 20, fontWeight: '900', color: text, marginBottom: 4 }}>
+            <Text style={{ fontSize: 20, fontWeight: '900', fontFamily: FONT_FAMILY.proximanovaBlack, color: text, marginBottom: 4 }}>
               {user?.name || user?.email || 'Music Lover'}
             </Text>
           </View>
@@ -178,7 +179,7 @@ export default function ProfileScreen() {
 
         {/* City Selection Section */}
         <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               setTempSelectedCity(selectedCity);
               setShowCitySelection(true);
@@ -190,16 +191,16 @@ export default function ProfileScreen() {
                 <MapPin size={18} color={primary} strokeWidth={2.5} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: text, marginBottom: 2 }}>
+                <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginBottom: 2 }}>
                   Location
                 </Text>
-                <Text style={{ fontSize: 14, color: textMuted, fontWeight: '500' }}>
+                <Text style={{ fontSize: 14, color: textMuted, fontWeight: '500', fontFamily: FONT_FAMILY.proximaNova }}>
                   {selectedCity || 'Select your city'}
                 </Text>
               </View>
             </View>
             <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
         {/* Favorite Genres Section */}
@@ -214,22 +215,52 @@ export default function ProfileScreen() {
         {/* Menu Items */}
         <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 20 }}>
 
-          <Pressable
+          <TouchableOpacity
             onPress={() => navigation.navigate('Feedback' as never)}
             style={{ flexDirection: 'row', alignItems: 'center', padding: 18 }}
           >
             <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: secondary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
               <MessageSquare size={18} color={secondary} strokeWidth={2.5} />
             </View>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1, fontFamily: FONT_FAMILY.proximaNovaBold }}>
               Send Feedback
             </Text>
             <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
-          </Pressable>
+          </TouchableOpacity>
+
+          <View style={{ height: 1, backgroundColor: border }} />
+
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://livemusickelowna.ca/terms-of-service/')}
+            style={{ flexDirection: 'row', alignItems: 'center', padding: 18 }}
+          >
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '15', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+              <FileText size={18} color={primary} strokeWidth={2.5} />
+            </View>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+              Terms of Service
+            </Text>
+            <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
+          </TouchableOpacity>
+
+          <View style={{ height: 1, backgroundColor: border }} />
+
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://livemusickelowna.ca/privacy-policy/')}
+            style={{ flexDirection: 'row', alignItems: 'center', padding: 18 }}
+          >
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '15', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+              <Lock size={18} color={primary} strokeWidth={2.5} />
+            </View>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+              Privacy Policy
+            </Text>
+            <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
+          </TouchableOpacity>
         </View>
 
         {/* Sign Out */}
-        <Pressable
+        <TouchableOpacity
           onPress={handleSignOut}
           disabled={isSigningOut}
           style={{ marginBottom: 12, backgroundColor: cardBackground, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
@@ -239,13 +270,13 @@ export default function ProfileScreen() {
           ) : (
             <LogOut size={20} color={textMuted} strokeWidth={2.5} />
           )}
-          <Text style={{ fontSize: 16, fontWeight: '700', color: textMuted }}>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: textMuted, fontFamily: FONT_FAMILY.proximaNovaBold }}>
             {isSigningOut ? 'Signing Out...' : 'Sign Out'}
           </Text>
-        </Pressable>
+        </TouchableOpacity>
 
         {/* Delete Account */}
-        <Pressable
+        <TouchableOpacity
           onPress={handleDeleteAccount}
           disabled={isDeleting}
           style={{ backgroundColor: destructive + '15', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
@@ -255,17 +286,17 @@ export default function ProfileScreen() {
           ) : (
             <Trash2 size={20} color={destructive} strokeWidth={2.5} />
           )}
-          <Text style={{ fontSize: 16, fontWeight: '700', color: destructive }}>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: destructive, fontFamily: FONT_FAMILY.proximaNovaBold }}>
             {isDeleting ? 'Deleting...' : 'Delete Account'}
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* City Selection Modal */}
       {showCitySelection && (
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ backgroundColor: background, borderRadius: 20, padding: 20, margin: 20, width: '90%', maxWidth: 400 }}>
-            <Text style={{ fontSize: 24, fontWeight: '700', color: text, textAlign: 'center', marginBottom: 20 }}>
+            <Text style={{ fontSize: 24, fontWeight: '700', color: text, textAlign: 'center', marginBottom: 20, fontFamily: FONT_FAMILY.proximaNovaBold }}>
               Change Location
             </Text>
             
@@ -298,16 +329,16 @@ export default function ProfileScreen() {
             </View>
 
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Pressable
+              <TouchableOpacity
                 onPress={handleCancelCityChange}
                 style={{ flex: 1, paddingVertical: 14, paddingHorizontal: 20, backgroundColor: cardBackground, borderRadius: 12, alignItems: 'center' }}
               >
                 <Text style={{ color: text, fontSize: 16, fontWeight: '600' }}>
                   Cancel
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
               
-              <Pressable
+              <TouchableOpacity
                 onPress={handleConfirmCityChange}
                 disabled={!tempSelectedCity}
                 style={{ 
@@ -322,7 +353,7 @@ export default function ProfileScreen() {
                 <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>
                   Confirm
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

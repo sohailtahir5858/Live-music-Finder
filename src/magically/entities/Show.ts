@@ -75,7 +75,9 @@ export interface Show {
   /** Show description or details */
   description?: string;
   /** Show or artist image URL */
-  imageUrl?: string;
+  imageUrl: string;
+  imageWidth: number;
+  imageHeight: number;
   /** Ticket price (e.g., $25, Free) */
   price?: string;
   /** Venue capacity */

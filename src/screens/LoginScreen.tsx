@@ -24,7 +24,6 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
-
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
@@ -242,12 +241,14 @@ export default function LoginScreen() {
                           inputRange: [0.4, 0.9],
                           outputRange: [0.15, 0.35],
                         }),
-                        transform: [{ 
-                          scale: pulseAnim.interpolate({
-                             inputRange: [1, 1.15],
-                            outputRange: [1, 1.1],
-                          })
-                        }],
+                        transform: [
+                          {
+                            scale: pulseAnim.interpolate({
+                              inputRange: [1, 1.15],
+                              outputRange: [1, 1.1],
+                            }),
+                          },
+                        ],
                       }}
                     />
 
@@ -263,12 +264,14 @@ export default function LoginScreen() {
                           inputRange: [0, 1],
                           outputRange: [0.2, 0.5],
                         }),
-                        transform: [{ 
-                          scale: pulseAnim.interpolate({
-                            inputRange: [1, 1.15],
-                            outputRange: [1, 1.1],
-                          })
-                        }],
+                        transform: [
+                          {
+                            scale: pulseAnim.interpolate({
+                              inputRange: [1, 1.15],
+                              outputRange: [1, 1.1],
+                            }),
+                          },
+                        ],
                       }}
                     />
 
@@ -285,31 +288,32 @@ export default function LoginScreen() {
                         borderColor: theme.primary,
                         shadowColor: theme.primary,
                         shadowOffset: { width: 0, height: 0 },
-                        
                       }}
                     >
                       <Logo size={100} />
                     </Animated.View>
                   </Animated.View>
 
-                  <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                  <Animated.View style={{ opacity: 1 }}>
                     <Text
                       style={{
                         fontSize: 36,
                         fontWeight: "800",
+                        fontFamily: theme.fontFamilyBlack,
                         color: theme.text,
                         marginBottom: 12,
                         textAlign: "center",
                         letterSpacing: -0.5,
                       }}
                     >
-                      Live Tonight
+                      Live Music Local
                     </Text>
                   </Animated.View>
 
                   <Text
                     style={{
                       fontSize: 17,
+                      fontFamily: theme.fontFamily,
                       color: theme.textMuted,
                       textAlign: "center",
                       lineHeight: 24,
@@ -372,27 +376,28 @@ export default function LoginScreen() {
                     borderColor={theme.border}
                   />
 
-              {Platform.OS=='ios'&&<AuthButton
-                    onPress={() => triggerAuth("apple")}
-                    icon={
-                      <Image
-                        source={{
-                          uri: "https://yrsdqwemtqgdwoixrrge.supabase.co/storage/v1/object/public/assets/icons/apple.png",
-                        }}
-                        style={{
-                          width: 24,
-                          height: 24,
-                          tintColor:'black'
-                         
-                        }}
-                        resizeMode="contain"
-                      />
-                    }
-                    label="Continue with Apple"
-                    provider="apple"
-                    bgColor={theme.text}
-                    textColor={theme.background}
-                  />}
+                  {Platform.OS == "ios" && (
+                    <AuthButton
+                      onPress={() => triggerAuth("apple")}
+                      icon={
+                        <Image
+                          source={{
+                            uri: "https://yrsdqwemtqgdwoixrrge.supabase.co/storage/v1/object/public/assets/icons/apple.png",
+                          }}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            tintColor: "black",
+                          }}
+                          resizeMode="contain"
+                        />
+                      }
+                      label="Continue with Apple"
+                      provider="apple"
+                      bgColor={theme.text}
+                      textColor={theme.background}
+                    />
+                  )}
 
                   <AuthButton
                     onPress={() => triggerAuth("email")}

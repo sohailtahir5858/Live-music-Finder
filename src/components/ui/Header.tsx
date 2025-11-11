@@ -254,11 +254,12 @@ export const HeaderTitle: React.FC<HeaderTitleProps> = ({
                                                             style,
                                                             ...props
                                                         }) => {
-    const { text } = useTheme();
+    const { text, fontFamilySemiBold } = useTheme();
 
     const defaultStyles = {
         fontSize: 18,
         fontWeight: '600' as const,
+        fontFamily: fontFamilySemiBold,
         color: text,
         textAlign: 'center' as const,
     };

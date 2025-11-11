@@ -26,6 +26,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../contexts/ThemeContext";
+import { FONT_FAMILY } from "../utils/fontConfig";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { useFilterStore } from "../stores/filterStore";
 import { Show, Shows } from "../magically/entities/Show";
@@ -207,6 +208,7 @@ export const ShowsScreen = () => {
                       style={{
                         fontSize: 13,
                         fontWeight: "600",
+                        fontFamily: FONT_FAMILY.proximaNovaSemiBold,
                         color: 'white',
                         letterSpacing: 0.3,
                       }}
@@ -248,6 +250,7 @@ export const ShowsScreen = () => {
                       style={{
                         fontSize: 14,
                         fontWeight: "600",
+                        fontFamily: FONT_FAMILY.proximaNovaSemiBold,
                         color: 'white',
                         letterSpacing: 0.3,
                       }}
@@ -279,6 +282,7 @@ export const ShowsScreen = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: "bold",
+                    fontFamily: FONT_FAMILY.proximaNovaBold,
                     color: text,
                     letterSpacing: 0.2,
                   }}
@@ -290,6 +294,7 @@ export const ShowsScreen = () => {
                     fontSize: 14,
                     color: textMuted,
                     fontWeight: "500",
+                    fontFamily: FONT_FAMILY.proximaNova,
                   }}
                 >
                   Upcoming Shows
@@ -326,6 +331,7 @@ export const ShowsScreen = () => {
                   style={{
                     color: textMuted,
                     fontSize: 16,
+                    fontFamily: FONT_FAMILY.proximaNova,
                     textAlign: "center",
                   }}
                 >
@@ -421,7 +427,6 @@ const ShowCard = ({
 }: ShowCardProps) => {
   const cardScale = React.useRef(new Animated.Value(1)).current;
   const heartScale = React.useRef(new Animated.Value(1)).current;
-
   const handlePressIn = () => {
     Animated.spring(cardScale, {
       toValue: 0.97,
@@ -477,7 +482,7 @@ const ShowCard = ({
           }}
         >
           {/* Show Image */}
-          <View style={{ height: 200, position: "relative" }}>
+          <View style={{ height: 200, position: "relative",justifyContent:'center', alignItems:'center' }}>
             <Image
               source={
                 show.imageUrl ||
@@ -485,7 +490,7 @@ const ShowCard = ({
                   show.artist + " live music"
                 )}`
               }
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              style={{ width: '100%', height: '100%' }}
             />
 
             {/* Favorite Button */}
@@ -537,6 +542,7 @@ const ShowCard = ({
                         color: "#FFFFFF",
                         fontSize: 11,
                         fontWeight: "800",
+                        fontFamily: FONT_FAMILY.proximanovaExtraBold,
                         textTransform: "uppercase",
                         letterSpacing: 0.5,
                       }}
@@ -555,6 +561,7 @@ const ShowCard = ({
               style={{
                 fontSize: 20,
                 fontWeight: "800",
+                fontFamily: FONT_FAMILY.proximanovaExtraBold,
                 color: text,
                 marginBottom: 8,
               }}
@@ -571,7 +578,7 @@ const ShowCard = ({
             >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
               >
                 {show.venue}
               </Text>
@@ -581,7 +588,7 @@ const ShowCard = ({
             >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600" }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
               >
                 {formatDate(show.date)} • {show.time}
               </Text>
