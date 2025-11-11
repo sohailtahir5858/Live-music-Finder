@@ -1,7 +1,7 @@
 import * as Font from 'expo-font';
 
 /**
- * Font configuration for the Live Music Finder app
+ * Font configuration for the Live Music Local app
  * Uses Proxima Nova family with various weights
  */
 
