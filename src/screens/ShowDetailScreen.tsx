@@ -24,7 +24,9 @@ export const ShowDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute<any>();
   const { show } = route.params || {};
-  const { favoriteArtists, toggleFavoriteArtist, isPremium, selectedCity } = useUserPreferences();
+  console.log("🚀 ~ ShowDetailScreen ~ show:", show._id)
+  const {  toggleFavoriteArtist, isPremium, selectedCity,favoriteShows } = useUserPreferences();
+  console.log("🚀 ~ ShowDetailScreen ~ favoriteArtists:", favoriteShows)
   
   const [isLoading, setIsLoading] = useState(false);
   const [activeAd, setActiveAd] = useState<Ad | null>(null);
@@ -133,7 +135,8 @@ export const ShowDetailScreen = () => {
     return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   };
 
-  const isFavorite = show ? favoriteArtists.includes(show.artist) : false;
+  const isFavorite =  favoriteShows.some(s => s._id === show?._id);
+
 
   if (isLoading) {
     return (
@@ -153,13 +156,13 @@ export const ShowDetailScreen = () => {
 
   if (!show) {
     return (
-      <View style={{ flex: 1, backgroundColor: background, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 }}>
+      <View style={{ flex: 1, backgroundColor: background, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 }}>
         <Text style={{ fontSize: 20, fontWeight: '700', color: text, textAlign: 'center', fontFamily: FONT_FAMILY.poppinsBold }}>
           Show Not Found
         </Text>
         <Pressable
           onPress={() => navigation.goBack()}
-          style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 32, backgroundColor: cardBackground, borderRadius: 12 }}
+          style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 20, backgroundColor: cardBackground, borderRadius: 12 }}
         >
           <Text style={{ color: primary, fontSize: 15, fontWeight: '700' }}>
             Go Back
@@ -232,7 +235,7 @@ export const ShowDetailScreen = () => {
             </View>
 
             {/* Artist Name */}
-            <View style={{ paddingHorizontal: 24 }}>
+            <View style={{ paddingHorizontal: 20, }}>
               <Text style={{ fontSize: 32, fontWeight: '900', fontFamily: FONT_FAMILY.poppinsBlack, color: text, marginBottom: 8, letterSpacing: -0.5 }}>
                 {show.artist}
               </Text>
@@ -242,7 +245,7 @@ export const ShowDetailScreen = () => {
             </View>
 
             {/* Details Card */}
-            <View style={{ marginHorizontal: 24, backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 20 }}>
+            <View style={{ marginHorizontal: 20, backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 20 }}>
               {/* Venue */}
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16 }}>
                 <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: primary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>

@@ -14,6 +14,7 @@ import {
   Animated,
   Easing,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import {
   Heart,
@@ -119,11 +120,15 @@ export const FavoritesScreen = () => {
     navigation.navigate("Shows");
   };
 
-
-
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
-      <View style={{ flex: 1, backgroundColor: background,paddingHorizontal:20 }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: background,
+          paddingHorizontal: Platform.OS == "android" ? 20 : 10,
+        }}
+      >
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <Animated.View
             style={{
@@ -451,7 +456,9 @@ const ShowCard = ({
                   show.artist + " live music"
                 )}`
               }
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              style={{ width: "100%", height: "100%" }}
+              contentPosition="top center"
+              contentFit="cover"
             />
 
             {/* Favorite Button */}
@@ -508,7 +515,7 @@ const ShowCard = ({
                         letterSpacing: 0.5,
                       }}
                     >
-                      {genre.replace(';', '').trim()}
+                      {genre.replace(";", "").trim()}
                     </Text>
                   </View>
                 </View>
@@ -539,7 +546,12 @@ const ShowCard = ({
             >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
+                style={{
+                  fontSize: 14,
+                  color: textMuted,
+                  fontWeight: "600",
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
+                }}
               >
                 {show.venue}
               </Text>
@@ -549,7 +561,12 @@ const ShowCard = ({
             >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
+                style={{
+                  fontSize: 14,
+                  color: textMuted,
+                  fontWeight: "600",
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
+                }}
               >
                 {formatDate(show.date)} • {show.time}
               </Text>

@@ -14,6 +14,7 @@ import {
   RefreshControl,
   FlatList,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import {
   MapPin,
@@ -170,7 +171,7 @@ export const ShowsScreen = () => {
             }}
           >
             {/* Header */}
-            <View style={{ marginTop: 12, marginBottom: 24,paddingHorizontal:20 }}>
+            <View style={{ marginTop: 12, marginBottom: 24,paddingHorizontal:Platform.OS=='android'? 20:10 }}>
               {/* Top row: Logo + Buttons */}
               <View
                 style={{
@@ -469,7 +470,7 @@ const ShowCard = ({
   };
   return (
     <Animated.View
-      style={{ marginBottom: 24,paddingHorizontal:20,transform: [{ scale: cardScale }] }}
+      style={{ marginBottom: 24,paddingHorizontal:Platform.OS=='android'? 20:10,transform: [{ scale: cardScale }] }}
     >
       <Pressable
         onPress={onPress}
