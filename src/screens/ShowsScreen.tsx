@@ -65,6 +65,9 @@ export const ShowsScreen = () => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(30)).current;
 
+  // Clean up genre text by removing trailing semicolons and extra whitespace
+ 
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -167,7 +170,7 @@ export const ShowsScreen = () => {
             }}
           >
             {/* Header */}
-            <View style={{ paddingHorizontal: 2, marginTop: 12, marginBottom: 24 }}>
+            <View style={{ marginTop: 12, marginBottom: 24,paddingHorizontal:20 }}>
               {/* Top row: Logo + Buttons */}
               <View
                 style={{
@@ -179,7 +182,7 @@ export const ShowsScreen = () => {
               >
                 {/* Logo text with styling */}
                 <View style={{ flex: 1 }}>
-                  <Image source={selectedCity=='Kelowna'? require('./../../assets/images/Live-Music-Kelowna-White.png'):require('./../../assets/images/live-music-logo-white.png')} style={{width:150, height:50, resizeMode:'contain'}} />
+                  <Image source={selectedCity=='Kelowna'? require('./../../assets/images/Live-Music-Kelowna-White.png'):require('./../../assets/images/live-music-logo-white.png')} style={{width:170, height:70, resizeMode:'contain'}} />
                 </View>
 
                 {/* View Mode Toggle + Filter Buttons */}
@@ -190,7 +193,7 @@ export const ShowsScreen = () => {
                       setViewMode(viewMode === "card" ? "list" : "card")
                     }
                     style={{
-                      paddingHorizontal: 14,
+                      paddingHorizontal: 10,
                       paddingVertical: 10,
                       borderRadius: 20,
                       backgroundColor: viewMode === "list"? secondary: cardBackground,
@@ -208,7 +211,7 @@ export const ShowsScreen = () => {
                       style={{
                         fontSize: 13,
                         fontWeight: "600",
-                        fontFamily: FONT_FAMILY.proximaNovaSemiBold,
+                        fontFamily: FONT_FAMILY.poppinsSemiBold,
                         color: 'white',
                         letterSpacing: 0.3,
                       }}
@@ -250,7 +253,7 @@ export const ShowsScreen = () => {
                       style={{
                         fontSize: 14,
                         fontWeight: "600",
-                        fontFamily: FONT_FAMILY.proximaNovaSemiBold,
+                        fontFamily: FONT_FAMILY.poppinsSemiBold,
                         color: 'white',
                         letterSpacing: 0.3,
                       }}
@@ -282,7 +285,7 @@ export const ShowsScreen = () => {
                   style={{
                     fontSize: 16,
                     fontWeight: "bold",
-                    fontFamily: FONT_FAMILY.proximaNovaBold,
+                    fontFamily: FONT_FAMILY.poppinsBold,
                     color: text,
                     letterSpacing: 0.2,
                   }}
@@ -294,7 +297,7 @@ export const ShowsScreen = () => {
                     fontSize: 14,
                     color: textMuted,
                     fontWeight: "500",
-                    fontFamily: FONT_FAMILY.proximaNova,
+                    fontFamily: FONT_FAMILY.poppinsRegular
                   }}
                 >
                   Upcoming Shows
@@ -312,7 +315,7 @@ export const ShowsScreen = () => {
 
             {/* Shows List */}
             {isLoadingShows ? (
-              <View style={{ paddingHorizontal: 24 }}>
+              <View style={{ paddingHorizontal: 20, }}>
                 {[1, 2, 3].map((i) => (
                   <Skeleton
                     key={i}
@@ -331,7 +334,7 @@ export const ShowsScreen = () => {
                   style={{
                     color: textMuted,
                     fontSize: 16,
-                    fontFamily: FONT_FAMILY.proximaNova,
+                    fontFamily: FONT_FAMILY.poppinsRegular,
                     textAlign: "center",
                   }}
                 >
@@ -464,10 +467,9 @@ const ShowCard = ({
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
-
   return (
     <Animated.View
-      style={{ marginBottom: 24, transform: [{ scale: cardScale }] }}
+      style={{ marginBottom: 24,paddingHorizontal:20,transform: [{ scale: cardScale }] }}
     >
       <Pressable
         onPress={onPress}
@@ -482,7 +484,7 @@ const ShowCard = ({
           }}
         >
           {/* Show Image */}
-          <View style={{ height: 200, position: "relative",justifyContent:'center', alignItems:'center' }}>
+          <View style={{ height: 200, position: "relative", overflow: "hidden" }}>
             <Image
               source={
                 show.imageUrl ||
@@ -491,6 +493,8 @@ const ShowCard = ({
                 )}`
               }
               style={{ width: '100%', height: '100%' }}
+              contentPosition="top center"
+              contentFit="cover"
             />
 
             {/* Favorite Button */}
@@ -542,12 +546,12 @@ const ShowCard = ({
                         color: "#FFFFFF",
                         fontSize: 11,
                         fontWeight: "800",
-                        fontFamily: FONT_FAMILY.proximanovaExtraBold,
+                        fontFamily: FONT_FAMILY.poppinsExtraBold,
                         textTransform: "uppercase",
                         letterSpacing: 0.5,
                       }}
                     >
-                      {genre}
+                      {genre.replace(';', '').trim()}
                     </Text>
                   </View>
                 </View>
@@ -561,7 +565,7 @@ const ShowCard = ({
               style={{
                 fontSize: 20,
                 fontWeight: "800",
-                fontFamily: FONT_FAMILY.proximanovaExtraBold,
+                fontFamily: FONT_FAMILY.poppinsExtraBold,
                 color: text,
                 marginBottom: 8,
               }}
@@ -578,7 +582,7 @@ const ShowCard = ({
             >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
               >
                 {show.venue}
               </Text>
@@ -588,7 +592,7 @@ const ShowCard = ({
             >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
               >
                 {formatDate(show.date)} • {show.time}
               </Text>

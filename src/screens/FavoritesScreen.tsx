@@ -123,7 +123,7 @@ export const FavoritesScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
-      <View style={{ flex: 1, backgroundColor: background,paddingHorizontal:10 }}>
+      <View style={{ flex: 1, backgroundColor: background,paddingHorizontal:20 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <Animated.View
             style={{
@@ -503,12 +503,12 @@ const ShowCard = ({
                         color: "#FFFFFF",
                         fontSize: 11,
                         fontWeight: "800",
-                        fontFamily: FONT_FAMILY.proximanovaExtraBold,
+                        fontFamily: FONT_FAMILY.poppinsExtraBold,
                         textTransform: "uppercase",
                         letterSpacing: 0.5,
                       }}
                     >
-                      {genre}
+                      {genre.replace(';', '').trim()}
                     </Text>
                   </View>
                 </View>
@@ -522,7 +522,7 @@ const ShowCard = ({
               style={{
                 fontSize: 20,
                 fontWeight: "800",
-                fontFamily: FONT_FAMILY.proximanovaExtraBold,
+                fontFamily: FONT_FAMILY.poppinsExtraBold,
                 color: text,
                 marginBottom: 8,
               }}
@@ -539,7 +539,7 @@ const ShowCard = ({
             >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
               >
                 {show.venue}
               </Text>
@@ -549,7 +549,7 @@ const ShowCard = ({
             >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}
+                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
               >
                 {formatDate(show.date)} • {show.time}
               </Text>

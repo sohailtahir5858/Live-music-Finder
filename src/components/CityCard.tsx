@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, Pressable, Animated, Image, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Check } from 'lucide-react-native';
+import { FONT_FAMILY } from '../utils/fontConfig';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48;
 
 interface CityCardProps {
   city: string;
-  imageUrl: string;
+  imageUrl: any;
   description: string;
   isSelected: boolean;
   onSelect: () => void;
@@ -67,7 +68,7 @@ export const CityCard: React.FC<CityCardProps> = ({
         <View style={{ height: 220, width: '100%', position: 'relative' }}>
           {/* Background Image */}
           <Image
-            source={{ uri: imageUrl }}
+            source={ imageUrl }
             style={{
               width: '100%',
               height: '100%',
@@ -82,26 +83,20 @@ export const CityCard: React.FC<CityCardProps> = ({
               position: 'absolute',
               width: '100%',
               height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.3)',
             }}
           />
 
           {/* Glassmorphic Content */}
-          <View style={{ flex: 1, justifyContent: 'flex-end', padding: 10 }}>
-            <BlurView
-              intensity={isDark ? 40 : 60}
-              tint={isDark ? 'dark' : 'light'}
+          <View style={{ flex: 1, justifyContent: 'flex-end',}}>
+            <View
               style={{
-                borderRadius: 16,
                 overflow: 'hidden',
-                padding: 16,
               }}
             >
               <View
                 style={{
-                  backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.3)',
-                  borderRadius: 16,
-                  padding: 16,
+                  padding: 10,
+                  backgroundColor:'rgba(0, 0, 0, 0.6)',
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -112,6 +107,7 @@ export const CityCard: React.FC<CityCardProps> = ({
                         fontWeight: '700',
                         color: '#fff',
                         marginBottom: 4,
+                        fontFamily: FONT_FAMILY.poppinsBold,
                       }}
                     >
                       {city}
@@ -120,6 +116,7 @@ export const CityCard: React.FC<CityCardProps> = ({
                       style={{
                         fontSize: 14,
                         color: 'rgba(255,255,255,0.9)',
+                        fontFamily: FONT_FAMILY.poppinsRegular,
                       }}
                     >
                       {description}
@@ -142,7 +139,7 @@ export const CityCard: React.FC<CityCardProps> = ({
                   )}
                 </View>
               </View>
-            </BlurView>
+            </View>
           </View>
         </View>
       </Animated.View>

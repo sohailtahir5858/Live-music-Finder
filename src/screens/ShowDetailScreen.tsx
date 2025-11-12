@@ -154,7 +154,7 @@ export const ShowDetailScreen = () => {
   if (!show) {
     return (
       <View style={{ flex: 1, backgroundColor: background, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 }}>
-        <Text style={{ fontSize: 20, fontWeight: '700', color: text, textAlign: 'center', fontFamily: FONT_FAMILY.proximaNovaBold }}>
+        <Text style={{ fontSize: 20, fontWeight: '700', color: text, textAlign: 'center', fontFamily: FONT_FAMILY.poppinsBold }}>
           Show Not Found
         </Text>
         <Pressable
@@ -233,10 +233,10 @@ export const ShowDetailScreen = () => {
 
             {/* Artist Name */}
             <View style={{ paddingHorizontal: 24 }}>
-              <Text style={{ fontSize: 32, fontWeight: '900', fontFamily: FONT_FAMILY.proximanovaBlack, color: text, marginBottom: 8, letterSpacing: -0.5 }}>
+              <Text style={{ fontSize: 32, fontWeight: '900', fontFamily: FONT_FAMILY.poppinsBlack, color: text, marginBottom: 8, letterSpacing: -0.5 }}>
                 {show.artist}
               </Text>
-              <Text style={{ fontSize: 18, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: textMuted, marginBottom: 24 }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: textMuted, marginBottom: 24 }}>
                 {show.title}
               </Text>
             </View>
@@ -249,14 +249,14 @@ export const ShowDetailScreen = () => {
                   <MapPin size={20} color={primary} strokeWidth={2.5} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaSemiBold, textTransform: 'uppercase', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsSemiBold, textTransform: 'uppercase', marginBottom: 4 }}>
                     Venue
                   </Text>
-                  <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginBottom: 2 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: text, marginBottom: 2 }}>
                     {show.venue}
                   </Text>
                   {show.venueAddress && (
-                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNova }}>
+                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsRegular}}>
                       {show.venueAddress}
                     </Text>
                   )}
@@ -269,15 +269,15 @@ export const ShowDetailScreen = () => {
                   <Calendar size={20} color={secondary} strokeWidth={2.5} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                  <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                     Date & Time
                   </Text>
-                  <Text style={{ fontSize: 16, fontWeight: '700', color: text, marginBottom: 2, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: text, marginBottom: 2, fontFamily: FONT_FAMILY.poppinsBold }}>
                     {formatDate(show.date)}
                   </Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     <Clock size={14} color={textMuted} strokeWidth={2.5} />
-                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNova }}>
+                    <Text style={{ fontSize: 14, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsRegular}}>
                       {show.time}
                     </Text>
                   </View>
@@ -291,10 +291,10 @@ export const ShowDetailScreen = () => {
                     <DollarSign size={20} color={secondary} strokeWidth={2.5} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                    <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                       Price
                     </Text>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: text, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: text, fontFamily: FONT_FAMILY.poppinsBold }}>
                       {show.price}
                     </Text>
                   </View>
@@ -311,10 +311,10 @@ export const ShowDetailScreen = () => {
                     <MapPin size={20} color={primary} strokeWidth={2.5} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                    <Text style={{ fontSize: 13, color: textMuted, fontWeight: '700', textTransform: 'uppercase', marginBottom: 4, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                       Event Link
                     </Text>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: primary, textDecorationLine: 'underline', fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: primary, textDecorationLine: 'underline', fontFamily: FONT_FAMILY.poppinsBold }}>
                       View on Website
                     </Text>
                   </View>
@@ -332,10 +332,10 @@ export const ShowDetailScreen = () => {
             {/* Description */}
             {show.description && (
               <View style={{ marginTop: 24,paddingHorizontal:20 }}>
-                <Text style={{ fontSize: 20, fontWeight: '800', color: text, marginBottom: 12, fontFamily: FONT_FAMILY.proximanovaBlack }}>
+                <Text style={{ fontSize: 20, fontWeight: '800', color: text, marginBottom: 12, fontFamily: FONT_FAMILY.poppinsBlack }}>
                   About This Show
                 </Text>
-                <Text style={{ fontSize: 15, color: textMuted, fontWeight: '500', lineHeight: 24, fontFamily: FONT_FAMILY.proximaNova }}>
+                <Text style={{ fontSize: 15, color: textMuted, fontWeight: '500', lineHeight: 24, fontFamily: FONT_FAMILY.poppinsRegular,marginBottom:20}}>
                   {show.description}
                 </Text>
               </View>

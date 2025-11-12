@@ -151,7 +151,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                 marginBottom: 20,
               }}
             >
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#000000', fontFamily: FONT_FAMILY.proximanovaBlack }}>
+              <Text style={{ fontSize: 18, fontWeight: '800', color: '#000000', fontFamily: FONT_FAMILY.poppinsBlack }}>
                 Select Date Range
               </Text>
               <Pressable onPress={onClose}>
@@ -238,7 +238,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                     >
                       From
                     </Text>
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#000000', fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#000000', fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                       {formatDate(startDate)}
                     </Text>
                   </View>
@@ -255,7 +255,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                     >
                       To
                     </Text>
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#000000', fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#000000', fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                       {formatDate(endDate)}
                     </Text>
                   </View>
@@ -274,10 +274,10 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                     borderLeftColor: primary,
                   }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: primary, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: primary, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                     {formatDate(startDate)} → {formatDate(endDate)}
                   </Text>
-                                    <Text style={{ fontSize: 11, fontWeight: '500', color: primary, opacity: 0.7, marginTop: 4, fontFamily: FONT_FAMILY.proximaNova }}>
+                                    <Text style={{ fontSize: 11, fontWeight: '500', color: primary, opacity: 0.7, marginTop: 4, fontFamily: FONT_FAMILY.poppinsRegular}}>
                     {getDayCount()} days selected
                   </Text>
                 </View>
@@ -294,7 +294,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                     borderLeftColor: '#FFC107',
                   }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#856404', fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#856404', fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                     {!startDate ? 'Tap a date to start' : 'Tap another date to complete the range'}
                   </Text>
                 </View>
@@ -315,7 +315,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                   backgroundColor: '#F5F5F5',
                 }}
               >
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#000000', fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#000000', fontFamily: FONT_FAMILY.poppinsBold }}>
                   Cancel
                 </Text>
               </Pressable>
@@ -334,7 +334,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                 }}
               >
                 <Check size={18} color="#FFFFFF" strokeWidth={2.5} />
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF', fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#FFFFFF', fontFamily: FONT_FAMILY.poppinsBold }}>
                   Apply
                 </Text>
               </Pressable>

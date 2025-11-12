@@ -25,10 +25,10 @@ export const NotificationSettings = () => {
       <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flex: 1, marginRight: 16 }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 6, fontFamily: FONT_FAMILY.proximanovaBlack }}>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 6, fontFamily: FONT_FAMILY.poppinsBlack }}>
               Push Notifications
             </Text>
-            <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', lineHeight: 18, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+            <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', lineHeight: 18, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
               {isPremium ? 'Get instant alerts when your favorite artist, genre, or venue is coming up' : 'Get general updates about new events'}
             </Text>
           </View>
@@ -44,10 +44,10 @@ export const NotificationSettings = () => {
       {/* Notification Frequency */}
       {notificationsEnabled && (
         <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
-          <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 12, fontFamily: FONT_FAMILY.proximanovaBlack }}>
+          <Text style={{ fontSize: 16, fontWeight: '800', color: text, marginBottom: 12, fontFamily: FONT_FAMILY.poppinsBlack }}>
             Notification Frequency
           </Text>
-          <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginBottom: 16, lineHeight: 18, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+          <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', marginBottom: 16, lineHeight: 18, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
             Choose how often you want to receive notifications
           </Text>
           
@@ -76,18 +76,18 @@ export const NotificationSettings = () => {
               >
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: isSelected ? primary : text, fontFamily: FONT_FAMILY.poppinsBold }}>
                       {freq.charAt(0).toUpperCase() + freq.slice(1)}
                     </Text>
                     {isPremiumFeature && (
                       <View style={{ paddingHorizontal: 8, paddingVertical: 2, backgroundColor: primary, borderRadius: 6 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5, fontFamily: FONT_FAMILY.proximanovaBlack }}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5, fontFamily: FONT_FAMILY.poppinsBlack }}>
                           PREMIUM
                         </Text>
                       </View>
                     )}
                   </View>
-                  <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600', marginTop: 4, fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+                  <Text style={{ fontSize: 12, color: textMuted, fontWeight: '600', marginTop: 4, fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                     {freq === 'instant' && (isPremium ? 'Instant alerts for your favorite artists, genres, and venues' : 'Upgrade to get instant personalized alerts')}
                     {freq === 'daily' && (isPremium ? 'Daily personalized digest matching your favorites' : 'Daily general updates about new events')}
                     {freq === 'weekly' && (isPremium ? 'Weekly curated summary of your favorite genres' : 'Weekly general event list')}

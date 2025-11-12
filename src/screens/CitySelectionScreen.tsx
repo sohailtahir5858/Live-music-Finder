@@ -9,6 +9,7 @@ import { BlurView } from 'expo-blur';
 import { MapPin, Check } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, useThemeMode } from '../contexts/ThemeContext';
+import { FONT_FAMILY } from '../utils/fontConfig';
 import { useUserPreferences } from '../stores/userPreferencesStore';
 
 const { width } = Dimensions.get('window');
@@ -104,6 +105,7 @@ export const CitySelectionScreen = () => {
               color: text,
               textAlign: 'center',
               marginBottom: 12,
+              fontFamily: FONT_FAMILY.poppinsBold,
             }}
           >
             Choose Your City
@@ -115,6 +117,7 @@ export const CitySelectionScreen = () => {
               textAlign: 'center',
               lineHeight: 24,
               paddingHorizontal: 20,
+              fontFamily: FONT_FAMILY.poppinsRegular,
             }}
           >
             Select your location to discover live music events in your area
@@ -174,7 +177,7 @@ export const CitySelectionScreen = () => {
                 }}
               >
                 <Check size={20} color="#fff" strokeWidth={3} />
-                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsSemiBold }}>
                   {isConfirming ? 'Confirming...' : `Continue with ${selectedCity}`}
                 </Text>
               </View>
@@ -292,6 +295,7 @@ const CityCard: React.FC<CityCardProps> = ({
                         fontWeight: '700', 
                         color: '#fff',
                         marginBottom: 4,
+                        fontFamily: FONT_FAMILY.poppinsBold,
                       }}
                     >
                       {city}
@@ -300,6 +304,7 @@ const CityCard: React.FC<CityCardProps> = ({
                       style={{ 
                         fontSize: 14, 
                         color: 'rgba(255,255,255,0.9)',
+                        fontFamily: FONT_FAMILY.poppinsRegular,
                       }}
                     >
                       {description}

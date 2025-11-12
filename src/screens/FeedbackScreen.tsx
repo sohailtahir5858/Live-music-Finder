@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../contexts/ThemeContext';
+import { FONT_FAMILY } from '../utils/fontConfig';
 import {
   MagicallyAlert,
   Skeleton,
@@ -213,6 +214,7 @@ export default function FeedbackScreen({ navigation }) {
                   fontWeight: '600',
                   color: text,
                   textAlign: 'center',
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
                 }}
                 numberOfLines={1}
               >
@@ -279,6 +281,7 @@ export default function FeedbackScreen({ navigation }) {
                   fontWeight: '600',
                   color: text,
                   textAlign: 'center',
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
                 }}
                 numberOfLines={1}
               >
@@ -319,6 +322,7 @@ export default function FeedbackScreen({ navigation }) {
                 color: text,
                 marginTop: 16,
                 marginBottom: 8,
+                fontFamily: FONT_FAMILY.poppinsSemiBold,
               }}>
                 No feedback yet
               </Text>
@@ -327,6 +331,7 @@ export default function FeedbackScreen({ navigation }) {
                 color: textMuted,
                 textAlign: 'center',
                 marginBottom: 16,
+                fontFamily: FONT_FAMILY.poppinsRegular,
               }}>
                 Be the first to share your thoughts and suggestions
               </Text>
@@ -343,6 +348,7 @@ export default function FeedbackScreen({ navigation }) {
                   color: primaryForeground,
                   fontSize: 14,
                   fontWeight: '600',
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
                 }}>
                   Submit Feedback
                 </Text>

@@ -151,13 +151,13 @@ export const FilterScreen = () => {
               >
                 <ArrowLeft size={20} color={text} strokeWidth={2.5} />
               </Pressable>
-              <Text style={{ fontSize: 24, fontWeight: '900', fontFamily: FONT_FAMILY.proximanovaBlack, color: text, letterSpacing: -0.5 }}>
+              <Text style={{ fontSize: 24, fontWeight: '900', fontFamily: FONT_FAMILY.poppinsBlack, color: text, letterSpacing: -0.5 }}>
                 Filters
               </Text>
             </View>
             {hasActiveFilters && (
               <Pressable onPress={handleClearFilters}>
-                <Text style={{ fontSize: 14, color: primary, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold }}>
+                <Text style={{ fontSize: 14, color: primary, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold }}>
                   Clear All
                 </Text>
               </Pressable>
@@ -174,11 +174,11 @@ export const FilterScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Music2 size={20} color={primary} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.poppinsBlack, color: text }}>
                       Genres
                     </Text>
                     {!expandedGenres && selectedGenres.length > 0 && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsSemiBold, marginTop: 4 }}>
                         {selectedGenres.length} selected
                       </Text>
                     )}
@@ -186,7 +186,7 @@ export const FilterScreen = () => {
                 </View>
                 {selectedGenres.length > 0 && (
                   <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
-                    <Text style={{ fontSize: 12, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: primary }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', fontFamily: FONT_FAMILY.poppinsBlack, color: primary }}>
                       {selectedGenres.length}
                     </Text>
                   </View>
@@ -219,7 +219,7 @@ export const FilterScreen = () => {
                             backgroundColor: isSelected ? primary + '20' : 'transparent',
                           }}
                         >
-                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text }}>
+                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: isSelected ? primary : text }}>
                             {decodedName}
                           </Text>
                         </Pressable>
@@ -239,11 +239,11 @@ export const FilterScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <MapPin size={20} color={primary} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.poppinsBlack, color: text }}>
                       Venues in {selectedCity}
                     </Text>
                     {!expandedVenues && selectedVenues.length > 0 && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsSemiBold, marginTop: 4 }}>
                         {selectedVenues.length} selected
                       </Text>
                     )}
@@ -251,7 +251,7 @@ export const FilterScreen = () => {
                 </View>
                 {selectedVenues.length > 0 && (
                   <View style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: primary + '20', borderRadius: 10, marginRight: 12 }}>
-                    <Text style={{ fontSize: 12, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: primary }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', fontFamily: FONT_FAMILY.poppinsBlack, color: primary }}>
                       {selectedVenues.length}
                     </Text>
                   </View>
@@ -285,7 +285,7 @@ export const FilterScreen = () => {
                           }}
                         >
                           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 15, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text, flex: 1 }}>
+                            <Text style={{ fontSize: 15, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: isSelected ? primary : text, flex: 1 }}>
                               {decodedVenueName}
                             </Text>
                             <View
@@ -322,11 +322,11 @@ export const FilterScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Clock size={20} color={primary} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.poppinsBlack, color: text }}>
                       Time of Day
                     </Text>
                     {!expandedTimeFilter && selectedTimeFilter && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsSemiBold, marginTop: 4 }}>
                         {TIME_FILTERS.find(t => t.value === selectedTimeFilter)?.label}
                       </Text>
                     )}
@@ -359,7 +359,7 @@ export const FilterScreen = () => {
                             backgroundColor: isSelected ? primary + '20' : 'transparent',
                           }}
                         >
-                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text }}>
+                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: isSelected ? primary : text }}>
                             {timeFilter.label}
                           </Text>
                         </Pressable>
@@ -379,11 +379,11 @@ export const FilterScreen = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Calendar size={20} color={primary} style={{ marginRight: 12 }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, color: text }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.poppinsBlack, color: text }}>
                       Date Range
                     </Text>
                     {!expandedDateFilter && selectedDatePreset && (
-                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.proximaNovaSemiBold, marginTop: 4 }}>
+                      <Text style={{ fontSize: 13, color: textMuted, fontWeight: '600', fontFamily: FONT_FAMILY.poppinsSemiBold, marginTop: 4 }}>
                         {selectedDatePreset === 'custom' && customDateFrom && customDateTo
                           ? `${customDateFrom.toLocaleDateString()} - ${customDateTo.toLocaleDateString()}`
                           : datePresets.find(p => p.value === selectedDatePreset)?.label}
@@ -418,7 +418,7 @@ export const FilterScreen = () => {
                             backgroundColor: isSelected ? primary + '20' : 'transparent',
                           }}
                         >
-                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: isSelected ? primary : text }}>
+                          <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: isSelected ? primary : text }}>
                             {preset.label}
                           </Text>
                         </Pressable>
@@ -443,7 +443,7 @@ export const FilterScreen = () => {
                       }}
                     >
                       <Calendar size={14} color={selectedDatePreset === 'custom' ? primary : text} />
-                      <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: selectedDatePreset === 'custom' ? primary : text }}>
+                      <Text style={{ fontSize: 14, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: selectedDatePreset === 'custom' ? primary : text }}>
                         Custom
                       </Text>
                     </Pressable>
@@ -452,7 +452,7 @@ export const FilterScreen = () => {
                   {/* Custom Date Picker */}
                   {selectedDatePreset === 'custom' && (
                     <View style={{ marginTop: 16, padding: 16, backgroundColor: background, borderRadius: 12, borderWidth: 1, borderColor: border }}>
-                      <Text style={{ fontSize: 12, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginBottom: 12 }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', fontFamily: FONT_FAMILY.poppinsBold, color: text, marginBottom: 12 }}>
                         Select date range
                       </Text>
                       <View style={{ gap: 12 }}>

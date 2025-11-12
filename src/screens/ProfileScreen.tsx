@@ -3,31 +3,59 @@
  * @description User profile with subscription management, settings, and account actions
  */
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { CommonActions } from '@react-navigation/native';
-import { User, Bell, MessageSquare, LogOut, Trash2, ChevronRight, MapPin, FileText, Lock } from 'lucide-react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { FONT_FAMILY } from '../utils/fontConfig';
-import { useUserPreferences } from '../stores/userPreferencesStore';
-import { AnimatedSpinner } from '../components/ui';
-import magically from 'magically-sdk';
-import { MagicallyAlert } from '../components/ui';
-import { NotificationSettings } from '../components/NotificationSettings';
-import { GenreSelector } from '../components/GenreSelector';
-import { VenueSelector } from '../components/VenueSelector';
-import { CityCard } from '../components/CityCard';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Linking,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { CommonActions } from "@react-navigation/native";
+import {
+  User,
+  Bell,
+  MessageSquare,
+  LogOut,
+  Trash2,
+  ChevronRight,
+  MapPin,
+  FileText,
+  Lock,
+} from "lucide-react-native";
+import { useTheme } from "../contexts/ThemeContext";
+import { FONT_FAMILY } from "../utils/fontConfig";
+import { useUserPreferences } from "../stores/userPreferencesStore";
+import { AnimatedSpinner } from "../components/ui";
+import magically from "magically-sdk";
+import { MagicallyAlert } from "../components/ui";
+import { NotificationSettings } from "../components/NotificationSettings";
+import { GenreSelector } from "../components/GenreSelector";
+import { VenueSelector } from "../components/VenueSelector";
+import { CityCard } from "../components/CityCard";
 
 export default function ProfileScreen() {
-  const { background, text, textMuted, primary, secondary, cardBackground, border, destructive } = useTheme();
+  const {
+    background,
+    text,
+    textMuted,
+    primary,
+    secondary,
+    cardBackground,
+    border,
+    destructive,
+  } = useTheme();
   const navigation = useNavigation();
-  const { isPremium, setIsPremium, selectedCity, setSelectedCity } = useUserPreferences();
+  const { isPremium, setIsPremium, selectedCity, setSelectedCity } =
+    useUserPreferences();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showCitySelection, setShowCitySelection] = useState(false);
-  const [tempSelectedCity, setTempSelectedCity] = useState<'Kelowna' | 'Nelson' | null>(selectedCity);
+  const [tempSelectedCity, setTempSelectedCity] = useState<
+    "Kelowna" | "Nelson" | null
+  >(selectedCity);
   const user = magically.auth.getCurrentUser();
 
   const handleSignOut = async () => {
@@ -37,12 +65,12 @@ export default function ProfileScreen() {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: 'Login' }],
+          routes: [{ name: "Login" }],
         })
       );
     } catch (error) {
-      console.error('Sign out failed:', error);
-      MagicallyAlert.alert('Error', 'Failed to sign out');
+      console.error("Sign out failed:", error);
+      MagicallyAlert.alert("Error", "Failed to sign out");
     } finally {
       setIsSigningOut(false);
     }
@@ -50,52 +78,67 @@ export default function ProfileScreen() {
 
   const handleDeleteAccount = async () => {
     MagicallyAlert.alert(
-      'Delete Account?',
-      'This will permanently delete your account from this app. This cannot be undone.',
+      "Delete Account?",
+      "This will permanently delete your account from this app. This cannot be undone.",
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: "Cancel", style: "cancel" },
         {
-          text: 'Delete',
-          style: 'destructive',
+          text: "Delete",
+          style: "destructive",
           onPress: async () => {
             setIsDeleting(true);
             try {
               const result = await magically.auth.deleteAccount();
               await magically.auth.signOut();
 
-              if (result.action === 'scheduled') {
+              if (result.action === "scheduled") {
                 MagicallyAlert.alert(
-                  'Scheduled',
+                  "Scheduled",
                   `Account will be deleted in ${result.daysRemaining} days. Log back in to cancel.`
                 );
               } else {
-                MagicallyAlert.alert('Deleted', 'Your account has been deleted.');
+                MagicallyAlert.alert(
+                  "Deleted",
+                  "Your account has been deleted."
+                );
               }
 
               navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
-                  routes: [{ name: 'Login' }],
+                  routes: [{ name: "Login" }],
                 })
               );
             } catch (error: any) {
-              console.error('Delete failed:', error);
+              console.error("Delete failed:", error);
 
-              const errorMessage = error.message || '';
-              const errorCode = error.responseData?.code || error.responseData?.error || errorMessage;
+              const errorMessage = error.message || "";
+              const errorCode =
+                error.responseData?.code ||
+                error.responseData?.error ||
+                errorMessage;
 
-              if (errorCode === 'OWNER_CANNOT_DELETE' || errorMessage === 'OWNER_CANNOT_DELETE') {
+              if (
+                errorCode === "OWNER_CANNOT_DELETE" ||
+                errorMessage === "OWNER_CANNOT_DELETE"
+              ) {
                 MagicallyAlert.alert(
-                  'Protected Account',
-                  'As the app creator, your account keeps this app running. To close your account, you can delete the entire project from your dashboard.\\n\\nTo test account deletion, try logging in with a different account.'
+                  "Protected Account",
+                  "As the app creator, your account keeps this app running. To close your account, you can delete the entire project from your dashboard.\\n\\nTo test account deletion, try logging in with a different account."
                 );
-              } else if (errorCode === 'LAST_ADMIN_CANNOT_DELETE' || errorMessage === 'LAST_ADMIN_CANNOT_DELETE') {
+              } else if (
+                errorCode === "LAST_ADMIN_CANNOT_DELETE" ||
+                errorMessage === "LAST_ADMIN_CANNOT_DELETE"
+              ) {
                 MagicallyAlert.alert(
-                  'Admin Required',
-                  'Your app needs at least one admin to keep running. Please make someone else an admin before deleting your account.\\n\\nTo test account deletion, try logging in with a non-admin account.'
+                  "Admin Required",
+                  "Your app needs at least one admin to keep running. Please make someone else an admin before deleting your account.\\n\\nTo test account deletion, try logging in with a non-admin account."
                 );
               } else {
-                MagicallyAlert.alert('Error', error.message || 'Failed to delete account. Please try again.');
+                MagicallyAlert.alert(
+                  "Error",
+                  error.message || "Failed to delete account. Please try again."
+                );
               }
             } finally {
               setIsDeleting(false);
@@ -106,7 +149,7 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleCitySelect = (city: 'Kelowna' | 'Nelson') => {
+  const handleCitySelect = (city: "Kelowna" | "Nelson") => {
     setTempSelectedCity(city);
   };
 
@@ -114,7 +157,10 @@ export default function ProfileScreen() {
     if (tempSelectedCity) {
       setSelectedCity(tempSelectedCity);
       setShowCitySelection(false);
-      MagicallyAlert.alert('City Updated', `Your location has been changed to ${tempSelectedCity}.`);
+      MagicallyAlert.alert(
+        "City Updated",
+        `Your location has been changed to ${tempSelectedCity}.`
+      );
     }
   };
 
@@ -127,17 +173,54 @@ export default function ProfileScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: background }}>
         <View style={{ flex: 1, backgroundColor: background }}>
-          <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 }} edges={['top']}>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingHorizontal: 40,
+            }}
+            edges={["top"]}
+          >
             <User size={64} color={textMuted} strokeWidth={1.5} />
-            <Text style={{ fontSize: 20, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginTop: 16, textAlign: 'center' }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "700",
+                fontFamily: FONT_FAMILY.poppinsBold,
+                color: text,
+                marginTop: 16,
+                textAlign: "center",
+              }}
+            >
               Sign In Required
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Login' as never)}
-              style={{ marginTop: 24, borderRadius: 16, overflow: 'hidden', width: '100%' }}
+              onPress={() => navigation.navigate("Login" as never)}
+              style={{
+                marginTop: 24,
+                borderRadius: 16,
+                overflow: "hidden",
+                width: "100%",
+              }}
             >
-              <View style={{ paddingVertical: 16, paddingHorizontal: 32, alignItems: 'center', backgroundColor: '#f2a41e' }}>
-                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '800', fontFamily: FONT_FAMILY.proximanovaBlack, letterSpacing: 0.5 }}>
+              <View
+                style={{
+                  paddingVertical: 16,
+                  // paddingHorizontal: 32,
+                  alignItems: "center",
+                  backgroundColor: "#f2a41e",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#FFFFFF",
+                    fontSize: 16,
+                    fontWeight: "800",
+                    fontFamily: FONT_FAMILY.poppinsBlack,
+                    letterSpacing: 0.5,
+                  }}
+                >
                   Sign In
                 </Text>
               </View>
@@ -149,53 +232,109 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: background }} edges={['top']}>
-      <ScrollView 
-        style={{ flex: 1 }} 
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: background }}
+      edges={["top"]}
+    >
+      <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
         {/* User Info Section */}
-        <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
-          <View style={{ alignItems: 'center', marginBottom: 20 }}>
-            <View 
-              style={{ 
-                width: 80, 
-                height: 80, 
-                borderRadius: 40, 
-                backgroundColor: primary, 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                marginBottom: 12
+        <View
+          style={{
+            backgroundColor: cardBackground,
+            borderRadius: 20,
+            padding: 20,
+            marginBottom: 16,
+          }}
+        >
+          <View style={{ alignItems: "center", marginBottom: 20 }}>
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                backgroundColor: primary,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 12,
               }}
             >
               <User size={36} color="#FFFFFF" strokeWidth={2.5} />
             </View>
-            <Text style={{ fontSize: 20, fontWeight: '900', fontFamily: FONT_FAMILY.proximanovaBlack, color: text, marginBottom: 4 }}>
-              {user?.name || user?.email || 'Music Lover'}
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "900",
+                fontFamily: FONT_FAMILY.poppinsBlack,
+                color: text,
+                marginBottom: 4,
+              }}
+            >
+              {user?.name || user?.email || "Music Lover"}
             </Text>
           </View>
         </View>
 
         {/* City Selection Section */}
-        <View style={{ backgroundColor: cardBackground, borderRadius: 20, padding: 20, marginBottom: 16 }}>
+        <View
+          style={{
+            backgroundColor: cardBackground,
+            borderRadius: 20,
+            padding: 20,
+            marginBottom: 16,
+          }}
+        >
           <TouchableOpacity
             onPress={() => {
               setTempSelectedCity(selectedCity);
               setShowCitySelection(true);
             }}
-            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
+            >
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: primary + "20",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 14,
+                }}
+              >
                 <MapPin size={18} color={primary} strokeWidth={2.5} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: FONT_FAMILY.proximaNovaBold, color: text, marginBottom: 2 }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "700",
+                    fontFamily: FONT_FAMILY.poppinsBold,
+                    color: text,
+                    marginBottom: 2,
+                  }}
+                >
                   Location
                 </Text>
-                <Text style={{ fontSize: 14, color: textMuted, fontWeight: '500', fontFamily: FONT_FAMILY.proximaNova }}>
-                  {selectedCity || 'Select your city'}
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: textMuted,
+                    fontWeight: "500",
+                    fontFamily: FONT_FAMILY.poppinsRegular,
+                  }}
+                >
+                  {selectedCity || "Select your city"}
                 </Text>
               </View>
             </View>
@@ -213,16 +352,39 @@ export default function ProfileScreen() {
         <NotificationSettings />
 
         {/* Menu Items */}
-        <View style={{ backgroundColor: cardBackground, borderRadius: 20, marginBottom: 20 }}>
-
+        <View
+          style={{
+            backgroundColor: cardBackground,
+            borderRadius: 20,
+            marginBottom: 20,
+          }}
+        >
           <TouchableOpacity
-            onPress={() => navigation.navigate('Feedback' as never)}
-            style={{ flexDirection: 'row', alignItems: 'center', padding: 18 }}
+            onPress={() => navigation.navigate("Feedback" as never)}
+            style={{ flexDirection: "row", alignItems: "center", padding: 18 }}
           >
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: secondary + '20', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: secondary + "20",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 14,
+              }}
+            >
               <MessageSquare size={18} color={secondary} strokeWidth={2.5} />
             </View>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "700",
+                color: text,
+                flex: 1,
+                fontFamily: FONT_FAMILY.poppinsBold,
+              }}
+            >
               Send Feedback
             </Text>
             <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
@@ -231,13 +393,33 @@ export default function ProfileScreen() {
           <View style={{ height: 1, backgroundColor: border }} />
 
           <TouchableOpacity
-            onPress={() => Linking.openURL('https://livemusickelowna.ca/terms-of-service/')}
-            style={{ flexDirection: 'row', alignItems: 'center', padding: 18 }}
+            onPress={() =>
+              Linking.openURL("https://livemusickelowna.ca/terms-of-service/")
+            }
+            style={{ flexDirection: "row", alignItems: "center", padding: 18 }}
           >
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '15', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: primary + "15",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 14,
+              }}
+            >
               <FileText size={18} color={primary} strokeWidth={2.5} />
             </View>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "700",
+                color: text,
+                flex: 1,
+                fontFamily: FONT_FAMILY.poppinsBold,
+              }}
+            >
               Terms of Service
             </Text>
             <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
@@ -246,13 +428,33 @@ export default function ProfileScreen() {
           <View style={{ height: 1, backgroundColor: border }} />
 
           <TouchableOpacity
-            onPress={() => Linking.openURL('https://livemusickelowna.ca/privacy-policy/')}
-            style={{ flexDirection: 'row', alignItems: 'center', padding: 18 }}
+            onPress={() =>
+              Linking.openURL("https://livemusickelowna.ca/privacy-policy/")
+            }
+            style={{ flexDirection: "row", alignItems: "center", padding: 18 }}
           >
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: primary + '15', alignItems: 'center', justifyContent: 'center', marginRight: 14 }}>
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: primary + "15",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 14,
+              }}
+            >
               <Lock size={18} color={primary} strokeWidth={2.5} />
             </View>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: text, flex: 1, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "700",
+                color: text,
+                flex: 1,
+                fontFamily: FONT_FAMILY.poppinsBold,
+              }}
+            >
               Privacy Policy
             </Text>
             <ChevronRight size={20} color={textMuted} strokeWidth={2.5} />
@@ -263,15 +465,31 @@ export default function ProfileScreen() {
         <TouchableOpacity
           onPress={handleSignOut}
           disabled={isSigningOut}
-          style={{ marginBottom: 12, backgroundColor: cardBackground, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+          style={{
+            marginBottom: 12,
+            backgroundColor: cardBackground,
+            borderRadius: 16,
+            padding: 18,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+          }}
         >
           {isSigningOut ? (
             <AnimatedSpinner size={20} color={textMuted} />
           ) : (
             <LogOut size={20} color={textMuted} strokeWidth={2.5} />
           )}
-          <Text style={{ fontSize: 16, fontWeight: '700', color: textMuted, fontFamily: FONT_FAMILY.proximaNovaBold }}>
-            {isSigningOut ? 'Signing Out...' : 'Sign Out'}
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "700",
+              color: textMuted,
+              fontFamily: FONT_FAMILY.poppinsBold,
+            }}
+          >
+            {isSigningOut ? "Signing Out..." : "Sign Out"}
           </Text>
         </TouchableOpacity>
 
@@ -279,34 +497,78 @@ export default function ProfileScreen() {
         <TouchableOpacity
           onPress={handleDeleteAccount}
           disabled={isDeleting}
-          style={{ backgroundColor: destructive + '15', borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+          style={{
+            backgroundColor: destructive + "15",
+            borderRadius: 16,
+            padding: 18,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+          }}
         >
           {isDeleting ? (
             <AnimatedSpinner size={20} color={destructive} />
           ) : (
             <Trash2 size={20} color={destructive} strokeWidth={2.5} />
           )}
-          <Text style={{ fontSize: 16, fontWeight: '700', color: destructive, fontFamily: FONT_FAMILY.proximaNovaBold }}>
-            {isDeleting ? 'Deleting...' : 'Delete Account'}
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "700",
+              color: destructive,
+              fontFamily: FONT_FAMILY.poppinsBold,
+            }}
+          >
+            {isDeleting ? "Deleting..." : "Delete Account"}
           </Text>
         </TouchableOpacity>
       </ScrollView>
 
       {/* City Selection Modal */}
       {showCitySelection && (
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ backgroundColor: background, borderRadius: 20, padding: 20, margin: 20, width: '90%', maxWidth: 400 }}>
-            <Text style={{ fontSize: 24, fontWeight: '700', color: text, textAlign: 'center', marginBottom: 20, fontFamily: FONT_FAMILY.proximaNovaBold }}>
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: background,
+              borderRadius: 20,
+              padding: 16,
+              // margin: 20,
+              width: "100%",
+              maxWidth: 400,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "700",
+                color: text,
+                textAlign: "center",
+                marginBottom: 20,
+                fontFamily: FONT_FAMILY.poppinsBold,
+              }}
+            >
               Change Location
             </Text>
-            
+
             <View style={{ gap: 16, marginBottom: 24 }}>
               <CityCard
                 city="Kelowna"
-                imageUrl="https://trymagically.com/api/media/image?query=kelowna%20bc%20canada%20city%20beautiful%20okanagan%20lake%20sunset"
-                description="Okanagan's vibrant music scene"
-                isSelected={tempSelectedCity === 'Kelowna'}
-                onSelect={() => handleCitySelect('Kelowna')}
+                imageUrl={require("../../assets/images/kelowna.jpg")}
+                description="Heart of the Okanagan’s Live Music Scene"
+                isSelected={tempSelectedCity === "Kelowna"}
+                onSelect={() => handleCitySelect("Kelowna")}
                 primary={primary}
                 text={text}
                 textMuted={textMuted}
@@ -316,10 +578,10 @@ export default function ProfileScreen() {
 
               <CityCard
                 city="Nelson"
-                imageUrl="https://trymagically.com/api/media/image?query=nelson%20bc%20canada%20city%20mountains%20kootenay%20lake"
-                description="Kootenay's eclectic music hub"
-                isSelected={tempSelectedCity === 'Nelson'}
-                onSelect={() => handleCitySelect('Nelson')}
+                imageUrl={require("../../assets/images/Nelson.jpg")}
+                description="Kootenay’s Eclectic Music Hub"
+                isSelected={tempSelectedCity === "Nelson"}
+                onSelect={() => handleCitySelect("Nelson")}
                 primary={primary}
                 text={text}
                 textMuted={textMuted}
@@ -328,29 +590,40 @@ export default function ProfileScreen() {
               />
             </View>
 
-            <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View style={{ flexDirection: "row", gap: 12 }}>
               <TouchableOpacity
                 onPress={handleCancelCityChange}
-                style={{ flex: 1, paddingVertical: 14, paddingHorizontal: 20, backgroundColor: cardBackground, borderRadius: 12, alignItems: 'center' }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  paddingHorizontal: 20,
+                  backgroundColor: cardBackground,
+                  borderRadius: 12,
+                  alignItems: "center",
+                }}
               >
-                <Text style={{ color: text, fontSize: 16, fontWeight: '600' }}>
+                <Text style={{ color: text, fontSize: 16, fontWeight: "600" }}>
                   Cancel
                 </Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 onPress={handleConfirmCityChange}
                 disabled={!tempSelectedCity}
-                style={{ 
-                  flex: 1, 
-                  paddingVertical: 14, 
-                  paddingHorizontal: 20, 
-                  backgroundColor: tempSelectedCity ? primary : textMuted + '40', 
-                  borderRadius: 12, 
-                  alignItems: 'center' 
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  paddingHorizontal: 20,
+                  backgroundColor: tempSelectedCity
+                    ? primary
+                    : textMuted + "40",
+                  borderRadius: 12,
+                  alignItems: "center",
                 }}
               >
-                <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>
+                <Text
+                  style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "600" }}
+                >
                   Confirm
                 </Text>
               </TouchableOpacity>

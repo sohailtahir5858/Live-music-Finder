@@ -55,11 +55,11 @@ export const VenueSelector = () => {
           }}
         >
           <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
-          <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.proximanovaBlack }}>
+          <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.poppinsBlack }}>
             Favorite Venues
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.proximaNovaSemiBold }}>
+        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}>
           Loading venues...
         </Text>
       </View>
@@ -88,7 +88,7 @@ export const VenueSelector = () => {
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.proximanovaBlack }}>
+            <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.poppinsBlack }}>
               Favorite Venues
             </Text>
             {!isExpanded && (
@@ -98,7 +98,6 @@ export const VenueSelector = () => {
                   color: textMuted,
                   fontWeight: "600",
                   marginTop: 4,
-                  fontFamily: FONT_FAMILY.proximaNovaSemiBold,
                 }}
               >
                 Select your favourite venues to see matching shows in the "My
@@ -152,7 +151,7 @@ export const VenueSelector = () => {
                     fontSize: 14,
                     fontWeight: "700",
                     color: isSelected ? primary : text,
-                    fontFamily: FONT_FAMILY.proximaNovaBold,
+                    fontFamily: FONT_FAMILY.poppinsBold,
                   }}
                 >
                   {decodedName}
@@ -167,7 +166,7 @@ export const VenueSelector = () => {
               fontWeight: "500",
               marginTop: 16,
               letterSpacing: 0.3,
-              fontFamily: FONT_FAMILY.proximaNova,
+              fontFamily: FONT_FAMILY.poppinsRegular
             }}
           >
             WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH

@@ -11,6 +11,7 @@
     "deploy:testflight": "npx testflight --non-interactive"
   },
   "dependencies": {
+    "@expo-google-fonts/poppins": "^0.4.1",
     "@expo/metro-runtime": "~5.0.5",
     "@expo/vector-icons": "^14.1.0",
     "@gorhom/bottom-sheet": "5.2.0",
