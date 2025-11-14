@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
-import { MapPin, ChevronDown, ChevronRight } from "lucide-react-native";
+import { View, Text, Pressable, ScrollView, TextInput } from "react-native";
+import { MapPin, ChevronDown, ChevronRight, Search, X } from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { decodeHtmlEntities, fetchVenues } from "../services/eventService";
@@ -21,8 +21,14 @@ export const VenueSelector = () => {
     isPremium,
   } = useUserPreferences();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const currentCityVenues = favoriteVenues?.[selectedCity] || [];
+
+  // Filter venues based on search query
+  const filteredVenues = allVenues.filter((venue) =>
+    venue.venue.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleVenuePress = (venueName: string) => {
     const isAlreadySelected = currentCityVenues.includes(venueName);
@@ -118,47 +124,104 @@ export const VenueSelector = () => {
       {isExpanded && (
         <View
           style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 8,
-            paddingTop: 30,
+            paddingTop: 20,
           }}
         >
-          {allVenues.map((venue) => {
-            const decodedName = decodeHtmlEntities(venue.venue);
+          {/* Search Bar */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: cardBackground,
+              borderWidth: 1,
+              borderColor: border,
+              borderRadius: 12,
+              paddingHorizontal: 12,
+              marginBottom: 20,
+              justifyContent: "center",
+            }}
+          >
+            <Search size={18} color={textMuted} style={{ marginRight: 10 }} />
+            <TextInput
+              placeholder="Search venues..."
+              placeholderTextColor={textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={{
+                flex: 1,
+                fontSize: 14,
+                color: text,
+                fontFamily: FONT_FAMILY.poppinsRegular,
+                textAlignVertical: "center",
+                paddingTop: 15,
+              }}
+            />
+            {searchQuery.length > 0 && (
+              <Pressable onPress={() => setSearchQuery("")} style={{ marginLeft: 8 }}>
+                <X size={18} color={textMuted} />
+              </Pressable>
+            )}
+          </View>
 
-            const isSelected = currentCityVenues.includes(venue.venue);
-            const canSelect =
-              isPremium || isSelected || currentCityVenues.length < 3;
+          {/* Venues List */}
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 8,
+            }}
+          >
+            {filteredVenues.length > 0 ? (
+              filteredVenues.map((venue) => {
+                const decodedName = decodeHtmlEntities(venue.venue);
 
-            return (
-              <Pressable
-                key={venue.id}
-                onPress={() => handleVenuePress(venue.venue)}
-                disabled={!canSelect && !isSelected}
+                const isSelected = currentCityVenues.includes(venue.venue);
+                const canSelect =
+                  isPremium || isSelected || currentCityVenues.length < 3;
+
+                return (
+                  <Pressable
+                    key={venue.id}
+                    onPress={() => handleVenuePress(venue.venue)}
+                    disabled={!canSelect && !isSelected}
+                    style={{
+                      paddingVertical: 10,
+                      paddingHorizontal: 16,
+                      borderRadius: 20,
+                      borderWidth: 2,
+                      borderColor: isSelected ? primary : border,
+                      backgroundColor: isSelected ? primary + "20" : "transparent",
+                      opacity: !canSelect && !isSelected ? 0.4 : 1,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "700",
+                        color: isSelected ? primary : text,
+                        fontFamily: FONT_FAMILY.poppinsBold,
+                      }}
+                    >
+                      {decodedName}
+                    </Text>
+                  </Pressable>
+                );
+              })
+            ) : (
+              <Text
                 style={{
-                  paddingVertical: 10,
-                  paddingHorizontal: 16,
-                  borderRadius: 20,
-                  borderWidth: 2,
-                  borderColor: isSelected ? primary : border,
-                  backgroundColor: isSelected ? primary + "20" : "transparent",
-                  opacity: !canSelect && !isSelected ? 0.4 : 1,
+                  fontSize: 13,
+                  color: textMuted,
+                  fontWeight: "500",
+                  fontFamily: FONT_FAMILY.poppinsRegular,
+                  marginTop: 12,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "700",
-                    color: isSelected ? primary : text,
-                    fontFamily: FONT_FAMILY.poppinsBold,
-                  }}
-                >
-                  {decodedName}
-                </Text>
-              </Pressable>
-            );
-          })}
+                No venues found matching "{searchQuery}"
+              </Text>
+            )}
+          </View>
+
           <Text
             style={{
               fontSize: 12,
@@ -166,7 +229,7 @@ export const VenueSelector = () => {
               fontWeight: "500",
               marginTop: 16,
               letterSpacing: 0.3,
-              fontFamily: FONT_FAMILY.poppinsRegular
+              fontFamily: FONT_FAMILY.poppinsRegular,
             }}
           >
             WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH

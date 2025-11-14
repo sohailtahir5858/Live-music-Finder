@@ -7,8 +7,6 @@ import { Skeleton } from '../components/ui';
 import LoginScreen from '../screens/LoginScreen';
 import FeedbackScreen from '../screens/FeedbackScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import { ShowDetailScreen } from '../screens/ShowDetailScreen';
-import { FilterScreen } from '../screens/FilterScreen';
 import CitySelectionScreen from '../screens/CitySelectionScreen';
 import MainTabNavigator from './MainTabNavigator';
 import { useAppStateStore } from '../stores/appStateStore';
@@ -21,8 +19,6 @@ export type RootStackParamList = {
   MainTabs: undefined;
   Feedback: undefined;
   Profile: undefined;
-  ShowDetail: { showId: string };
-  Filter: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -117,8 +113,6 @@ export const RootNavigator = () => {
           {/* DETAIL SCREENS - These hide the tabs automatically */}
           <Stack.Screen name="Feedback" component={FeedbackScreen}/>
           <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="ShowDetail" component={ShowDetailScreen} />
-          <Stack.Screen name="Filter" component={FilterScreen} />
         </>
       )}
     </Stack.Navigator>

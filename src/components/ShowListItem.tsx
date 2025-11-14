@@ -36,7 +36,7 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
     <Pressable
       onPress={onPress}
       style={({ pressed }) => ({
-        marginHorizontal: 24,
+        // marginHorizontal: 24,
         marginBottom: 12,
         padding: 16,
         backgroundColor: cardBackground,
@@ -134,6 +134,7 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
           backgroundColor: isFavorite ? '#f2a41e20' : 'transparent',
           alignItems: 'center',
           justifyContent: 'center',
+          marginTop:-50
         }}
       >
         <Heart

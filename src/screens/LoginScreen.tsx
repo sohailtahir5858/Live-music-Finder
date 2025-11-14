@@ -298,8 +298,7 @@ export default function LoginScreen() {
                     <Text
                       style={{
                         fontSize: 36,
-                        fontWeight: "800",
-                        fontFamily: theme.fontFamilyBlack,
+                        fontFamily: theme.fontFamilyBold,
                         color: theme.text,
                         marginBottom: 12,
                         textAlign: "center",
@@ -321,7 +320,7 @@ export default function LoginScreen() {
                       marginBottom: 8,
                     }}
                   >
-                    Discover live music in Kelowna & Nelson
+                   One app. Every show.
                   </Text>
 
                   <View
@@ -348,8 +347,8 @@ export default function LoginScreen() {
                       style={{
                         fontSize: 14,
                         color: theme.primary,
-                        fontWeight: "600",
                         letterSpacing: 0.3,
+                        fontFamily: theme.fontFamilySemiBold,
                       }}
                     >
                       Your backstage pass to local shows

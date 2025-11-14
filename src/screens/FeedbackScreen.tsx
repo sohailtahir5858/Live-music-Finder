@@ -305,10 +305,10 @@ export default function FeedbackScreen({ navigation }) {
           </View>
         </View>
 
-        <CategoryFilter 
+        {/* <CategoryFilter 
           selectedCategory={filterCategory}
           onSelectCategory={setFilterCategory}
-        />
+        /> */}
 
         <View style={{ flex: 1 }}>
           {feedbacks.length === 0 && !loading ? (
@@ -323,8 +323,9 @@ export default function FeedbackScreen({ navigation }) {
                 marginTop: 16,
                 marginBottom: 8,
                 fontFamily: FONT_FAMILY.poppinsSemiBold,
+                textAlign: 'center',
               }}>
-                No feedback yet
+               Feature requests, feedback or having an issue? 
               </Text>
               <Text style={{
                 fontSize: 14,
@@ -333,7 +334,7 @@ export default function FeedbackScreen({ navigation }) {
                 marginBottom: 16,
                 fontFamily: FONT_FAMILY.poppinsRegular,
               }}>
-                Be the first to share your thoughts and suggestions
+               We’d love to hear from you.
               </Text>
               <TouchableOpacity
                 onPress={() => setShowCreateModal(true)}

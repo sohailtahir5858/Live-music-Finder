@@ -50,7 +50,7 @@ export const FavoritesScreen = () => {
     toggleFavoriteShow,
   } = useUserPreferences();
   const { isAuthenticated } = useAppStateStore();
-
+  console.log(favoriteShows, "favoriteShows");
   const [shows, setShows] = useState<Show[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -271,7 +271,7 @@ export const FavoritesScreen = () => {
                   style={{
                     fontSize: 14,
                     color: textMuted,
-                    fontWeight: "500",
+                    fontFamily: FONT_FAMILY.poppinsMedium,
                   }}
                 >
                   Favorite Shows
@@ -497,7 +497,18 @@ const ShowCard = ({
               }}
             >
               {show.genre.slice(0, 2).map((genre, i) => (
-                <View key={i} style={{ borderRadius: 12, overflow: "hidden" }}>
+                <View
+                  key={i}
+                  style={{
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}
+                >
                   <View
                     style={{
                       paddingHorizontal: 12,

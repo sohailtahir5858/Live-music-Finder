@@ -258,11 +258,9 @@ export const fetchEvents = async (
       ? options.dateTo
       : `${options.dateTo} 23:59:59`;
   }
-
   let url = `${baseUrl}?page=${page}&per_page=10&start_date=${encodeURIComponent(
     startDate
   )}&end_date=${encodeURIComponent(endDate)}&status=publish`;
-
   // Add category filters if provided
   if (options?.categoryIds && options.categoryIds.length > 0) {
     options.categoryIds.forEach((catId) => {
@@ -277,9 +275,9 @@ export const fetchEvents = async (
     let events = mapWordPressEventsToAppFormat(data);
 
     // Apply time filter in memory if provided
-    if (options?.timeFilter) {
-      events = filterEventsByTime(events, options.timeFilter);
-    }
+    // if (options?.timeFilter) {
+    //   events = filterEventsByTime(events, options.timeFilter);
+    // }
 
     return {
       events: events,
@@ -302,27 +300,57 @@ export const fetchEvents = async (
 // Helper function to filter events by time of day
 function filterEventsByTime(events: Show[], timeFilter: string): Show[] {
   const getHourFromTime = (timeStr: string): number => {
-    const match = timeStr.match(/(\d+):/);
-    return match ? parseInt(match[1], 10) : 0;
+    // Match time with optional AM/PM
+    const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/i);
+    if (!match) {
+      console.log("⚠️ Failed to parse time:", timeStr);
+      return 0;
+    }
+    
+    let hour = parseInt(match[1], 10);
+    const period = match[3]?.toUpperCase();
+    
+    // Convert to 24-hour format
+    if (period === 'PM' && hour !== 12) {
+      hour += 12;
+    } else if (period === 'AM' && hour === 12) {
+      hour = 0;
+    }
+    
+    console.log(`⏰ Parsed "${timeStr}" -> hour: ${hour}, period: ${period}`);
+    return hour;
   };
 
-  return events.filter((event) => {
+  console.log(`🔍 Filtering ${events.length} events by timeFilter: "${timeFilter}"`);
+  
+  const filtered = events.filter((event) => {
     const hour = getHourFromTime(event.time);
+    let matches = false;
 
     switch (timeFilter) {
       case "morning":
-        return hour >= 6 && hour < 12;
+        matches = hour >= 6 && hour < 12;
+        break;
       case "afternoon":
-        return hour >= 12 && hour < 17;
+        matches = hour >= 12 && hour < 17;
+        break;
       case "evening":
-        return hour >= 17 && hour < 21;
+        matches = hour >= 17 && hour < 21;
+        break;
       case "night":
-        return hour >= 21 || hour < 6;
+        matches = hour >= 21 || hour < 6;
+        break;
       case "all-day":
       default:
-        return true;
+        matches = true;
     }
+    
+    console.log(`  ${matches ? '✅' : '❌'} "${event.title}" @ ${event.time} (hour: ${hour}) - ${matches ? 'INCLUDED' : 'EXCLUDED'}`);
+    return matches;
   });
+
+  console.log(`✅ Filtered result: ${filtered.length} events match "${timeFilter}"`);
+  return filtered;
 }
 
 export const fetchGenres = async (

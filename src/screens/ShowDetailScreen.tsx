@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Animated, Easing, Share, Linking, Platform } from 'react-native';
+import { View, Text, ScrollView, Pressable, Animated, Easing, Share, Linking, Platform, TouchableOpacity } from 'react-native';
 import { MapPin, Calendar, Clock, DollarSign, Users, ArrowLeft, Heart, Share2, CalendarPlus } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -18,6 +18,7 @@ import { AdCard } from '../components/AdCard';
 import { Ad, Ads } from '../magically/entities/Ad';
 import magically from 'magically-sdk';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export const ShowDetailScreen = () => {
   const { background, text, textMuted, primary, secondary, cardBackground } = useTheme();
@@ -25,7 +26,7 @@ export const ShowDetailScreen = () => {
   const route = useRoute<any>();
   const { show } = route.params || {};
   console.log("🚀 ~ ShowDetailScreen ~ show:", show._id)
-  const {  toggleFavoriteArtist, isPremium, selectedCity,favoriteShows } = useUserPreferences();
+  const {  toggleFavoriteArtist, isPremium, selectedCity,favoriteShows,toggleFavoriteShow } = useUserPreferences();
   console.log("🚀 ~ ShowDetailScreen ~ favoriteArtists:", favoriteShows)
   
   const [isLoading, setIsLoading] = useState(false);
@@ -71,16 +72,13 @@ export const ShowDetailScreen = () => {
   };
 
   const handleFavoritePress = () => {
-    if (!magically.auth.currentUser) {
-      navigation.navigate('Login' as never);
-      return;
-    }
+  
     if (show) {
       Animated.sequence([
         Animated.timing(heartScale, { toValue: 1.4, duration: 120, easing: Easing.bezier(0.4, 0, 0.2, 1), useNativeDriver: true }),
         Animated.spring(heartScale, { toValue: 1, useNativeDriver: true, friction: 5 }),
       ]).start();
-      toggleFavoriteArtist(show.artist);
+      toggleFavoriteShow(show);
     }
   };
 
@@ -186,38 +184,38 @@ export const ShowDetailScreen = () => {
               
               {/* Header Overlay */}
               <View style={{ position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', padding: 20 }}>
-                <Pressable
+                <TouchableOpacity
                   onPress={() => navigation.goBack()}
                   style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0, 0, 0, 0.6)', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <ArrowLeft size={22} color="#FFFFFF" strokeWidth={2.5} />
-                </Pressable>
+                </TouchableOpacity>
                 
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   {/* Share Button */}
-                  <Pressable
+                  <TouchableOpacity
                     onPress={handleSharePress}
                     style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0, 0, 0, 0.6)', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Share2 size={20} color="#FFFFFF" strokeWidth={2.5} />
-                  </Pressable>
+                  </TouchableOpacity>
                   
                   {/* Calendar Button */}
-                  <Pressable
+                  <TouchableOpacity
                     onPress={handleAddToCalendar}
                     style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0, 0, 0, 0.6)', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <CalendarPlus size={20} color="#FFFFFF" strokeWidth={2.5} />
-                  </Pressable>
+                  </TouchableOpacity>
                   
                   {/* Favorite Button */}
                   <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                    <Pressable
+                    <TouchableOpacity
                       onPress={handleFavoritePress}
                       style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: isFavorite ? primary : 'rgba(0, 0, 0, 0.6)', alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Heart size={20} color="#FFFFFF" fill={isFavorite ? '#FFFFFF' : 'transparent'} strokeWidth={2.5} />
-                    </Pressable>
+                    </TouchableOpacity>
                   </Animated.View>
                 </View>
               </View>
@@ -225,8 +223,8 @@ export const ShowDetailScreen = () => {
               {/* Event Categories */}
               <View style={{ position: 'absolute', bottom: 24, left: 2, flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 {show.genre.map((genre: string, i: number) => (
-                  <View key={i} style={{ borderRadius: 12, overflow: 'hidden', backgroundColor: '#f2a41e', paddingHorizontal: 12, paddingVertical: 6 }}>
-                    <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  <View key={i} style={{ borderRadius: 12, overflow: 'hidden', backgroundColor: '#f2a41e', paddingHorizontal: 12, paddingVertical: 6, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 5 }}>
+                    <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: FONT_FAMILY.poppinsBlack }}>
                       {genre}
                     </Text>
                   </View>
@@ -343,6 +341,104 @@ export const ShowDetailScreen = () => {
                 </Text>
               </View>
             )}
+
+            {/* Action Buttons Section */}
+            <View style={{ marginTop: 30, marginBottom: 30 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 20 }}>
+                {/* Share Button */}
+                <TouchableOpacity
+                  onPress={handleSharePress}
+                  style={{ alignItems: 'center' }}
+                >
+                  <LinearGradient
+                    colors={['#FF6B6B', '#C92A2A']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 45,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 12,
+                      overflow: 'hidden',
+                      shadowColor: "#FF6B6B",
+                      shadowOffset: { width: 0, height: 8 },
+                      shadowOpacity: 0.35,
+                      shadowRadius: 12,
+                      elevation: 12
+                    }}
+                  >
+                    <Share2 size={32} color="#FFFFFF" strokeWidth={1.5} />
+                  </LinearGradient>
+                  <Text style={{ fontSize: 12, fontWeight: '900', color: text, textAlign: 'center', fontFamily: FONT_FAMILY.poppinsBlack, letterSpacing: 0.3 }}>
+                    SHARE{'\n'}EVENT
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Add to Calendar Button */}
+                <TouchableOpacity
+                  onPress={handleAddToCalendar}
+                  style={{ alignItems: 'center' }}
+                >
+                  <LinearGradient
+                    colors={['#845EC2', '#5A189A']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 45,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 12,
+                      overflow: 'hidden',
+                      shadowColor: "#845EC2",
+                      shadowOffset: { width: 0, height: 8 },
+                      shadowOpacity: 0.35,
+                      shadowRadius: 12,
+                      elevation: 12
+                    }}
+                  >
+                    <CalendarPlus size={32} color="#FFFFFF" strokeWidth={1.5} />
+                  </LinearGradient>
+                  <Text style={{ fontSize: 12, fontWeight: '900', color: text, textAlign: 'center', fontFamily: FONT_FAMILY.poppinsBlack, letterSpacing: 0.3 }}>
+                    ADD TO{'\n'}CALENDAR
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Save to Favorites Button */}
+                <TouchableOpacity
+                  onPress={handleFavoritePress}
+                  style={{ alignItems: 'center' }}
+                >
+                  <LinearGradient
+                    colors={['#00D4FF', '#0099CC']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 45,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 12,
+                      overflow: 'hidden',
+                      shadowColor: "#00D4FF",
+                      shadowOffset: { width: 0, height: 8 },
+                      shadowOpacity: 0.35,
+                      shadowRadius: 12,
+                      elevation: 12
+                    }}
+                  >
+                    <Heart size={32} color="#FFFFFF" strokeWidth={1.5} fill="none" />
+                  </LinearGradient>
+                  <Text style={{ fontSize: 12, fontWeight: '900', color: text, textAlign: 'center', fontFamily: FONT_FAMILY.poppinsBlack, letterSpacing: 0.3 }}>
+                    SAVE TO{'\n'}FAVOURITES
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </ScrollView>
         </Animated.View>
       </SafeAreaView>

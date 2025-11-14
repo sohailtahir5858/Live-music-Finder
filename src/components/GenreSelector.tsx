@@ -4,8 +4,14 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
-import { ChevronDown, ChevronRight, Music } from "lucide-react-native";
+import { View, Text, Pressable, ScrollView, TextInput } from "react-native";
+import {
+  ChevronDown,
+  ChevronRight,
+  Music,
+  Search,
+  X,
+} from "lucide-react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { decodeHtmlEntities, fetchGenres } from "../services/eventService";
@@ -21,8 +27,14 @@ export const GenreSelector = () => {
     selectedCity,
   } = useUserPreferences();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const currentCityGenres = favoriteGenres?.[selectedCity] || [];
+
+  // Filter genres based on search query
+  const filteredGenres = allGenres.filter((genre) =>
+    genre.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleGenrePress = (genreName: string) => {
     const isAlreadySelected = currentCityGenres.includes(genreName);
@@ -55,11 +67,25 @@ export const GenreSelector = () => {
           }}
         >
           <Music size={20} color={primary} style={{ marginRight: 8 }} />
-          <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.poppinsBlack }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "800",
+              color: text,
+              fontFamily: FONT_FAMILY.poppinsBlack,
+            }}
+          >
             Favorite Genres
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}>
+        <Text
+          style={{
+            fontSize: 13,
+            color: textMuted,
+            fontWeight: "600",
+            fontFamily: FONT_FAMILY.poppinsSemiBold,
+          }}
+        >
           Loading genres...
         </Text>
       </View>
@@ -88,7 +114,14 @@ export const GenreSelector = () => {
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Music size={20} color={primary} style={{ marginRight: 8 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.poppinsBlack }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "800",
+                color: text,
+                fontFamily: FONT_FAMILY.poppinsBlack,
+              }}
+            >
               Favorite Genres
             </Text>
             {!isExpanded && (
@@ -118,46 +151,108 @@ export const GenreSelector = () => {
       {isExpanded && (
         <View
           style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 8,
-            paddingTop: 30,
+            paddingTop: 20,
           }}
         >
-          {allGenres.map((genre) => {
-            const decodedName = decodeHtmlEntities(genre.name);
-            const isSelected = currentCityGenres.includes(genre.name);
-            const canSelect =
-              isPremium || isSelected || currentCityGenres.length < 3;
-
-            return (
+          {/* Search Bar */}
+          <View
+             style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: cardBackground,
+              borderWidth: 1,
+              borderColor: border,
+              borderRadius: 12,
+              paddingHorizontal: 12,
+              marginBottom: 20,
+              justifyContent: "center",
+            }}
+          >
+            <Search size={18} color={textMuted} style={{ marginRight: 10 }} />
+            <TextInput
+              placeholder="Search genres..."
+              placeholderTextColor={textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={{
+                flex: 1,
+                fontSize: 14,
+                color: text,
+                fontFamily: FONT_FAMILY.poppinsRegular,
+                textAlignVertical: "center",
+                paddingTop: 15,
+              }}
+            />
+            {searchQuery.length > 0 && (
               <Pressable
-                key={genre.id}
-                onPress={() => handleGenrePress(genre.name)}
-                disabled={!canSelect && !isSelected}
+                onPress={() => setSearchQuery("")}
+                style={{ marginLeft: 8 }}
+              >
+                <X size={18} color={textMuted} />
+              </Pressable>
+            )}
+          </View>
+
+          {/* Genres List */}
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 8,
+            }}
+          >
+            {filteredGenres.length > 0 ? (
+              filteredGenres.map((genre) => {
+                const decodedName = decodeHtmlEntities(genre.name);
+                const isSelected = currentCityGenres.includes(genre.name);
+                const canSelect =
+                  isPremium || isSelected || currentCityGenres.length < 3;
+
+                return (
+                  <Pressable
+                    key={genre.id}
+                    onPress={() => handleGenrePress(genre.name)}
+                    disabled={!canSelect && !isSelected}
+                    style={{
+                      paddingVertical: 10,
+                      paddingHorizontal: 16,
+                      borderRadius: 20,
+                      borderWidth: 2,
+                      borderColor: isSelected ? primary : border,
+                      backgroundColor: isSelected
+                        ? primary + "20"
+                        : "transparent",
+                      opacity: !canSelect && !isSelected ? 0.4 : 1,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "700",
+                        color: isSelected ? primary : text,
+                        fontFamily: FONT_FAMILY.poppinsBold,
+                      }}
+                    >
+                      {decodedName}
+                    </Text>
+                  </Pressable>
+                );
+              })
+            ) : (
+              <Text
                 style={{
-                  paddingVertical: 10,
-                  paddingHorizontal: 16,
-                  borderRadius: 20,
-                  borderWidth: 2,
-                  borderColor: isSelected ? primary : border,
-                  backgroundColor: isSelected ? primary + "20" : "transparent",
-                  opacity: !canSelect && !isSelected ? 0.4 : 1,
+                  fontSize: 13,
+                  color: textMuted,
+                  fontWeight: "500",
+                  fontFamily: FONT_FAMILY.poppinsRegular,
+                  marginTop: 12,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "700",
-                    color: isSelected ? primary : text,
-                    fontFamily: FONT_FAMILY.poppinsBold,
-                  }}
-                >
-                  {decodedName}
-                </Text>
-              </Pressable>
-            );
-          })}
+                No genres found matching "{searchQuery}"
+              </Text>
+            )}
+          </View>
+
           <Text
             style={{
               fontSize: 12,
@@ -165,7 +260,7 @@ export const GenreSelector = () => {
               fontWeight: "500",
               marginTop: 16,
               letterSpacing: 0.3,
-              fontFamily: FONT_FAMILY.poppinsRegular
+              fontFamily: FONT_FAMILY.poppinsRegular,
             }}
           >
             WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH

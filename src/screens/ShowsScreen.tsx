@@ -52,6 +52,7 @@ export const ShowsScreen = () => {
     viewMode,
     setViewMode,
     hasLoadedPreferences,
+    allGenres,
   } = useUserPreferences();
   const { activeFilters, hasActiveFilters } = useFilterStore();
 
@@ -66,7 +67,15 @@ export const ShowsScreen = () => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(30)).current;
 
-  // Clean up genre text by removing trailing semicolons and extra whitespace
+  // Helper function to convert genre names to category IDs
+  const genreNamesToIds = (genreNames: string[]): string[] => {
+    return genreNames
+      .map(name => {
+        const genre = allGenres.find(g => g.name === name);
+        return genre?.id.toString();
+      })
+      .filter((id): id is string => id !== undefined);
+  };
  
 
   useEffect(() => {
@@ -101,17 +110,22 @@ export const ShowsScreen = () => {
       }
 
       // Build filter options from activeFilters
+      // Convert genre names to category IDs
+      const categoryIds =
+        activeFilters.genres && activeFilters.genres.length > 0
+          ? genreNamesToIds(activeFilters.genres)
+          : undefined;
+
       const filterOptions = {
-        categoryIds:
-          activeFilters.genres && activeFilters.genres.length > 0
-            ? activeFilters.genres
-            : undefined,
+        categoryIds,
         timeFilter: activeFilters.timeFilter,
         dateFrom: activeFilters.dateFrom,
         dateTo: activeFilters.dateTo,
       };
+console.log("Loading shows with filters:", filterOptions);
 
       const result = await fetchEvents(selectedCity, page, filterOptions);
+      console.log("🚀 ~ loadShows ~ result:", result)
       setTotalShows(result.total);
       if (page === 1) {
         setShows(result.events);
@@ -297,8 +311,7 @@ export const ShowsScreen = () => {
                   style={{
                     fontSize: 14,
                     color: textMuted,
-                    fontWeight: "500",
-                    fontFamily: FONT_FAMILY.poppinsRegular
+                    fontFamily: FONT_FAMILY.poppinsMedium
                   }}
                 >
                   Upcoming Shows
@@ -534,7 +547,7 @@ const ShowCard = ({
               }}
             >
               {show.genre.slice(0, 2).map((genre, i) => (
-                <View key={i} style={{ borderRadius: 12, overflow: "hidden" }}>
+                <View key={i} style={{ borderRadius: 12, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 5 }}>
                   <View
                     style={{
                       paddingHorizontal: 12,
