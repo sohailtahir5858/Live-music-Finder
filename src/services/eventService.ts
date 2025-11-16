@@ -1,4 +1,5 @@
 import { Show } from "../magically/entities/Show";
+import { formatDate, TIME_FILTERS } from "../utils/filterHelpers";
 
 /**
  * Service for fetching events from WordPress REST API
@@ -51,11 +52,6 @@ interface WordPressImage {
       url: string;
     };
     [key: string]: any;
-  };
-  "et-pb-image--responsive--phone"?: {
-    url: string;
-    width: number;
-    height: number;
   };
 }
 
@@ -220,8 +216,10 @@ export const fetchEvents = async (
     timeFilter?: string;
     dateFrom?: string;
     dateTo?: string;
+    venueIds?: string[];
   }
 ): Promise<FinalEventsI> => {
+  console.log(".......", options);
   const baseUrl =
     city.toLowerCase() === "nelson"
       ? "https://livemusicnelson.ca/wp-json/tribe/events/v1/events/"
@@ -258,26 +256,65 @@ export const fetchEvents = async (
       ? options.dateTo
       : `${options.dateTo} 23:59:59`;
   }
+
+  // IMPORTANT: We always send the FULL 24-hour day to the API
+  // Time filtering (morning/afternoon/evening/night) happens CLIENT-SIDE after fetching
+
+  // Store the selected time filter for local filtering after API response
+  const selectedTimeFilter = options?.timeFilter;
+  console.log("🚀 ~ fetchEvents ~ selectedTimeFilter:", selectedTimeFilter)
+  if (selectedTimeFilter) {
+    const timeFilter = TIME_FILTERS.find(
+      (tf) => tf.value === options.timeFilter
+    );
+    if (timeFilter && timeFilter.dateRange) {
+      const { from, to } = timeFilter.dateRange;
+      startDate = formatDate(new Date(from));
+      endDate = formatDate(new Date(to)).split("T")[0] + "T23:59:59";
+    }
+  }
+
   let url = `${baseUrl}?page=${page}&per_page=10&start_date=${encodeURIComponent(
     startDate
-  )}&end_date=${encodeURIComponent(endDate)}&status=publish`;
+  )}&end_date=${encodeURIComponent(endDate)}&strict_dates=true&status=publish`;
   // Add category filters if provided
   if (options?.categoryIds && options.categoryIds.length > 0) {
     options.categoryIds.forEach((catId) => {
       url += `&categories[]=${catId}`;
     });
   }
-
+  // Add venue filters if provided
+  if (options?.venueIds && options.venueIds.length > 0) {
+    options.venueIds.forEach((venueId) => {
+      url += `&venue[]=${venueId}`;
+    });
+  }
+  console.log(url, "url");
   try {
     const response = await fetch(url);
     const data: WordPressApiResponse = await response.json();
 
     let events = mapWordPressEventsToAppFormat(data);
+    console.log(`✅ Fetched ${events.length} events from API (full day)`);
 
-    // Apply time filter in memory if provided
-    // if (options?.timeFilter) {
-    //   events = filterEventsByTime(events, options.timeFilter);
-    // }
+    // Apply time filter locally if user selected a specific time of day
+    if (selectedTimeFilter) {
+      if (selectedTimeFilter === "all-day") {
+        console.log(
+          `📋 Showing all ${events.length} events (all-day selected)`
+        );
+      } else {
+        const beforeCount = events.length;
+        events = filterEventsByTime(events, selectedTimeFilter);
+        console.log(
+          `🎯 Filtered to ${
+            events.length
+          } events for "${selectedTimeFilter}" (removed ${
+            beforeCount - events.length
+          })`
+        );
+      }
+    }
 
     return {
       events: events,
@@ -297,59 +334,72 @@ export const fetchEvents = async (
   }
 };
 
-// Helper function to filter events by time of day
+// Helper function to filter events by time of day (CLIENT-SIDE)
 function filterEventsByTime(events: Show[], timeFilter: string): Show[] {
   const getHourFromTime = (timeStr: string): number => {
     // Match time with optional AM/PM
     const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/i);
     if (!match) {
-      console.log("⚠️ Failed to parse time:", timeStr);
+      console.warn("⚠️ Failed to parse time:", timeStr);
       return 0;
     }
-    
+
     let hour = parseInt(match[1], 10);
     const period = match[3]?.toUpperCase();
-    
+
     // Convert to 24-hour format
-    if (period === 'PM' && hour !== 12) {
+    if (period === "PM" && hour !== 12) {
       hour += 12;
-    } else if (period === 'AM' && hour === 12) {
+    } else if (period === "AM" && hour === 12) {
       hour = 0;
     }
-    
-    console.log(`⏰ Parsed "${timeStr}" -> hour: ${hour}, period: ${period}`);
+
     return hour;
   };
 
-  console.log(`🔍 Filtering ${events.length} events by timeFilter: "${timeFilter}"`);
-  
+  console.log(
+    `🎬 Applying "${timeFilter}" filter to ${events.length} events...`
+  );
+
   const filtered = events.filter((event) => {
     const hour = getHourFromTime(event.time);
     let matches = false;
 
     switch (timeFilter) {
       case "morning":
+        // 6:00 AM to 11:59 AM
         matches = hour >= 6 && hour < 12;
         break;
       case "afternoon":
+        // 12:00 PM to 4:59 PM
         matches = hour >= 12 && hour < 17;
         break;
       case "evening":
+        // 5:00 PM to 8:59 PM
         matches = hour >= 17 && hour < 21;
         break;
       case "night":
+        // 9:00 PM to 5:59 AM
         matches = hour >= 21 || hour < 6;
         break;
       case "all-day":
       default:
         matches = true;
     }
-    
-    console.log(`  ${matches ? '✅' : '❌'} "${event.title}" @ ${event.time} (hour: ${hour}) - ${matches ? 'INCLUDED' : 'EXCLUDED'}`);
+
+    // Only log excluded events to reduce console noise
+    if (!matches) {
+      console.log(
+        `  ⏭️  Skipping "${event.title}" @ ${event.time} (hour: ${hour})`
+      );
+    }
+
     return matches;
   });
 
-  console.log(`✅ Filtered result: ${filtered.length} events match "${timeFilter}"`);
+  console.log(
+    `✅ Filter complete: ${filtered.length}/${events.length} events match "${timeFilter}"`
+  );
   return filtered;
 }
 
@@ -462,20 +512,35 @@ export function mapWordPressEventsToAppFormat(
       minute: "2-digit",
     });
 
-    // Use highest resolution image available, fallback to medium, then main url
-    const phoneImage = event.image?.["et-pb-image--responsive--phone"];
-    const imageUrl =
-      (phoneImage && phoneImage.url) || event.image?.url || undefined;
+    // Extract image variants for different screen sizes
+    const mobileImageData =
+      event.image?.sizes?.["et-pb-image--responsive--phone"];
+    const hdImageData = event.image; // Main image is HD
 
-    // derive width/height from the same source if available
-    const width =
-      phoneImage?.width ??
-      event.image?.sizes?.medium?.width ??
-      event.image?.width;
-    const height =
-      phoneImage?.height ??
-      event.image?.sizes?.medium?.height ??
-      event.image?.height;
+    // Determine which image to use as primary (fallback chain: mobile → medium → main)
+    const imageUrl =
+      (mobileImageData && mobileImageData.url) || event.image?.url || undefined;
+    const width = mobileImageData?.width ?? event.image?.width;
+    const height = mobileImageData?.height ?? event.image?.height;
+
+    // Build mobile image object if available
+    const mobileImage = mobileImageData
+      ? {
+          url: mobileImageData.url,
+          width: mobileImageData.width,
+          height: mobileImageData.height,
+        }
+      : undefined;
+
+    // Build HD image object if available
+    const hdImage =
+      hdImageData && hdImageData.url
+        ? {
+            url: hdImageData.url,
+            width: hdImageData.width,
+            height: hdImageData.height,
+          }
+        : undefined;
 
     return {
       _id: event.id.toString(),
@@ -499,6 +564,8 @@ export function mapWordPressEventsToAppFormat(
       imageUrl: imageUrl!,
       imageHeight: height!,
       imageWidth: width!,
+      mobileImage,
+      hdImage,
       price: event.cost && event.cost !== "Free" ? `$${event.cost}` : "Free",
       capacity: undefined, // not in WP data
       popularity: 4 + Math.random() * 1, // mock rating 4–5

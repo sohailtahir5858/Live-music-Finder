@@ -9,6 +9,7 @@ import { FavoritesScreen } from '../screens/FavoritesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { ShowDetailScreen } from '../screens/ShowDetailScreen';
 import { FilterScreen } from '../screens/FilterScreen';
+import FeedbackScreen from '../screens/FeedbackScreen';
 
 // Define tab types explicitly - 3 tabs only
 export type MainTabsParamList = {
@@ -23,8 +24,20 @@ export type ShowsStackParamList = {
   Filter: undefined;
 };
 
+export type FavoritesStackParamList = {
+  FavoritesList: undefined;
+  ShowDetail: { show: any };
+};
+
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  Feedback: undefined;
+};
+
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 const ShowsStack = createNativeStackNavigator<ShowsStackParamList>();
+const FavoritesStack = createNativeStackNavigator<FavoritesStackParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
 // Shows Stack Navigator - keeps tab bar visible
 const ShowsStackNavigator = () => {
@@ -38,6 +51,34 @@ const ShowsStackNavigator = () => {
       <ShowsStack.Screen name="ShowDetail" component={ShowDetailScreen} />
       <ShowsStack.Screen name="Filter" component={FilterScreen} />
     </ShowsStack.Navigator>
+  );
+};
+
+// Favorites Stack Navigator - keeps tab bar visible
+const FavoritesStackNavigator = () => {
+  return (
+    <FavoritesStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <FavoritesStack.Screen name="FavoritesList" component={FavoritesScreen} />
+      <FavoritesStack.Screen name="ShowDetail" component={ShowDetailScreen} />
+    </FavoritesStack.Navigator>
+  );
+};
+
+// Profile Stack Navigator - keeps tab bar visible, contains Profile and Feedback
+const ProfileStackNavigator = () => {
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+      <ProfileStack.Screen name="Feedback" component={FeedbackScreen} />
+    </ProfileStack.Navigator>
   );
 };
 
@@ -87,7 +128,7 @@ export const MainTabNavigator = () => {
             
             <Tab.Screen
                 name="Favorites"
-                component={FavoritesScreen}
+                component={FavoritesStackNavigator}
                 options={{
                     tabBarLabel: 'My Feed',
                     tabBarIcon: ({color}) => <Heart size={tabBarIconSize} color={color} />
@@ -96,7 +137,7 @@ export const MainTabNavigator = () => {
             
             <Tab.Screen
                 name="Profile"
-                component={ProfileScreen}
+                component={ProfileStackNavigator}
                 options={{
                     tabBarLabel: 'Profile',
                     tabBarIcon: ({color}) => <User size={tabBarIconSize} color={color} />

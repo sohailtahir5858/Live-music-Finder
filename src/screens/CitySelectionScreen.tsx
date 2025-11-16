@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, useThemeMode } from '../contexts/ThemeContext';
 import { FONT_FAMILY } from '../utils/fontConfig';
 import { useUserPreferences } from '../stores/userPreferencesStore';
+import { CityCard } from '../components/CityCard';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48;
@@ -79,7 +80,7 @@ export const CitySelectionScreen = () => {
           flex: 1, 
           backgroundColor: '#0A0A0A',
           paddingHorizontal: 24,
-          paddingTop: 40,
+          paddingTop: 50,
         }}
       >
         {/* Header */}
@@ -106,6 +107,8 @@ export const CitySelectionScreen = () => {
               textAlign: 'center',
               marginBottom: 12,
               fontFamily: FONT_FAMILY.poppinsBold,
+               marginTop: -15,
+
             }}
           >
             Choose Your City
@@ -129,8 +132,8 @@ export const CitySelectionScreen = () => {
           {/* Kelowna Card */}
           <CityCard
             city="Kelowna"
-            imageUrl="https://trymagically.com/api/media/image?query=kelowna%20bc%20canada%20city%20beautiful%20okanagan%20lake%20sunset"
-            description="Okanagan's vibrant music scene"
+            imageUrl={require("../../assets/images/kelowna.jpg")}
+            description="Heart of the Okanagan’s Live Music Scene"
             isSelected={selectedCity === 'Kelowna'}
             onSelect={() => handleCitySelect('Kelowna')}
             primary={primary}
@@ -143,8 +146,8 @@ export const CitySelectionScreen = () => {
           {/* Nelson Card */}
           <CityCard
             city="Nelson"
-            imageUrl="https://trymagically.com/api/media/image?query=nelson%20bc%20canada%20city%20mountains%20kootenay%20lake"
-            description="Kootenay's eclectic music hub"
+            imageUrl={require("../../assets/images/Nelson.jpg")}
+            description="Kootenay’s Eclectic Music Hub"
             isSelected={selectedCity === 'Nelson'}
             onSelect={() => handleCitySelect('Nelson')}
             primary={primary}
@@ -202,137 +205,6 @@ interface CityCardProps {
   isDark: boolean;
 }
 
-const CityCard: React.FC<CityCardProps> = ({
-  city,
-  imageUrl,
-  description,
-  isSelected,
-  onSelect,
-  primary,
-  text,
-  textMuted,
-  cardBackground,
-  isDark,
-}) => {
-  const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.97,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  return (
-    <Pressable
-      onPress={onSelect}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
-      <Animated.View
-        style={{
-          transform: [{ scale: scaleAnim }],
-          borderRadius: 20,
-          overflow: 'hidden',
-          borderWidth: isSelected ? 3 : 0,
-          borderColor: isSelected ? primary : 'transparent',
-        }}
-      >
-        <View style={{ height: 220, width: CARD_WIDTH, position: 'relative' }}>
-          {/* Background Image */}
-          <Image
-            source={{ uri: imageUrl }}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-            }}
-            resizeMode="cover"
-          />
-
-          {/* Dark Gradient Overlay */}
-          <View
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.3)',
-            }}
-          />
-
-          {/* Glassmorphic Content */}
-          <View style={{ flex: 1, justifyContent: 'flex-end', padding: 20 }}>
-            <BlurView
-              intensity={isDark ? 40 : 60}
-              tint={isDark ? 'dark' : 'light'}
-              style={{
-                borderRadius: 16,
-                overflow: 'hidden',
-                padding: 16,
-              }}
-            >
-              <View 
-                style={{ 
-                  backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.3)',
-                  borderRadius: 16,
-                  padding: 16,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <View style={{ flex: 1 }}>
-                    <Text 
-                      style={{ 
-                        fontSize: 24, 
-                        fontWeight: '700', 
-                        color: '#fff',
-                        marginBottom: 4,
-                        fontFamily: FONT_FAMILY.poppinsBold,
-                      }}
-                    >
-                      {city}
-                    </Text>
-                    <Text 
-                      style={{ 
-                        fontSize: 14, 
-                        color: 'rgba(255,255,255,0.9)',
-                        fontFamily: FONT_FAMILY.poppinsRegular,
-                      }}
-                    >
-                      {description}
-                    </Text>
-                  </View>
-
-                  {isSelected && (
-                    <View
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 16,
-                        backgroundColor: primary,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Check size={18} color="#fff" strokeWidth={3} />
-                    </View>
-                  )}
-                </View>
-              </View>
-            </BlurView>
-          </View>
-        </View>
-      </Animated.View>
-    </Pressable>
-  );
-};
 
 export default CitySelectionScreen;

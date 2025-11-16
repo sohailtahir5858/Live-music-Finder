@@ -78,6 +78,18 @@ export interface Show {
   imageUrl: string;
   imageWidth: number;
   imageHeight: number;
+  /** Mobile/responsive image object */
+  mobileImage?: {
+    url: string;
+    width: number;
+    height: number;
+  };
+  /** HD/high-resolution image object */
+  hdImage?: {
+    url: string;
+    width: number;
+    height: number;
+  };
   /** Ticket price (e.g., $25, Free) */
   price?: string;
   /** Venue capacity */

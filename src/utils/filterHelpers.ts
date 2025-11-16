@@ -7,6 +7,7 @@ export interface TimeRange {
   label: string;
   value: string;
   timeRange?: { startHour: number; endHour: number };
+  dateRange?: { from: string; to: string };
 }
 
 export interface DateRangePreset {
@@ -14,7 +15,18 @@ export interface DateRangePreset {
   value: string;
   getDateRange: () => { from: string; to: string };
 }
+export function formatDate(date = new Date(), format = "YYYY-MM-DD") {
+  const d = new Date(date);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const yyyy = d.getFullYear();
 
+  if (format === "YYYY-MM-DD") {
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  return `${mm}-${dd}-${yyyy}`; // default
+}
 /**
  * Time filter options with hour ranges for API filtering
  */
@@ -23,26 +35,31 @@ export const TIME_FILTERS: TimeRange[] = [
     label: 'All Day',
     value: 'all-day',
     timeRange: { startHour: 0, endHour: 23 },
+    dateRange:{from:formatDate(new Date()),to:formatDate(new Date()).split('T')[0]+'T23:59:59'}
   },
   {
     label: 'Morning',
     value: 'morning',
     timeRange: { startHour: 6, endHour: 11 },
+    dateRange:{from:formatDate(new Date())+'T06:00:00',to:formatDate(new Date())+'T12:00:00'}
   },
   {
     label: 'Afternoon',
     value: 'afternoon',
     timeRange: { startHour: 12, endHour: 16 },
+    dateRange:{from:formatDate(new Date())+'T12:00:00',to:formatDate(new Date())+'T17:00:00'}
   },
   {
     label: 'Evening',
     value: 'evening',
     timeRange: { startHour: 17, endHour: 20 },
+    dateRange:{from:formatDate(new Date())+'T17:00:00',to:formatDate(new Date())+'T21:00:00'}
   },
   {
     label: 'Night',
     value: 'night',
     timeRange: { startHour: 21, endHour: 23 },
+    dateRange:{from:formatDate(new Date())+'T21:00:00',to:formatDate(new Date())+'T23:59:59'}
   },
 ];
 

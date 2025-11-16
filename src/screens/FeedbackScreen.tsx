@@ -18,7 +18,7 @@ import {
 import { Feedback, Feedbacks } from '../magically/entities/Feedback';
 import magically from 'magically-sdk';
 
-export default function FeedbackScreen({ navigation }) {
+export default function FeedbackScreen({ navigation }: any) {
   const { background, primary, primaryForeground, borderRadius, text, textMuted, headerBackground, border } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -27,7 +27,7 @@ export default function FeedbackScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
-  const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const [filterCategory, setFilterCategory] = useState<'bug' | 'feature' | 'improvement' | 'other' | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const currentUser = magically.auth.currentUser;

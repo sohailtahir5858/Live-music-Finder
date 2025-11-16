@@ -5,8 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import magically from 'magically-sdk';
 import { Skeleton } from '../components/ui';
 import LoginScreen from '../screens/LoginScreen';
-import FeedbackScreen from '../screens/FeedbackScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import CitySelectionScreen from '../screens/CitySelectionScreen';
 import MainTabNavigator from './MainTabNavigator';
 import { useAppStateStore } from '../stores/appStateStore';
@@ -17,8 +15,6 @@ export type RootStackParamList = {
   Login: undefined;
   CitySelection: undefined;
   MainTabs: undefined;
-  Feedback: undefined;
-  Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -107,12 +103,9 @@ export const RootNavigator = () => {
       ) : (
         // Authenticated with city selected: Show main app
         <>
-          {/* TABS SCREEN - Shows bottom tabs */}
+          {/* TABS SCREEN WITH NESTED STACKS - Shows bottom tabs with nested navigators */}
+          {/* Includes: Shows (with ShowDetail & Filter), Favorites (with ShowDetail), Profile (with Feedback) */}
           <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-          
-          {/* DETAIL SCREENS - These hide the tabs automatically */}
-          <Stack.Screen name="Feedback" component={FeedbackScreen}/>
-          <Stack.Screen name="Profile" component={ProfileScreen} />
         </>
       )}
     </Stack.Navigator>

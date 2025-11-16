@@ -105,7 +105,7 @@ export const FavoritesScreen = () => {
   };
 
   const handleShowPress = (show: Show) => {
-    navigation.navigate("ShowDetail", { show });
+    navigation.navigate("ShowDetail" as never, { show } as never);
   };
 
   const handleFavoritePress = (show: Show) => {
@@ -260,9 +260,10 @@ export const FavoritesScreen = () => {
                 <Text
                   style={{
                     fontSize: 16,
-                    fontWeight: "bold",
                     color: text,
                     letterSpacing: 0.2,
+                    fontFamily: FONT_FAMILY.poppinsSemiBold,
+
                   }}
                 >
                   {shows.length}
@@ -274,7 +275,7 @@ export const FavoritesScreen = () => {
                     fontFamily: FONT_FAMILY.poppinsMedium,
                   }}
                 >
-                  Favorite Shows
+                Favorite Shows
                 </Text>
                 <View
                   style={{

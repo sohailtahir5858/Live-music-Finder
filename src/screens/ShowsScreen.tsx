@@ -22,7 +22,7 @@ import {
   Heart,
   Search,
   SlidersVertical,
-  LucideTableOfContents
+  LucideTableOfContents,
 } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -53,6 +53,7 @@ export const ShowsScreen = () => {
     setViewMode,
     hasLoadedPreferences,
     allGenres,
+    allVenues,
   } = useUserPreferences();
   const { activeFilters, hasActiveFilters } = useFilterStore();
 
@@ -63,20 +64,26 @@ export const ShowsScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalShows, setTotalShows] = useState(0);
-
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(30)).current;
 
   // Helper function to convert genre names to category IDs
   const genreNamesToIds = (genreNames: string[]): string[] => {
     return genreNames
-      .map(name => {
-        const genre = allGenres.find(g => g.name === name);
+      .map((name) => {
+        const genre = allGenres.find((g) => g.name === name);
         return genre?.id.toString();
       })
       .filter((id): id is string => id !== undefined);
   };
- 
+  const venueNamesToIds = (venueNames: string[]): string[] => {
+    return venueNames
+      .map((name) => {
+        const venue = allVenues.find((v) => v.venue === name);
+        return venue?.id.toString();
+      })
+      .filter((id): id is string => id !== undefined);
+  };
 
   useEffect(() => {
     Animated.parallel([
@@ -115,23 +122,27 @@ export const ShowsScreen = () => {
         activeFilters.genres && activeFilters.genres.length > 0
           ? genreNamesToIds(activeFilters.genres)
           : undefined;
+      const venueIds =
+        activeFilters.venues && activeFilters.venues.length > 0
+          ? venueNamesToIds(activeFilters.venues)
+          : undefined;
 
       const filterOptions = {
-        categoryIds,
+        categoryIds: categoryIds,
         timeFilter: activeFilters.timeFilter,
         dateFrom: activeFilters.dateFrom,
         dateTo: activeFilters.dateTo,
+        venueIds: venueIds,
       };
-console.log("Loading shows with filters:", filterOptions);
 
       const result = await fetchEvents(selectedCity, page, filterOptions);
-      console.log("🚀 ~ loadShows ~ result:", result)
-      setTotalShows(result.total);
+
       if (page === 1) {
-        setShows(result.events);
+        setShows(result?.events ?? []);
       } else {
         setShows((prev) => [...prev, ...result.events]);
       }
+      setTotalShows(result?.total ?? 0);
       setCurrentPage(page);
       setHasMore(result.events.length > 0);
     } catch (error) {
@@ -141,7 +152,6 @@ console.log("Loading shows with filters:", filterOptions);
       setIsLoadingMore(false);
     }
   };
-
   const loadMore = () => {
     if (!isLoadingMore && hasMore) {
       setIsLoadingMore(true);
@@ -171,8 +181,14 @@ console.log("Loading shows with filters:", filterOptions);
     toggleFavoriteShow(show);
   };
 
-  const isFavorite = (showId: string) => favoriteShows.some(s => s._id === showId);
-
+  const isFavorite = (showId: string) =>
+    favoriteShows.some((s) => s._id === showId);
+  function eventsLength() {
+    if (activeFilters.timeFilter) {
+      return shows.length ? shows.length : 0;
+    }
+    return totalShows < shows.length ? shows.length : totalShows;
+  }
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
       <View style={{ flex: 1, backgroundColor: background }}>
@@ -185,7 +201,13 @@ console.log("Loading shows with filters:", filterOptions);
             }}
           >
             {/* Header */}
-            <View style={{ marginTop: 12, marginBottom: 24,paddingHorizontal:Platform.OS=='android'? 20:10 }}>
+            <View
+              style={{
+                marginTop: 12,
+                marginBottom: 24,
+                paddingHorizontal: Platform.OS == "android" ? 20 : 10,
+              }}
+            >
               {/* Top row: Logo + Buttons */}
               <View
                 style={{
@@ -197,11 +219,24 @@ console.log("Loading shows with filters:", filterOptions);
               >
                 {/* Logo text with styling */}
                 <View style={{ flex: 1 }}>
-                  <Image source={selectedCity=='Kelowna'? require('./../../assets/images/Live-Music-Kelowna-White.png'):require('./../../assets/images/live-music-logo-white.png')} style={{width:170, height:70, resizeMode:'contain'}} />
+                  <Image
+                    source={
+                      selectedCity == "Kelowna"
+                        ? require("./../../assets/images/Live-Music-Kelowna-White.png")
+                        : require("./../../assets/images/live-music-logo-white.png")
+                    }
+                    style={{ width: 170, height: 70, resizeMode: "contain" }}
+                  />
                 </View>
 
                 {/* View Mode Toggle + Filter Buttons */}
-                <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 12,
+                    alignItems: "center",
+                  }}
+                >
                   {/* VIEW Button */}
                   <Pressable
                     onPress={() =>
@@ -211,7 +246,8 @@ console.log("Loading shows with filters:", filterOptions);
                       paddingHorizontal: 10,
                       paddingVertical: 10,
                       borderRadius: 20,
-                      backgroundColor: viewMode === "list"? secondary: cardBackground,
+                      backgroundColor:
+                        viewMode === "list" ? secondary : cardBackground,
                       alignItems: "center",
                       justifyContent: "center",
                       flexDirection: "row",
@@ -220,14 +256,18 @@ console.log("Loading shows with filters:", filterOptions);
                   >
                     {/* Dots with lines icon */}
                     <View style={{ gap: 2, alignItems: "center" }}>
-                     <LucideTableOfContents color={viewMode === "list"? 'white': secondary} style={{ transform: [{ rotate: "180deg" }] }} size={20} />
+                      <LucideTableOfContents
+                        color={viewMode === "list" ? "white" : secondary}
+                        style={{ transform: [{ rotate: "180deg" }] }}
+                        size={20}
+                      />
                     </View>
                     <Text
                       style={{
                         fontSize: 13,
                         fontWeight: "600",
                         fontFamily: FONT_FAMILY.poppinsSemiBold,
-                        color: 'white',
+                        color: "white",
                         letterSpacing: 0.3,
                       }}
                     >
@@ -261,15 +301,17 @@ console.log("Loading shows with filters:", filterOptions);
                         justifyContent: "center",
                       }}
                     >
-                      
-                      <SlidersVertical color={hasActiveFilters()?'white':secondary} size={20}/>
+                      <SlidersVertical
+                        color={hasActiveFilters() ? "white" : secondary}
+                        size={20}
+                      />
                     </View>
                     <Text
                       style={{
                         fontSize: 14,
                         fontWeight: "600",
                         fontFamily: FONT_FAMILY.poppinsSemiBold,
-                        color: 'white',
+                        color: "white",
                         letterSpacing: 0.3,
                       }}
                     >
@@ -292,26 +334,25 @@ console.log("Loading shows with filters:", filterOptions);
                   style={{
                     flex: 1,
                     height: 1,
-                    backgroundColor: 'white',
-                    borderColor:'white'
+                    backgroundColor: "white",
+                    borderColor: "white",
                   }}
                 />
                 <Text
                   style={{
                     fontSize: 16,
-                    fontWeight: "bold",
-                    fontFamily: FONT_FAMILY.poppinsBold,
                     color: text,
                     letterSpacing: 0.2,
+                    fontFamily: FONT_FAMILY.poppinsSemiBold,
                   }}
                 >
-                  {totalShows}
+                  {eventsLength()}
                 </Text>
                 <Text
                   style={{
                     fontSize: 14,
                     color: textMuted,
-                    fontFamily: FONT_FAMILY.poppinsMedium
+                    fontFamily: FONT_FAMILY.poppinsMedium,
                   }}
                 >
                   Upcoming Shows
@@ -320,8 +361,8 @@ console.log("Loading shows with filters:", filterOptions);
                   style={{
                     flex: 1,
                     height: 1,
-                    backgroundColor: 'white',
-                    borderColor:'white'
+                    backgroundColor: "white",
+                    borderColor: "white",
                   }}
                 />
               </View>
@@ -329,7 +370,7 @@ console.log("Loading shows with filters:", filterOptions);
 
             {/* Shows List */}
             {isLoadingShows ? (
-              <View style={{ paddingHorizontal: 20, }}>
+              <View style={{ paddingHorizontal: 20 }}>
                 {[1, 2, 3].map((i) => (
                   <Skeleton
                     key={i}
@@ -483,7 +524,11 @@ const ShowCard = ({
   };
   return (
     <Animated.View
-      style={{ marginBottom: 24,paddingHorizontal:Platform.OS=='android'? 20:10,transform: [{ scale: cardScale }] }}
+      style={{
+        marginBottom: 24,
+        paddingHorizontal: Platform.OS == "android" ? 20 : 10,
+        transform: [{ scale: cardScale }],
+      }}
     >
       <Pressable
         onPress={onPress}
@@ -498,15 +543,17 @@ const ShowCard = ({
           }}
         >
           {/* Show Image */}
-          <View style={{ height: 200, position: "relative", overflow: "hidden" }}>
+          <View
+            style={{ height: 200, position: "relative", overflow: "hidden" }}
+          >
             <Image
               source={
-                show.imageUrl ||
+                show.mobileImage?.url ||
                 `https://trymagically.com/api/media/image?query=${encodeURIComponent(
                   show.artist + " live music"
                 )}`
               }
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: "100%", height: "100%" }}
               contentPosition="top center"
               contentFit="cover"
             />
@@ -547,7 +594,18 @@ const ShowCard = ({
               }}
             >
               {show.genre.slice(0, 2).map((genre, i) => (
-                <View key={i} style={{ borderRadius: 12, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 5 }}>
+                <View
+                  key={i}
+                  style={{
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}
+                >
                   <View
                     style={{
                       paddingHorizontal: 12,
@@ -565,7 +623,7 @@ const ShowCard = ({
                         letterSpacing: 0.5,
                       }}
                     >
-                      {genre.replace(';', '').trim()}
+                      {genre.replace(";", "").trim()}
                     </Text>
                   </View>
                 </View>
@@ -596,7 +654,12 @@ const ShowCard = ({
             >
               <MapPin size={16} color={primary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
+                style={{
+                  fontSize: 14,
+                  color: textMuted,
+                  fontWeight: "600",
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
+                }}
               >
                 {show.venue}
               </Text>
@@ -606,7 +669,12 @@ const ShowCard = ({
             >
               <Calendar size={16} color={secondary} strokeWidth={2.5} />
               <Text
-                style={{ fontSize: 14, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}
+                style={{
+                  fontSize: 14,
+                  color: textMuted,
+                  fontWeight: "600",
+                  fontFamily: FONT_FAMILY.poppinsSemiBold,
+                }}
               >
                 {formatDate(show.date)} • {show.time}
               </Text>

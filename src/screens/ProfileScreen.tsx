@@ -549,6 +549,20 @@ export default function ProfileScreen() {
               maxWidth: 400,
             }}
           >
+            <View
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 36,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 24,
+                backgroundColor: "#f2a41e",
+                alignSelf:'center'
+              }}
+            >
+              <MapPin size={36} color="#fff" strokeWidth={2} />
+            </View>
             <Text
               style={{
                 fontSize: 24,
@@ -557,6 +571,7 @@ export default function ProfileScreen() {
                 textAlign: "center",
                 marginBottom: 20,
                 fontFamily: FONT_FAMILY.poppinsBold,
+                marginTop: -15,
               }}
             >
               Change Location

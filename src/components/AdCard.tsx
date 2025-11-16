@@ -41,7 +41,7 @@ export const AdCard: React.FC<AdCardProps> = ({ ad, onImpression }) => {
 
   return (
     <View style={{ 
-      marginHorizontal: 16, 
+      marginHorizontal: 20, 
       marginVertical: 8,
       backgroundColor: cardBackground,
       borderRadius,

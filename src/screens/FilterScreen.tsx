@@ -517,7 +517,7 @@ export const FilterScreen = () => {
                         color: text,
                       }}
                     >
-                      Venues in {selectedCity}
+                      Venues
                     </Text>
                     {!expandedVenues && selectedVenues.length > 0 && (
                       <Text
