@@ -435,13 +435,15 @@ export const ShowsScreen = () => {
                         textMuted={textMuted}
                       />
                     ) : (
-                      <ShowListItem
-                        show={item}
-                        onPress={() => handleShowPress(item)}
-                        onFavoritePress={() => handleFavoritePress(item)}
-                        isFavorite={isFavorite(item._id)}
-                        isPremium={isPremium}
-                      />
+                      <View style={{paddingHorizontal:20}}>
+                        <ShowListItem
+                          show={item}
+                          onPress={() => handleShowPress(item)}
+                          onFavoritePress={() => handleFavoritePress(item)}
+                          isFavorite={isFavorite(item._id)}
+                          isPremium={isPremium}
+                        />
+                      </View>
                     )}
                   </React.Fragment>
                 )}

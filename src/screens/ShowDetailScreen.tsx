@@ -41,7 +41,6 @@ import { AdCard } from "../components/AdCard";
 import { Ad, Ads } from "../magically/entities/Ad";
 import magically from "magically-sdk";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import ImageViewer from "react-native-image-zoom-viewer";
 
 export const ShowDetailScreen = () => {
@@ -793,6 +792,7 @@ export const ShowDetailScreen = () => {
         visible={isImageModalVisible}
         transparent={true}
         animationType="fade"
+        onRequestClose={handleCloseImageModal}
       >
         <ImageViewer
           imageUrls={[
