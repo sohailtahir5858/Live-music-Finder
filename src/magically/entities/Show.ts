@@ -102,6 +102,7 @@ export interface Show {
   isPublic?: boolean;
   /** Standard fields */
   _id: string;
+  all_day: boolean;
   creator: string;
   createdAt: Date;
   updatedAt: Date;

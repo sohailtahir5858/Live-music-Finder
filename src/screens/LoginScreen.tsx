@@ -219,7 +219,7 @@ export default function LoginScreen() {
                   paddingTop: 60,
                 }}
               >
-                <View style={{ alignItems: "center", marginBottom: 40 }}>
+                <View style={{ alignItems: "center", marginBottom: 40,flex:1,justifyContent:'center',paddingTop:100,gap:20 }}>
                   <Animated.View
                     style={{
                       transform: [{ scale: scaleAnim }],
@@ -322,38 +322,6 @@ export default function LoginScreen() {
                   >
                    One app. Every show.
                   </Text>
-
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 16,
-                      paddingHorizontal: 20,
-                      paddingVertical: 10,
-                      backgroundColor: theme.primary + "15",
-                      borderRadius: 20,
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 4,
-                        backgroundColor: theme.primary,
-                        marginRight: 8,
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: theme.primary,
-                        letterSpacing: 0.3,
-                        fontFamily: theme.fontFamilySemiBold,
-                      }}
-                    >
-                      Your backstage pass to local shows
-                    </Text>
-                  </View>
                 </View>
 
                 <View style={{ gap: 16, marginTop: 40 }}>

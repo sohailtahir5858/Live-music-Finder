@@ -263,7 +263,6 @@ export const FavoritesScreen = () => {
                     color: text,
                     letterSpacing: 0.2,
                     fontFamily: FONT_FAMILY.poppinsSemiBold,
-
                   }}
                 >
                   {shows.length}
@@ -275,7 +274,7 @@ export const FavoritesScreen = () => {
                     fontFamily: FONT_FAMILY.poppinsMedium,
                   }}
                 >
-                Favorite Shows
+                  Favorite Shows
                 </Text>
                 <View
                   style={{
@@ -502,19 +501,30 @@ const ShowCard = ({
                   key={i}
                   style={{
                     borderRadius: 12,
-                    overflow: "hidden",
                     shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 5,
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: Platform.OS === "ios" ? 0.18 : 0.2,
+                    shadowRadius: 6,
+                    elevation: 6,
+                    marginRight: 8,
+                    backgroundColor: "transparent",
                   }}
                 >
                   <View
                     style={{
+                      borderRadius: 12,
+                      overflow: "hidden",
                       paddingHorizontal: 12,
                       paddingVertical: 6,
                       backgroundColor: "#f2a41e",
+                      shadowColor: "#000",
+                      shadowOffset: {
+                        width: 0,
+                        height: 8,
+                      },
+                      shadowOpacity: 0.46,
+                      shadowRadius: 11.14,
+                      elevation: 17,
                     }}
                   >
                     <Text

@@ -9,6 +9,7 @@ import {
   Text,
   ScrollView,
   Pressable,
+  Modal,
   Animated,
   Easing,
   Share,
@@ -26,6 +27,7 @@ import {
   Heart,
   Share2,
   CalendarPlus,
+  X,
 } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -40,6 +42,7 @@ import { Ad, Ads } from "../magically/entities/Ad";
 import magically from "magically-sdk";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import ImageViewer from "react-native-image-zoom-viewer";
 
 export const ShowDetailScreen = () => {
   const { background, text, textMuted, primary, secondary, cardBackground } =
@@ -58,8 +61,17 @@ export const ShowDetailScreen = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeAd, setActiveAd] = useState<Ad | null>(null);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const heartScale = React.useRef(new Animated.Value(1)).current;
+
+  const handleImagePress = () => {
+    setIsImageModalVisible(true);
+  };
+
+  const handleCloseImageModal = () => {
+    setIsImageModalVisible(false);
+  };
 
   useEffect(() => {
     if (show) {
@@ -250,15 +262,17 @@ export const ShowDetailScreen = () => {
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Hero Image */}
             <View style={{ height: 360, position: "relative" }}>
-              <Image
-                source={
-                  show.hdImage?.url ||
-                  `https://trymagically.com/api/media/image?query=${encodeURIComponent(
-                    show.artist + " live music concert"
-                  )}`
-                }
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+              <Pressable onPress={handleImagePress}>
+                <Image
+                  source={
+                    show.hdImage?.url ||
+                    `https://trymagically.com/api/media/image?query=${encodeURIComponent(
+                      show.artist + " live music concert"
+                    )}`
+                  }
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </Pressable>
 
               {/* Header Overlay */}
               <View
@@ -360,29 +374,46 @@ export const ShowDetailScreen = () => {
                     key={i}
                     style={{
                       borderRadius: 12,
-                      overflow: "hidden",
-                      backgroundColor: "#f2a41e",
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
+                      // shadow outer wrapper
                       shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 4,
-                      elevation: 5,
+                      shadowOffset: { width: 0, height: 6 },
+                      shadowOpacity: Platform.OS === "ios" ? 0.18 : 0.2,
+                      shadowRadius: 6,
+                      elevation: 6,
+                      marginRight: 8,
+                      backgroundColor: "transparent",
                     }}
                   >
-                    <Text
+                    <View
                       style={{
-                        color: "#FFFFFF",
-                        fontSize: 11,
-                        fontWeight: "800",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        fontFamily: FONT_FAMILY.poppinsBlack,
+                        borderRadius: 12,
+                        overflow: "hidden",
+                        backgroundColor: "#f2a41e",
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 8,
+                        },
+                        shadowOpacity: 0.46,
+                        shadowRadius: 11.14,
+                        elevation: 17,
                       }}
                     >
-                      {genre}
-                    </Text>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 11,
+                          fontWeight: "800",
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          fontFamily: FONT_FAMILY.poppinsBlack,
+                        }}
+                      >
+                        {genre}
+                      </Text>
+                    </View>
                   </View>
                 ))}
               </View>
@@ -396,13 +427,14 @@ export const ShowDetailScreen = () => {
                   fontWeight: "900",
                   fontFamily: FONT_FAMILY.poppinsBlack,
                   color: text,
-                  marginBottom: 8,
                   letterSpacing: -0.5,
+                  marginTop: 20,
+                  marginBottom: 24,
                 }}
               >
                 {show.artist}
               </Text>
-              <Text
+              {/* <Text
                 style={{
                   fontSize: 18,
                   fontWeight: "700",
@@ -412,7 +444,7 @@ export const ShowDetailScreen = () => {
                 }}
               >
                 {show.title}
-              </Text>
+              </Text> */}
             </View>
 
             {/* Details Card */}
@@ -686,7 +718,9 @@ export const ShowDetailScreen = () => {
             )}
 
             {/* Action Buttons Section */}
-            <View style={{ marginTop: 30, marginBottom: 30,paddingHorizontal:30 }}>
+            <View
+              style={{ marginTop: 30, marginBottom: 30, paddingHorizontal: 30 }}
+            >
               <View
                 style={{
                   flexDirection: "row",
@@ -695,64 +729,108 @@ export const ShowDetailScreen = () => {
                   paddingHorizontal: 20,
                 }}
               >
-                  {/* Share Button */}
+                {/* Share Button */}
+                <TouchableOpacity
+                  onPress={handleSharePress}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    backgroundColor: "rgba(0, 0, 0, 0.6)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Share2 size={20} color="#FFFFFF" strokeWidth={2.5} />
+                </TouchableOpacity>
+
+                {/* Calendar Button */}
+                <TouchableOpacity
+                  onPress={handleAddToCalendar}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    backgroundColor: "rgba(0, 0, 0, 0.6)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CalendarPlus size={20} color="#FFFFFF" strokeWidth={2.5} />
+                </TouchableOpacity>
+
+                {/* Favorite Button */}
+                <Animated.View style={{ transform: [{ scale: heartScale }] }}>
                   <TouchableOpacity
-                    onPress={handleSharePress}
+                    onPress={handleFavoritePress}
                     style={{
                       width: 44,
                       height: 44,
                       borderRadius: 22,
-                      backgroundColor: "rgba(0, 0, 0, 0.6)",
+                      backgroundColor: isFavorite
+                        ? primary
+                        : "rgba(0, 0, 0, 0.6)",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Share2 size={20} color="#FFFFFF" strokeWidth={2.5} />
+                    <Heart
+                      size={20}
+                      color="#FFFFFF"
+                      fill={isFavorite ? "#FFFFFF" : "transparent"}
+                      strokeWidth={2.5}
+                    />
                   </TouchableOpacity>
-
-                  {/* Calendar Button */}
-                  <TouchableOpacity
-                    onPress={handleAddToCalendar}
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      backgroundColor: "rgba(0, 0, 0, 0.6)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <CalendarPlus size={20} color="#FFFFFF" strokeWidth={2.5} />
-                  </TouchableOpacity>
-
-                  {/* Favorite Button */}
-                  <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                    <TouchableOpacity
-                      onPress={handleFavoritePress}
-                      style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 22,
-                        backgroundColor: isFavorite
-                          ? primary
-                          : "rgba(0, 0, 0, 0.6)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Heart
-                        size={20}
-                        color="#FFFFFF"
-                        fill={isFavorite ? "#FFFFFF" : "transparent"}
-                        strokeWidth={2.5}
-                      />
-                    </TouchableOpacity>
-                  </Animated.View>
-                </View>
+                </Animated.View>
               </View>
+            </View>
           </ScrollView>
         </Animated.View>
       </SafeAreaView>
+
+      {/* Image Zoom Modal */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        animationType="fade"
+      >
+        <ImageViewer
+          imageUrls={[
+            {
+              url:
+                show.hdImage?.url ||
+                `https://trymagically.com/api/media/image?query=${encodeURIComponent(
+                  show.artist + " live music concert"
+                )}`,
+            },
+          ]}
+          onCancel={handleCloseImageModal}
+          enableSwipeDown={true}
+          swipeDownThreshold={100}
+          backgroundColor="rgba(0, 0, 0, 0.9)"
+          saveToLocalByLongPress={false}
+          renderIndicator={() => <View />}
+          renderHeader={() => (
+            <TouchableOpacity
+              onPress={handleCloseImageModal}
+              style={{
+                position: "absolute",
+                top: 50,
+                right: 20,
+                zIndex: 10,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <X size={24} color="#FFFFFF" strokeWidth={2.5} />
+            </TouchableOpacity>
+          )}
+        />
+      </Modal>
     </View>
   );
 };

@@ -144,7 +144,7 @@ export const ShowsScreen = () => {
       }
       setTotalShows(result?.total ?? 0);
       setCurrentPage(page);
-      setHasMore(result.events.length > 0);
+      setHasMore(!!result.next_rest_url);
     } catch (error) {
       console.error("Error loading shows:", error);
     } finally {
@@ -183,12 +183,17 @@ export const ShowsScreen = () => {
 
   const isFavorite = (showId: string) =>
     favoriteShows.some((s) => s._id === showId);
+
   function eventsLength() {
+    // When time filter is active (including "all-day"), show the total filtered count
+    // totalShows already contains the correct filtered total from the backend
     if (activeFilters.timeFilter) {
-      return shows.length ? shows.length : 0;
+      return totalShows; // Show total filtered count (e.g., 80 events)
     }
+    // For normal pagination, show whichever is higher
     return totalShows < shows.length ? shows.length : totalShows;
   }
+
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
       <View style={{ flex: 1, backgroundColor: background }}>
@@ -371,6 +376,19 @@ export const ShowsScreen = () => {
             {/* Shows List */}
             {isLoadingShows ? (
               <View style={{ paddingHorizontal: 20 }}>
+                {activeFilters.timeFilter &&
+                  activeFilters.timeFilter !== "all-day" && (
+                    <View
+                      style={{
+                        padding: 16,
+                        borderRadius: 12,
+                        marginBottom: 16,
+                        alignItems: "center",
+                      }}
+                    >
+                      <ActivityIndicator size="small" color={primary} />
+                    </View>
+                  )}
                 {[1, 2, 3].map((i) => (
                   <Skeleton
                     key={i}
@@ -437,14 +455,22 @@ export const ShowsScreen = () => {
                   />
                 }
                 onEndReached={loadMore}
-                onEndReachedThreshold={0.5}
+                onEndReachedThreshold={0.3}
                 ListFooterComponent={
-                  isLoadingMore ? (
-                    <ActivityIndicator
-                      size="large"
-                      color={primary}
-                      style={{ marginVertical: 20 }}
-                    />
+                  isLoadingMore && hasMore ? (
+                    <View style={{ paddingVertical: 16, alignItems: "center" }}>
+                      <ActivityIndicator size="small" color={primary} />
+                      <Text
+                        style={{
+                          marginTop: 8,
+                          fontSize: 12,
+                          color: textMuted,
+                          fontFamily: FONT_FAMILY.poppinsRegular,
+                        }}
+                      >
+                        Loading more...
+                      </Text>
+                    </View>
                   ) : null
                 }
               />
@@ -600,10 +626,13 @@ const ShowCard = ({
                     borderRadius: 12,
                     overflow: "hidden",
                     shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 5,
+                    shadowOffset: {
+                      width: 0,
+                      height: 8,
+                    },
+                    shadowOpacity: 0.46,
+                    shadowRadius: 11.14,
+                    elevation: 17,
                   }}
                 >
                   <View
@@ -611,6 +640,14 @@ const ShowCard = ({
                       paddingHorizontal: 12,
                       paddingVertical: 6,
                       backgroundColor: "#f2a41e",
+                      shadowColor: "#000",
+                      shadowOffset: {
+                        width: 0,
+                        height: 8,
+                      },
+                      shadowOpacity: 0.46,
+                      shadowRadius: 11.14,
+                      elevation: 17,
                     }}
                   >
                     <Text

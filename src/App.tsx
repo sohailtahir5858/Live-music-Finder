@@ -4,6 +4,7 @@ import {
   DefaultTheme,
   NavigationContainer,
 } from "@react-navigation/native";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Toaster } from "sonner-native";
@@ -114,7 +115,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <AppContent />
+         <GestureHandlerRootView>
+           <AppContent />
+         </GestureHandlerRootView>
       </ThemeProvider>
     </SafeAreaProvider>
   );
