@@ -381,6 +381,7 @@ export const ShowDetailScreen = () => {
                       elevation: 6,
                       marginRight: 8,
                       backgroundColor: "transparent",
+                      left:20
                     }}
                   >
                     <View
