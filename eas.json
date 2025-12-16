@@ -1,36 +1,37 @@
 {
   "cli": {
-    "version": ">= 16.18.0"
+    "version": ">= 13.2.1",
+    "appVersionSource": "remote"
   },
   "build": {
-    "production": {
-      "channel": "production"
-    },
-    "apk": {
-      "channel": "production",
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "aab": {
-      "channel": "production",
-      "android": {
-        "buildType": "app-bundle"
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
       }
     },
     "preview": {
-      "channel": "preview"
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      }
     },
-    "development": {
-      "channel": "development",
-      "developmentClient": true
+    "production": {
+      "ios": {
+        "resourceClass": "m-medium"
+      }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "your-apple-id@example.com",
-        "ascAppId": "your-app-store-connect-app-id"
+        "appleId": "michael@incube8creative.ca",
+        "ascAppId": "6756622544",
+        "appleTeamId": "TM56Z266PG",
+        "ascApiKeyPath": "./AuthKey_B4TL7JR62G.p8",
+        "ascApiKeyIssuerId": "6af8ed36-e607-4b7f-a99e-544c52d874b0",
+        "ascApiKeyId": "B4TL7JR62G"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account-key.json",

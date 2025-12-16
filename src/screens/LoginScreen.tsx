@@ -219,7 +219,7 @@ export default function LoginScreen() {
                   paddingTop: 60,
                 }}
               >
-                <View style={{ alignItems: "center", marginBottom: 40,flex:1,justifyContent:'center',paddingTop:100,gap:20 }}>
+                <View style={{ alignItems: "center", marginBottom: 40,flex:1,justifyContent:'center',paddingTop:100,}}>
                   <Animated.View
                     style={{
                       transform: [{ scale: scaleAnim }],
@@ -227,6 +227,8 @@ export default function LoginScreen() {
                       position: "relative",
                       alignItems: "center",
                       justifyContent: "center",
+                      marginTop:-20
+                    
                     }}
                   >
                     {/* Pulsing shadow layer 1 */}
@@ -318,6 +320,7 @@ export default function LoginScreen() {
                       lineHeight: 24,
                       paddingHorizontal: 20,
                       marginBottom: 8,
+                      marginTop:-20
                     }}
                   >
                    One app. Every show.

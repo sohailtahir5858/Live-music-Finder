@@ -230,7 +230,7 @@ export const ShowsScreen = () => {
                         ? require("./../../assets/images/Live-Music-Kelowna-White.png")
                         : require("./../../assets/images/live-music-logo-white.png")
                     }
-                    style={{ width: 170, height: 70, resizeMode: "contain" }}
+                    style={{ width: 160, height: 60, resizeMode: "contain" }}
                   />
                 </View>
 
@@ -274,6 +274,8 @@ export const ShowsScreen = () => {
                         fontFamily: FONT_FAMILY.poppinsSemiBold,
                         color: "white",
                         letterSpacing: 0.3,
+                        marginTop:3
+
                       }}
                     >
                       VIEW
@@ -304,6 +306,7 @@ export const ShowsScreen = () => {
                         gap: 2,
                         alignItems: "center",
                         justifyContent: "center",
+                       
                       }}
                     >
                       <SlidersVertical
@@ -318,6 +321,9 @@ export const ShowsScreen = () => {
                         fontFamily: FONT_FAMILY.poppinsSemiBold,
                         color: "white",
                         letterSpacing: 0.3,
+                        height:'100%',
+                        marginTop:3
+
                       }}
                     >
                       FILTER
