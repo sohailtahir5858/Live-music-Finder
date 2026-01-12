@@ -130,7 +130,7 @@ export const MainTabNavigator = () => {
                 name="Favorites"
                 component={FavoritesStackNavigator}
                 options={{
-                    tabBarLabel: 'My Feed',
+                    tabBarLabel: 'Favourites',
                     tabBarIcon: ({color}) => <Heart size={tabBarIconSize} color={color} />
                 }}
             />

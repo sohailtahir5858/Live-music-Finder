@@ -16,6 +16,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { decodeHtmlEntities, fetchGenres } from "../services/eventService";
 import { FONT_FAMILY } from "../utils/fontConfig";
+import { MagicallyAlert } from "./ui";
 
 export const GenreSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
@@ -38,11 +39,19 @@ export const GenreSelector = () => {
 
   const handleGenrePress = (genreName: string) => {
     const isAlreadySelected = currentCityGenres.includes(genreName);
-    const canSelect =
-      isPremium || isAlreadySelected || currentCityGenres.length < 3;
+    
+    // If it's already selected, allow deselection
+    if (isAlreadySelected) {
+      toggleFavoriteGenre(genreName);
+      return;
+    }
 
-    if (!canSelect) {
-      // User has reached limit - don't toggle
+    // For free users, check if they're trying to select a 4th genre
+    if (!isPremium && currentCityGenres.length >= 3) {
+      MagicallyAlert.alert(
+        "Oops — this one's a Premium feature!",
+        "Upgrade to Premium to unlock this feature and fully customize your shows feed with the shows you care about."
+      );
       return;
     }
 
@@ -133,8 +142,7 @@ export const GenreSelector = () => {
                   marginTop: 4,
                 }}
               >
-                Select your favourite music to see matching shows in the "My
-                Feed" tab ({currentCityGenres.length}/3)
+                Select your favourite music to see matching shows in the "Shows" tab ({currentCityGenres.length}/3)
               </Text>
             )}
           </View>
@@ -212,7 +220,6 @@ export const GenreSelector = () => {
                   <Pressable
                     key={genre.id}
                     onPress={() => handleGenrePress(genre.name)}
-                    disabled={!canSelect && !isSelected}
                     style={{
                       paddingVertical: 10,
                       paddingHorizontal: 16,

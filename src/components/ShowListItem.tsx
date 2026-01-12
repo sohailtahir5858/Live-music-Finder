@@ -107,12 +107,12 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
                 key={idx}
                 style={{
                   paddingHorizontal: 8,
-                  paddingVertical: 2,
+                  paddingVertical: 4,
                   backgroundColor: '#f2a41e30',
                   borderRadius: 8,
                 }}
               >
-                <Text style={{ fontSize: 10, fontWeight: '700', color: '#f2a41e', fontFamily: FONT_FAMILY.poppinsBold }}>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#f2a41e', fontFamily: FONT_FAMILY.poppinsBold }}>
                   {cleanGenreText(genre)}
                 </Text>
               </View>

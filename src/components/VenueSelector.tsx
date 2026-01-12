@@ -10,6 +10,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useUserPreferences } from "../stores/userPreferencesStore";
 import { decodeHtmlEntities, fetchVenues } from "../services/eventService";
 import { FONT_FAMILY } from "../utils/fontConfig";
+import { MagicallyAlert } from "./ui";
 
 export const VenueSelector = () => {
   const { text, textMuted, primary, cardBackground, border } = useTheme();
@@ -32,11 +33,19 @@ export const VenueSelector = () => {
 
   const handleVenuePress = (venueName: string) => {
     const isAlreadySelected = currentCityVenues.includes(venueName);
-    const canSelect =
-      isPremium || isAlreadySelected || currentCityVenues.length < 3;
+    
+    // If it's already selected, allow deselection
+    if (isAlreadySelected) {
+      toggleFavoriteVenue(venueName);
+      return;
+    }
 
-    if (!canSelect) {
-      // User has reached limit - don't toggle
+    // For free users, check if they're trying to select a 4th venue
+    if (!isPremium && currentCityVenues.length >= 3) {
+      MagicallyAlert.alert(
+        "Oops — this one's a Premium feature!",
+        "Upgrade to Premium to unlock this feature and fully customize your shows feed with the shows you care about."
+      );
       return;
     }
 
@@ -106,8 +115,7 @@ export const VenueSelector = () => {
                   marginTop: 4,
                 }}
               >
-                Select your favourite venues to see matching shows in the "My
-                Feed" tab ({currentCityVenues.length}/3)
+                Select your favourite venues to see matching shows in the "Shows" tab ({currentCityVenues.length}/3)
               </Text>
             )}
           </View>
@@ -174,7 +182,6 @@ export const VenueSelector = () => {
             {filteredVenues.length > 0 ? (
               filteredVenues.map((venue) => {
                 const decodedName = decodeHtmlEntities(venue.venue);
-
                 const isSelected = currentCityVenues.includes(venue.venue);
                 const canSelect =
                   isPremium || isSelected || currentCityVenues.length < 3;
@@ -183,7 +190,6 @@ export const VenueSelector = () => {
                   <Pressable
                     key={venue.id}
                     onPress={() => handleVenuePress(venue.venue)}
-                    disabled={!canSelect && !isSelected}
                     style={{
                       paddingVertical: 10,
                       paddingHorizontal: 16,
