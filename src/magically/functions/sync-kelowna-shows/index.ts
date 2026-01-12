@@ -105,7 +105,8 @@ export default {
  */
 async function parseAllKelownaEvents(): Promise<Show[]> {
   const allShows: Show[] = [];
-  const baseUrl = 'https://livemusickelowna.ca/events/';
+  // const baseUrl = 'https://livemusickelowna.ca/events/';
+  const baseUrl ='http://13.53.107.49:8914/';
   const maxPages = 10; // Limit to prevent infinite loops
 
   try {
