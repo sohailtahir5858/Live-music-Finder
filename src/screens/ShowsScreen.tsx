@@ -230,7 +230,7 @@ export const ShowsScreen = () => {
                         ? require("./../../assets/images/Live-Music-Kelowna-White.png")
                         : require("./../../assets/images/live-music-logo-white.png")
                     }
-                    style={{ width: 160, height: 60, resizeMode: "contain" }}
+                    style={{ width: 110, height: 60, resizeMode: "contain" }}
                   />
                 </View>
 

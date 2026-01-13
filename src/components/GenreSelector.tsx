@@ -46,8 +46,8 @@ export const GenreSelector = () => {
       return;
     }
 
-    // For free users, check if they're trying to select a 4th genre
-    if (!isPremium && currentCityGenres.length >= 3) {
+    // For free users, block all selections
+    if (!isPremium) {
       MagicallyAlert.alert(
         "Oops — this one's a Premium feature!",
         "Upgrade to Premium to unlock this feature and fully customize your shows feed with the shows you care about."
@@ -84,7 +84,7 @@ export const GenreSelector = () => {
               fontFamily: FONT_FAMILY.poppinsBlack,
             }}
           >
-            Favorite Genres
+            Favourite Genres
           </Text>
         </View>
         <Text
@@ -131,7 +131,7 @@ export const GenreSelector = () => {
                 fontFamily: FONT_FAMILY.poppinsBlack,
               }}
             >
-              Favorite Genres
+              Favourite Genres
             </Text>
             {!isExpanded && (
               <Text
@@ -142,7 +142,7 @@ export const GenreSelector = () => {
                   marginTop: 4,
                 }}
               >
-                Select your favourite music to see matching shows in the "Shows" tab ({currentCityGenres.length}/3)
+                Select your favourite music to see matching shows in the "Shows" tab
               </Text>
             )}
           </View>
@@ -187,8 +187,7 @@ export const GenreSelector = () => {
                 fontSize: 14,
                 color: text,
                 fontFamily: FONT_FAMILY.poppinsRegular,
-                textAlignVertical: "center",
-                paddingTop: 15,
+                paddingVertical: 12,
               }}
             />
             {searchQuery.length > 0 && (
@@ -213,8 +212,7 @@ export const GenreSelector = () => {
               filteredGenres.map((genre) => {
                 const decodedName = decodeHtmlEntities(genre.name);
                 const isSelected = currentCityGenres.includes(genre.name);
-                const canSelect =
-                  isPremium || isSelected || currentCityGenres.length < 3;
+                const canSelect = isPremium || isSelected;
 
                 return (
                   <Pressable
@@ -270,7 +268,7 @@ export const GenreSelector = () => {
               fontFamily: FONT_FAMILY.poppinsRegular,
             }}
           >
-            WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH
+            THIS IS A PREMIUM FEATURE — UPGRADE TO UNLOCK
           </Text>
         </View>
       )}

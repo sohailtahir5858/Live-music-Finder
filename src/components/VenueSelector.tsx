@@ -40,8 +40,8 @@ export const VenueSelector = () => {
       return;
     }
 
-    // For free users, check if they're trying to select a 4th venue
-    if (!isPremium && currentCityVenues.length >= 3) {
+    // For free users, block all selections
+    if (!isPremium) {
       MagicallyAlert.alert(
         "Oops — this one's a Premium feature!",
         "Upgrade to Premium to unlock this feature and fully customize your shows feed with the shows you care about."
@@ -71,7 +71,7 @@ export const VenueSelector = () => {
         >
           <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
           <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.poppinsBlack }}>
-            Favorite Venues
+          Favourite Venues
           </Text>
         </View>
         <Text style={{ fontSize: 13, color: textMuted, fontWeight: "600", fontFamily: FONT_FAMILY.poppinsSemiBold }}>
@@ -104,7 +104,7 @@ export const VenueSelector = () => {
           <MapPin size={20} color={primary} style={{ marginRight: 8 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 16, fontWeight: "800", color: text, fontFamily: FONT_FAMILY.poppinsBlack }}>
-              Favorite Venues
+            Favourite Venues
             </Text>
             {!isExpanded && (
               <Text
@@ -115,7 +115,7 @@ export const VenueSelector = () => {
                   marginTop: 4,
                 }}
               >
-                Select your favourite venues to see matching shows in the "Shows" tab ({currentCityVenues.length}/3)
+                Select your favourite venues to see matching shows in the "Shows" tab
               </Text>
             )}
           </View>
@@ -160,8 +160,7 @@ export const VenueSelector = () => {
                 fontSize: 14,
                 color: text,
                 fontFamily: FONT_FAMILY.poppinsRegular,
-                textAlignVertical: "center",
-                paddingTop: 15,
+                paddingVertical: 12,
               }}
             />
             {searchQuery.length > 0 && (
@@ -183,8 +182,7 @@ export const VenueSelector = () => {
               filteredVenues.map((venue) => {
                 const decodedName = decodeHtmlEntities(venue.venue);
                 const isSelected = currentCityVenues.includes(venue.venue);
-                const canSelect =
-                  isPremium || isSelected || currentCityVenues.length < 3;
+                const canSelect = isPremium || isSelected;
 
                 return (
                   <Pressable
@@ -238,7 +236,7 @@ export const VenueSelector = () => {
               fontFamily: FONT_FAMILY.poppinsRegular,
             }}
           >
-            WITH FREE ACCOUNT USERS CAN ONLY SELECT 3 OF EACH
+            THIS IS A PREMIUM FEATURE — UPGRADE TO UNLOCK
           </Text>
         </View>
       )}

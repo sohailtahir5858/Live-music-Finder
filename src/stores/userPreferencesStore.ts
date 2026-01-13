@@ -140,9 +140,9 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
       set({ favoriteGenres: newFavoriteGenres });
       get().savePreferences();
     } else {
-      // Check limit for free users
-      if (!isPremium && currentCityGenres.length >= 3) {
-        console.log('[Genres] Free user reached 3 genre limit for', selectedCity);
+      // Block all selections for free users
+      if (!isPremium) {
+        console.log('[Genres] Free user cannot select genres - Premium feature');
         return;
       }
 
@@ -176,17 +176,15 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
       set({ favoriteVenues: newFavoriteVenues });
       get().savePreferences();
     } else {
-      // Check limit for free users
-      if (!isPremium && currentCityVenues.length >= 3) {
-        console.log('[Venues] Free user reached 3 venue limit for', selectedCity);
+      // Block all selections for free users
+      if (!isPremium) {
+        console.log('[Venues] Free user cannot select venues - Premium feature');
         return;
       }
 
       // Allow adding
       const updated = [...currentCityVenues, venue];
-      console.log("🚀 ~ updated:", updated)
       const newFavoriteVenues = { ...favoriteVenues, [selectedCity]: updated };
-      console.log("🚀 ~ newFavoriteVenues:", newFavoriteVenues)
       set({ favoriteVenues: newFavoriteVenues });
       get().savePreferences();
     }
@@ -257,6 +255,7 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
 
       while (hasNextPage) {
         const url = `${baseUrl}?page=${page}&per_page=100`;
+        console.log("🚀 ~ url:", url)
         const response = await fetch(url);
         const data = await response.json();
 
@@ -289,8 +288,11 @@ export const useUserPreferences = create<UserPreferencesState>((set, get) => ({
 
       while (hasNextPage) {
         const url = `${baseUrl}?page=${page}&per_page=100&status=publish`;
+        console.log("🚀 ~ url:", url)
         const response = await fetch(url);
+        console.log("🚀 ~ response:", response)
         const data = await response.json();
+        console.log("🚀 ~ data:", data)
 
         if (data.venues && data.venues.length > 0) {
           allVenues = [...allVenues, ...data.venues];

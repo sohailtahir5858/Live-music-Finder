@@ -113,7 +113,7 @@ export const ShowListItem: React.FC<ShowListItemProps> = ({
                 }}
               >
                 <Text style={{ fontSize: 12, fontWeight: '700', color: '#f2a41e', fontFamily: FONT_FAMILY.poppinsBold }}>
-                  {cleanGenreText(genre)}
+                  {cleanGenreText(genre.toUpperCase())}
                 </Text>
               </View>
             ))}

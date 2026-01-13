@@ -2,6 +2,7 @@ import React from 'react';
 import {Platform} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTheme} from '../contexts/ThemeContext';
 import { Music2, Heart, User } from 'lucide-react-native';
 import { ShowsScreen } from '../screens/ShowsScreen';
@@ -93,6 +94,7 @@ export const MainTabNavigator = () => {
         tabBarIconSize,
         tabBarLabelFontSize
     } = useTheme();
+    const insets = useSafeAreaInsets();
 
     return (
         <Tab.Navigator
@@ -103,13 +105,12 @@ export const MainTabNavigator = () => {
                 tabBarStyle: {
                     backgroundColor: tabBarBackground,
                     borderTopColor: tabBarBorder,
-                    height: Platform.OS === 'ios' ? 72 : 60,
-                    paddingBottom: 8,
+                    height: (Platform.OS === 'ios' ? 72 : 60) + Math.max(insets.bottom, 8),
+                    paddingBottom: Math.max(insets.bottom, 8),
+                    paddingTop: 8,
                     borderTopWidth: tabBarBorderTopWidth,
                     elevation: 0,
                     shadowOpacity: 0,
-                    // Ensure tab bar doesn't overlap with bottom notch
-                    ...(Platform.OS === 'ios' ? {paddingBottom: 0} : {}),
                 },
                 tabBarLabelStyle: {
                     fontSize: tabBarLabelFontSize,
